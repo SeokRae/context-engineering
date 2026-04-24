@@ -120,7 +120,7 @@ Phase 1 빈 초안 → Phase 2 최소 버전 → Phase 3 빈 초안 → Phase 4 
 |-------|---------|-------------------|
 | Phase 1 | Glossary·제약 테이블 빈 행 + `> 🔍 탐색 중` | 발견한 도메인 용어, 새 제약 |
 | Phase 2 | 프로젝트명·빌드 명령어만 + `> 🔍 탐색 중` | Non-obvious Gotchas, 코딩 컨벤션 |
-| Phase 3 | PRD·SPEC 제목만 + `> 🔍 탐색 중` | 기능 요구사항, 아키텍처 결정 |
+| Phase 3 | SPEC 제목만 + `> 🔍 탐색 중` | 아키텍처 결정 |
 
 **Readiness Gate 전환**: 충분히 탐색했다고 판단할 때 사용자가 직접 Readiness Gate를 요청한다. 게이트 통과 시 본궤도 구현으로 전환된다.
 
@@ -291,31 +291,11 @@ WHAT/WHY/HOW 3섹션 구조:
 
 ---
 
-## Phase 3: PRD + SPEC
+## Phase 3: SPEC
 
-**목적**: 무엇을(PRD) 어떻게(SPEC) 만들지 문서로 정의한다.
+**목적**: 어떻게 만들지 아키텍처 결정을 문서화한다.
 
-### Step 3-1. PRD (제품 요구사항)
-
-```markdown
-# PRD — {PROJECT_NAME}
-
-## 목적
-{이 제품/기능이 해결하는 문제}
-
-## 사용 시나리오
-{누가, 어떤 상황에서 사용하는가}
-
-## 기능 요구사항
-| 기능 | 성공 기준 | 우선순위 |
-|------|---------|---------|
-| {기능} | {검증 가능한 기준} | High/Medium/Low |
-
-## 제약
-{Phase 1 제약 목록에서 제품 수준 제약}
-```
-
-### Step 3-2. SPEC (기술 명세)
+### Step 3-1. SPEC (기술 명세)
 
 ```markdown
 # SPEC — {PROJECT_NAME}
@@ -327,20 +307,13 @@ WHAT/WHY/HOW 3섹션 구조:
 ## 패키지 구조
 의존 방향: `진입점 → 애플리케이션 → 도메인 ← 인프라` (역방향 금지)
 → [references/architecture-principles.md](references/architecture-principles.md)
-
-## 구현 계획
-
-| 순서 | 구현 대상 | 의존 | 병렬 가능 | 완료 기준 |
-|------|---------|------|:-------:|---------|
-| 1 | {모듈} | — | — | {기준} |
-| 2 | {모듈} | 1 | — | {기준} |
 ```
 
-탐색 모드: PRD·SPEC을 빈 초안으로 생성하고 `> 🔍 탐색 중` 표시. 개발하면서 채워 나간다.
+탐색 모드: SPEC을 빈 초안으로 생성하고 `> 🔍 탐색 중` 표시. 개발하면서 채워 나간다.
 
-**산출물**: `{OUTPUT_PATH}/prd.md`, `{OUTPUT_PATH}/spec.md`
+**산출물**: `{OUTPUT_PATH}/spec.md`
 
-### Step 3-3. Readiness Gate (반복 여부 판단)
+### Step 3-2. Readiness Gate (반복 여부 판단)
 
 **HARD-GATE (사용자 확인 필수)**: AI는 각 기준의 현재 상태를 요약해 제시한다. 통과 여부는 사용자가 직접 판단한다. AI가 스스로 "통과"를 선언하지 않는다.
 
@@ -348,16 +321,12 @@ WHAT/WHY/HOW 3섹션 구조:
 
 ```
 [Readiness Gate]
-① PRD의 모든 기능에 검증 가능한 성공 기준이 있는가?
-   → {현재 상태: 기능 N개 중 M개 성공 기준 기재됨 / 미기재 항목: ...}
-② SPEC의 아키텍처 결정에 대안과 근거가 있는가?
+① SPEC의 아키텍처 결정에 대안과 근거가 있는가?
    → {현재 상태: 결정 N개 중 M개 근거 있음 / 근거 없는 항목: ...}
-③ 도메인 용어 미확정 항목이 없는가?
+② 도메인 용어 미확정 항목이 없는가?
    → {현재 상태: 미확정 N개 — 항목명 나열}
-④ CLAUDE.md가 실제 제약을 반영하는가?
+③ CLAUDE.md가 실제 제약을 반영하는가?
    → {현재 상태: Phase 1 제약 N개 중 CLAUDE.md 반영 M개}
-⑤ SPEC 구현 계획의 첫 항목을 지금 바로 시작할 수 있는가?
-   → {현재 상태: 첫 항목과 의존 관계}
 
 미충족 항목이 있다면 해당 Phase를 지정해 주세요.
 모두 통과라면 "Phase 4 진행"이라고 알려 주세요.
@@ -365,11 +334,9 @@ WHAT/WHY/HOW 3섹션 구조:
 
 | 기준 | 미충족 시 돌아갈 Phase |
 |------|----------------------|
-| ① PRD의 모든 기능에 검증 가능한 성공 기준이 있는가? | Phase 3 |
-| ② SPEC의 아키텍처 결정에 대안과 근거가 있는가? | Phase 3 |
-| ③ 도메인 용어 미확정 항목이 없는가? | Phase 1 |
-| ④ CLAUDE.md가 실제 제약을 반영하는가? | Phase 2 |
-| ⑤ SPEC 구현 계획의 첫 항목을 지금 바로 시작할 수 있는가? | Phase 3 |
+| ① SPEC의 아키텍처 결정에 대안과 근거가 있는가? | Phase 3 |
+| ② 도메인 용어 미확정 항목이 없는가? | Phase 1 |
+| ③ CLAUDE.md가 실제 제약을 반영하는가? | Phase 2 |
 
 하나라도 미충족이면 해당 Phase로 돌아가 보강 후 Phase 3까지 재순환한다.
 
@@ -384,15 +351,14 @@ WHAT/WHY/HOW 3섹션 구조:
 ### 각 구현 단위마다
 
 **진입 기준**:
-- 일반 모드: PRD·SPEC 확인 완료
-- 탐색 모드: PRD·SPEC 빈 초안 생성 완료 (비어있어도 진입 가능)
+- 일반 모드: SPEC 확인 완료
+- 탐색 모드: SPEC 빈 초안 생성 완료 (비어있어도 진입 가능)
 
 **완료 기준**: 아래 체크리스트 전부 통과 시만 다음 단계로 이동
 
 - [ ] `{BUILD_CMD}` 성공
 - [ ] `{TEST_CMD}` 통과 (신규 + 기존 회귀 없음)
 - [ ] SPEC 아키텍처 결정 준수 — 탐색 모드에서 SPEC이 비어있으면 생략
-- [ ] PRD 기능별 성공 기준 달성 여부 확인 — 빌드 성공과 별개로 PRD에서 정의한 검증 가능한 기준을 충족했는지 직접 확인
 - [ ] 발견 사항 해당 단계 문서에 반영 완료
 
 ### 피드백 루프 — 구현 중 발견 시 해당 단계로 돌아간다
@@ -403,7 +369,6 @@ WHAT/WHY/HOW 3섹션 구조:
 |---------|---------|
 | 도메인 개념 오류, 용어 불일치, 새 제약 발견 | Phase 1 `knowledge-base.md` |
 | AI 행동 규칙 변경 필요, 새 gotcha 발견 | Phase 2 `CLAUDE.md` |
-| 기능 요구사항 변경, 구현 계획 재조정 | Phase 3 `prd.md` |
 | 아키텍처 결정 번복, 패키지 구조 변경 | Phase 3 `spec.md` |
 
 갱신 절차:
@@ -420,6 +385,5 @@ WHAT/WHY/HOW 3섹션 구조:
 - [4단계 체크리스트](references/phase-checklist.md)
 - [Knowledge Base 템플릿](references/knowledge-base-template.md)
 - [CLAUDE.md 정책 템플릿](references/claude-md-policy-template.md)
-- [PRD 템플릿](references/prd-template.md)
 - [SPEC 템플릿](references/spec-template.md)
 - [아키텍처 원칙](references/architecture-principles.md)
