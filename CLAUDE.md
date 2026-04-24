@@ -8,8 +8,12 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 소스 코드 없음. **순수 마크다운** Claude Code 플러그인:
 - `plugin.json` — 플러그인 메타데이터
-- `skills/context-engineering/SKILL.md` — 스킬 정의 (워크플로우 핵심)
+- `skills/context-engineering/SKILL.md` — 전체 워크플로우 스킬 (Step 0 → Phase 4)
 - `skills/context-engineering/references/` — 각 Phase 산출물 템플릿
+- `skills/gather/SKILL.md` — 서브스킬: Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md)
+- `skills/spec/SKILL.md` — 서브스킬: Phase 3 (PRD + SPEC)
+- `skills/valid/SKILL.md` — 서브스킬: Readiness Gate 검증
+- `skills/impl/SKILL.md` — 서브스킬: Phase 4 (구현)
 
 ## 스킬 수정 시 주의사항
 
