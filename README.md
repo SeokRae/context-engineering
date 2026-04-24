@@ -36,7 +36,10 @@ claude plugin install context-engineering
 설치 확인:
 ```bash
 claude plugin list
-# context-engineering@context-engineering  Version: 1.0.0  Status: ✔ enabled
+#   ❯ context-engineering@context-engineering
+#     Version: 1.0.0
+#     Scope: user
+#     Status: ✔ enabled
 ```
 
 로컬 디렉토리에서 바로 사용할 때:
