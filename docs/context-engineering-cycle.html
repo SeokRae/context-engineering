@@ -150,7 +150,28 @@
       padding: 3px 10px; border-radius: 20px;
       margin-bottom: 10px;
     }
-    .phase-card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
+    .phase-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .phase-card-title { font-size: 0.95rem; font-weight: 600; margin: 0; }
+    .confirm-badge {
+      font-size: 0.68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+      border: 1px solid transparent; white-space: nowrap; flex-shrink: 0;
+    }
+    .branch-section {
+      margin-top: 10px; padding: 10px 12px;
+      background: var(--surface-hover); border-radius: 8px;
+      font-size: 0.79rem;
+    }
+    .branch-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 2px 0; color: var(--text-secondary);
+    }
+    .branch-label {
+      font-weight: 700; white-space: nowrap; flex-shrink: 0;
+    }
     .phase-steps { list-style: none; font-size: 0.82rem; color: var(--text-secondary); }
     .phase-steps li {
       padding: 3px 0; display: flex; align-items: flex-start; gap: 8px;
@@ -420,20 +441,24 @@
         angle: -90, color: '#6366f1',
         icon: 'gather',
         subskill: '/context-engineering:gather',
+        confirmLabel: null,
         steps: [
           '요구사항 탐색 — 무엇·왜·제약 (질문 1개씩, 답변 후 다음)',
           '요구사항 요약 → 사용자 확인 (HARD-GATE)',
-          '코드 경로(@인자) + 빌드 파일에서 기술 스택 자동 감지',
-          '명확 → Phase 1~3 충실 작성 후 Phase 4 진입',
-          '불명확 → 탐색 모드: Phase 1~3 빈 초안 → Phase 4 직진'
+          '코드 경로(@인자) + 빌드 파일에서 기술 스택 자동 감지'
         ],
-        gate: '요구사항 명확: Phase 1~3 충실 작성. 불명확: Phase 1~3 빈 초안 생성 후 Phase 4로 직진 → 개발하며 채움.'
+        branches: [
+          { label: '명확', desc: 'Phase 1~3 충실 작성 후 Phase 4 진입' },
+          { label: '불명확', desc: '탐색 모드: 빈 초안 생성 → Phase 4 직행' }
+        ],
+        gate: null
       },
       {
         id: 'phase1', label: 'Phase 1', name: 'Knowledge Base',
         angle: -18, color: '#3b82f6',
         icon: 'book',
         subskill: '/context-engineering:gather',
+        confirmLabel: '사용자 확인',
         steps: [
           'Context Assessment — A/B/C/D 판별 후 사용자 확인 필수',
           'Source Scan — A: 대화 기반 / B: 스펙 탐색 / C: 코드 스캔 / D: B+C 병렬',
@@ -448,6 +473,7 @@
         angle: 54, color: '#8b5cf6',
         icon: 'shield',
         subskill: '/context-engineering:gather',
+        confirmLabel: '사용자 확인',
         steps: [
           'CLAUDE.md 레벨 결정 (프로젝트/모듈)',
           '아키텍처 — 복잡한 서비스: Hexagonal+DDD / 단순 프로젝트: 자유 기술',
@@ -462,6 +488,7 @@
         angle: 126, color: '#f59e0b',
         icon: 'file',
         subskill: '/context-engineering:spec',
+        confirmLabel: 'Readiness Gate',
         steps: [
           'PRD — 기능 요구사항 + 검증 가능한 성공 기준',
           'SPEC — 아키텍처 결정 (대안/선택/근거)',
@@ -476,6 +503,7 @@
         angle: 198, color: '#10b981',
         icon: 'code',
         subskill: '/context-engineering:impl',
+        confirmLabel: null,
         steps: [
           'SPEC 구현 계획 순서대로 구현',
           '빌드 + 테스트 통과 확인',
@@ -902,10 +930,25 @@
         badge.textContent = p.label;
         card.appendChild(badge);
 
+        var header = document.createElement('div');
+        header.className = 'phase-card-header';
+
         var title = document.createElement('div');
         title.className = 'phase-card-title';
         title.textContent = p.name;
-        card.appendChild(title);
+        header.appendChild(title);
+
+        if (p.confirmLabel) {
+          var cbadge = document.createElement('div');
+          cbadge.className = 'confirm-badge';
+          cbadge.style.background = p.color + '18';
+          cbadge.style.color = p.color;
+          cbadge.style.borderColor = p.color + '55';
+          cbadge.textContent = p.confirmLabel;
+          header.appendChild(cbadge);
+        }
+
+        card.appendChild(header);
 
         var ul = document.createElement('ul');
         ul.className = 'phase-steps';
@@ -915,6 +958,34 @@
           ul.appendChild(li);
         });
         card.appendChild(ul);
+
+        if (p.branches) {
+          var bsec = document.createElement('div');
+          bsec.className = 'branch-section';
+          p.branches.forEach(function(b) {
+            var row = document.createElement('div');
+            row.className = 'branch-row';
+
+            var lbl = document.createElement('span');
+            lbl.className = 'branch-label';
+            lbl.style.color = p.color;
+            lbl.textContent = b.label;
+            row.appendChild(lbl);
+
+            var arrow = document.createElement('span');
+            arrow.style.color = p.color;
+            arrow.style.flexShrink = '0';
+            arrow.textContent = '→';
+            row.appendChild(arrow);
+
+            var desc = document.createElement('span');
+            desc.textContent = b.desc;
+            row.appendChild(desc);
+
+            bsec.appendChild(row);
+          });
+          card.appendChild(bsec);
+        }
 
         if (p.gate) {
           var gate = document.createElement('div');
