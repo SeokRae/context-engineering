@@ -43,14 +43,20 @@ claude --plugin-dir /path/to/context-engineering
 
 ```
 Step 0: Context Gathering
-  ↓
-Phase 1: Knowledge Base  →  review
-  ↓
+  0-1. Requirements (what / why / constraints) — HARD-GATE
+  0-2. Tech parameters (code path, build tool, output path)
+  ↓  [user confirms before proceeding]
+Phase 1: Knowledge Base
+  1-1. Context Assessment — scenario A/B/C/D
+       A: greenfield  B: spec-first  C: code-first  D: full-context
+  1-2. Source Scan (conditional per scenario)
+  1-3. Glossary + Constraints + Manifest → knowledge-base.md
+  ↓  review
 Phase 2: Policy (CLAUDE.md)  →  review
   ↓
 Phase 3: Spec  →  review
   ↓
-Phase 4: Implementation
+Phase 4: Implementation (feedback loop → any prior phase)
 ```
 
 ## References

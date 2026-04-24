@@ -18,14 +18,16 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 **레이어 구조**
 
+> 기술 스택에 맞게 레이어를 정의한다. 아래는 예시 구조이며 수정해서 사용.
+
 | 레이어 | 책임 | 외부 의존 허용 |
 |--------|------|--------------|
-| `config` | Bean 조립, 설정 바인딩 | Spring, 외부 라이브러리 |
-| `adapter` | 외부 경계 변환 | `application` |
-| `application` | 비즈니스 로직 | 없음 |
-| `infrastructure` | 부가 기능 | 외부 시스템 |
+| `{진입점}` | 라우팅, 요청 변환 | 프레임워크, 외부 라이브러리 |
+| `{비즈니스}` | 도메인 로직, 유효성 검사 | 없음 (순수 도메인) |
+| `{인프라}` | DB·외부 API 어댑터 | 외부 시스템 |
+| `{설정}` | 의존성 조립, 환경 설정 | 전 레이어 |
 
-의존 방향: adapter → application (역방향 금지)
+의존 방향: {진입점} → {비즈니스} ← {인프라} (역방향 금지)
 
 ## 빌드 & 테스트
 

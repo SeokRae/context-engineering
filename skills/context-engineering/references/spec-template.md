@@ -23,21 +23,38 @@
 
 ---
 
-## 패키지 구조
+## 패키지/모듈 구조
+
+> 기술 스택에 맞게 아래 예시 중 하나를 선택하거나 직접 정의한다.
 
 ```
+# Java (헥사고날)
 {루트 패키지}
-├── config/           ← Bean 조립, 설정 바인딩
-│   ├── {ConfigClass}.java
-│   └── {RouterClass}.java
-├── adapter/          ← 외부 경계 (in/out)
-│   ├── in/           ← 인바운드 (API, Message)
-│   └── out/          ← 아웃바운드 (DB, 외부 API)
-├── application/      ← 비즈니스 로직
-│   ├── {Service}.java
-│   └── {DomainObject}.java
-└── infrastructure/   ← 부가 기능
-    └── {AlertManager}.java
+├── config/         ← 설정 조립
+├── adapter/        ← 외부 경계 (in/out)
+├── application/    ← 비즈니스 로직
+└── infrastructure/ ← 부가 기능
+
+# Node.js
+src/
+├── routes/         ← HTTP 라우터
+├── services/       ← 비즈니스 로직
+├── models/         ← 데이터 모델
+└── utils/          ← 공통 유틸
+
+# Python
+src/{패키지}/
+├── api/            ← FastAPI/Flask 라우터
+├── domain/         ← 도메인 모델·서비스
+├── infra/          ← DB·외부 API 어댑터
+└── core/           ← 설정·의존성
+
+# Go
+internal/
+├── handler/        ← HTTP 핸들러
+├── service/        ← 비즈니스 로직
+├── repository/     ← 데이터 접근
+└── domain/         ← 타입·인터페이스
 ```
 
 ---
