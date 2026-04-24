@@ -68,6 +68,8 @@ Step 0부터 Phase 4까지 순차 진행한다.
 
 ## Workflow
 
+> **[📊 Interactive Diagram](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)** — 각 Phase를 클릭하면 단계별 작업 내용을 확인할 수 있다.
+
 ```
 Step 0: Context Gathering
   ├─ 요구사항 명확  ─────────────────────────────────────┐
