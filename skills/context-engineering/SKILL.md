@@ -239,61 +239,65 @@ WHAT/WHY/HOW 3섹션 구조:
 
 ---
 
-## Phase 3: Spec (구현 명세)
+## Phase 3: PRD + SPEC
 
-**목적**: 무엇을 어떤 순서로 만들지 명세한다.
+**목적**: 무엇을(PRD) 어떻게(SPEC) 만들지 문서로 정의한다.
 
-### Step 3-1. 기능 요구사항 (FR-*)
-
-```markdown
-| ID | 요구사항 | 수용 기준 | 우선순위 |
-|----|---------|---------|---------|
-| FR-1 | {기능} | {검증 가능한 기준} | High |
-```
-
-### Step 3-2. 설계 결정 (D-*)
+### Step 3-1. PRD (제품 요구사항)
 
 ```markdown
-| ID | 결정 사항 | 대안 | 선택 | 근거 |
-|----|---------|------|------|------|
-| D-1 | {무엇을 결정했나} | {고려한 대안들} | {선택한 것} | {이유} |
+# PRD — {PROJECT_NAME}
+
+## 목적
+{이 제품/기능이 해결하는 문제}
+
+## 사용 시나리오
+{누가, 어떤 상황에서 사용하는가}
+
+## 기능 요구사항
+| 기능 | 성공 기준 | 우선순위 |
+|------|---------|---------|
+| {기능} | {검증 가능한 기준} | High/Medium/Low |
+
+## 제약
+{Phase 1 제약 목록에서 제품 수준 제약}
 ```
 
-### Step 3-3. 패키지/모듈 구조
+### Step 3-2. SPEC (기술 명세)
 
-Ports & Adapters + DDD 기반으로 레이어를 설계한다.
+```markdown
+# SPEC — {PROJECT_NAME}
+
+## 아키텍처 결정
+| 결정 사항 | 대안 | 선택 | 근거 |
+|---------|------|------|------|
+
+## 패키지 구조
 의존 방향: `진입점 → 애플리케이션 → 도메인 ← 인프라` (역방향 금지)
+→ [references/architecture-principles.md](references/architecture-principles.md)
 
-원칙·레이어 정의·언어별 폴더명 → [references/architecture-principles.md](references/architecture-principles.md)
-
-### Step 3-4. WBS
-
-```markdown
-| Phase | 작업 | 의존성 | 예상 산출물 |
-|-------|------|--------|-----------|
-| P1 | 공통 모듈 | — | {모듈명} |
-| P2 | 핵심 서버 | P1 | {모듈명} |
+## 구현 계획
+| 순서 | 구현 대상 | 의존 | 완료 기준 |
+|------|---------|------|---------|
+| 1 | {모듈} | — | {기준} |
+| 2 | {모듈} | 1 | {기준} |
 ```
 
-### Step 3-5. 구현 순서
+탐색 모드: PRD·SPEC을 빈 초안으로 생성하고 `> 🔍 탐색 중` 표시. 개발하면서 채워 나간다.
 
-의존성 그래프 기반으로 모듈 구현 순서 결정. 공유 공통 모듈 → 핵심 서버 → 클라이언트 → 통합 테스트.
+**산출물**: `{OUTPUT_PATH}/prd.md`, `{OUTPUT_PATH}/spec.md`
 
-탐색 모드: FR-* 테이블만 빈 행으로 생성하고 `> 🔍 탐색 중` 표시. D-*·WBS는 생략하고 Phase 4로 진행.
-
-**산출물**: `{OUTPUT_PATH}/spec/`
-
-### Step 3-6. Readiness Gate (반복 여부 판단)
+### Step 3-3. Readiness Gate (반복 여부 판단)
 
 아래 기준을 모두 충족해야 Phase 4로 진행한다.
 
 | 기준 | 미충족 시 돌아갈 Phase |
 |------|----------------------|
-| 모든 FR-*에 검증 가능한 수용 기준이 있는가? | Phase 3 |
-| 설계 결정(D-*)에 대안과 근거가 있는가? | Phase 3 |
+| PRD의 모든 기능에 검증 가능한 성공 기준이 있는가? | Phase 3 |
+| SPEC의 아키텍처 결정에 대안과 근거가 있는가? | Phase 3 |
 | 도메인 용어 미확정 항목이 없는가? | Phase 1 |
 | CLAUDE.md가 실제 제약을 반영하는가? | Phase 2 |
-| WBS 첫 번째 작업을 지금 바로 시작할 수 있는가? | Phase 3 |
+| SPEC 구현 계획의 첫 항목을 지금 바로 시작할 수 있는가? | Phase 3 |
 
 하나라도 미충족이면 해당 Phase로 돌아가 보강 후 Phase 3까지 재순환한다.
 
@@ -310,14 +314,14 @@ Ports & Adapters + DDD 기반으로 레이어를 설계한다.
 ### 각 구현 단위마다
 
 **진입 기준**:
-- 일반 모드: Phase 3 FR-*, D-* 확인 완료
-- 탐색 모드: Phase 3 FR-* 빈 초안 생성 완료 (D-*/WBS 없어도 진입 가능)
+- 일반 모드: PRD·SPEC 확인 완료
+- 탐색 모드: PRD·SPEC 빈 초안 생성 완료 (비어있어도 진입 가능)
 
 **완료 기준**: 아래 체크리스트 전부 통과 시만 다음 단계로 이동
 
 - [ ] `{BUILD_CMD}` 성공
 - [ ] `{TEST_CMD}` 통과 (신규 + 기존 회귀 없음)
-- [ ] 설계 결정(D-*) 준수 — 탐색 모드에서 D-*가 없으면 생략
+- [ ] SPEC 아키텍처 결정 준수 — 탐색 모드에서 SPEC이 비어있으면 생략
 - [ ] 발견 사항 해당 단계 문서에 반영 완료
 
 ### 피드백 루프 — 구현 중 발견 시 해당 단계로 돌아간다
@@ -328,7 +332,8 @@ Ports & Adapters + DDD 기반으로 레이어를 설계한다.
 |---------|---------|
 | 도메인 개념 오류, 용어 불일치, 새 제약 발견 | Phase 1 `knowledge-base.md` |
 | AI 행동 규칙 변경 필요, 새 gotcha 발견 | Phase 2 `CLAUDE.md` |
-| 기능 요구사항 변경, 설계 결정 번복, WBS 재조정 | Phase 3 `spec/` |
+| 기능 요구사항 변경, 구현 계획 재조정 | Phase 3 `prd.md` |
+| 아키텍처 결정 번복, 패키지 구조 변경 | Phase 3 `spec.md` |
 
 갱신 절차:
 1. 발견 내용과 이유를 한 줄로 기록
@@ -344,5 +349,6 @@ Ports & Adapters + DDD 기반으로 레이어를 설계한다.
 - [4단계 체크리스트](references/phase-checklist.md)
 - [Knowledge Base 템플릿](references/knowledge-base-template.md)
 - [CLAUDE.md 정책 템플릿](references/claude-md-policy-template.md)
-- [구현 Spec 템플릿](references/spec-template.md)
+- [PRD 템플릿](references/prd-template.md)
+- [SPEC 템플릿](references/spec-template.md)
 - [아키텍처 원칙](references/architecture-principles.md)
