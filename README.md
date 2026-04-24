@@ -30,12 +30,13 @@ claude --plugin-dir /path/to/context-engineering
 ## Usage
 
 ```
-/context-engineering @<code-path> [--obsidian <obsidian-area>] [--specs <spec-docs-path>]
+/context-engineering @<code-path> [--output <output-path>] [--specs <spec-docs-path>]
 ```
 
-**Example:**
+**Examples:**
 ```
-/context-engineering @/Users/sr/IdeaProjects/payment/fx --obsidian 20-areas/payment/fix --specs docs/references/
+/context-engineering @/Users/sr/IdeaProjects/payment/fx --specs docs/references/
+/context-engineering @/Users/sr/IdeaProjects/payment/fx --output /tmp/context-docs --specs docs/references/
 ```
 
 ## Workflow
