@@ -91,26 +91,30 @@ Step 0부터 Phase 4까지 순차 진행한다.
 ```
 Step 0 — Context Gathering
   · 요구사항 탐색 (무엇 · 왜 · 제약 — 질문 하나씩)
+  · 요약 확정 시 REQ-ID 부여 (REQ-1 · REQ-2 · REQ-3…)
   · 명확   → Phase 1~3 충실 작성 후 Phase 4 진입
   · 불명확 → 탐색 모드: 빈 초안 생성 → Phase 4 직행
                  ↓
-Phase 1 — Knowledge Base                  [사용자 확인]
+Phase 1 — Knowledge Base           [자체 평가] [사용자 확인]
   · Context Assessment — A/B/C/D 시나리오 판별
   · Source Scan  A: 대화  B: 문서 탐색  C: 코드  D: B+C
   · knowledge-base.md (Glossary · 제약 · 매니페스트)
                  ↓
-Phase 2 — Policy (CLAUDE.md)              [사용자 확인]
+Phase 2 — Policy (CLAUDE.md)       [자체 평가] [사용자 확인]
   · knowledge-base.md 링크 필수
   · Non-obvious Gotchas 초안 (Phase 4 피드백으로 갱신)
                  ↓
-Phase 3 — Spec                            [Readiness Gate]
-  · 아키텍처 결정 + 패키지 구조
+Phase 3 — Spec              [자체 평가] [Readiness Gate ⑥REQ]
+  · PRD 기능 요구사항 + SPEC 아키텍처 결정 + 패키지 구조
+  · 요구사항 추적 (REQ-ID → PRD 기능 → SPEC → 구현 계획)
   · Gate: AI가 현재 상태 요약 → 사용자가 통과 여부 결정
   ↑──────────────────── 미충족 시 해당 Phase 재순환
                  ↓  Gate 통과
-Phase 4 — Implementation
+Phase 4 — Implementation                          [회고]
   · 빌드 + 테스트 + PRD 성공 기준 달성
+  · 완료마다 REQ-ID 상태 갱신 (미구현 → 구현 완료)
   · 피드백 루프: 발견 내용 → 해당 Phase 문서 즉시 갱신
+  · 전체 완료 시 구현 회고 출력 (달성 · 프로세스 · 문서)
 ```
 
 **탐색 모드**: 요구사항 불명확 시 Phase 1~3을 빈 초안으로 생성하고 Phase 4로 바로 진입. 구현하며 채워나가다가 사용자가 직접 Readiness Gate를 요청해 본궤도로 전환한다.
