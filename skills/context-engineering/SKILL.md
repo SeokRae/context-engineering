@@ -28,12 +28,13 @@ Phase 4: Implementation
 ## 사용법
 
 ```
-/context-engineering @<코드경로> [--obsidian <옵시디언경로>] [--specs <스펙문서경로>]
+/context-engineering @<코드경로> [--output <출력경로>] [--specs <스펙문서경로>]
 ```
 
 **예시:**
 ```
-/context-engineering @/Users/sr/IdeaProjects/payment/fx --obsidian 20-areas/payment/financial-information-exchange --specs docs/references/
+/context-engineering @/Users/sr/IdeaProjects/payment/fx --specs docs/references/
+/context-engineering @/Users/sr/IdeaProjects/payment/fx --output /tmp/context-docs --specs docs/references/
 ```
 
 ---
@@ -46,12 +47,11 @@ Phase 4: Implementation
 |---------|------|---------|
 | `{PROJECT_NAME}` | 프로젝트 이름 | — (사용자 입력) |
 | `{CODE_PATH}` | 코드 저장소 절대 경로 | `@` 인자 |
-| `{OBSIDIAN_AREA}` | Obsidian 노트 영역 (선택) | `--obsidian` 인자 (vault 루트 기준 상대경로) |
 | `{TECH_STACK}` | 기술 스택 | `build.gradle` / `pom.xml` / `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` |
 | `{BUILD_CMD}` | 빌드 명령어 | 빌드 파일 기반 추론 |
 | `{TEST_CMD}` | 테스트 명령어 | 빌드 파일 기반 추론 |
 | `{SPEC_PATHS}` | 외부 스펙 문서 경로 | `--specs` 인자 |
-| `{OUTPUT_PATH}` | 산출물 저장 경로 | `--obsidian` 지정 시 vault `{OBSIDIAN_AREA}/docs/`, 없으면 `{CODE_PATH}/docs/` |
+| `{OUTPUT_PATH}` | 산출물 저장 경로 | `--output` 지정 시 해당 경로, 없으면 `{CODE_PATH}/docs/` |
 
 파라미터 수집 후 요약 출력하고 사용자 확인 요청.
 
@@ -207,7 +207,7 @@ WHAT/WHY/HOW 3섹션 구조:
 
 의존성 그래프 기반으로 모듈 구현 순서 결정. 공유 공통 모듈 → 핵심 서버 → 클라이언트 → 통합 테스트.
 
-**산출물**: `{출력경로}/spec/` 또는 Obsidian `docs/`
+**산출물**: `{OUTPUT_PATH}/spec/`
 
 > **게이트**: "Phase 3 완료 — `spec/` 초안을 저장했습니다. 검토 후 Phase 4 진행할까요?"
 
@@ -255,9 +255,8 @@ WHAT/WHY/HOW 3섹션 구조:
 ### 사후 문서화
 
 구현 완료 후:
-- 아키텍처 문서 (`docs/{번호}-{서비스}-architecture.md`)
+- 아키텍처 문서 (`{OUTPUT_PATH}/{서비스}-architecture.md`)
 - 개발자 온보딩 가이드
-- Obsidian 다이어그램 (해당 시)
 
 ---
 
