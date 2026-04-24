@@ -89,28 +89,28 @@ Step 0부터 Phase 4까지 순차 진행한다.
 > **[📊 인터랙티브 다이어그램](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)** — 각 Phase를 클릭하면 단계별 작업 내용을 확인할 수 있다.
 
 ```
-Step 0: Context Gathering
-  ├─ 요구사항 명확  ─────────────────────────────────────┐
-  └─ 요구사항 불명확 (탐색 모드) → 빈 초안 생성 ─────────┤
-                                                         ↓
-Phase 1: Knowledge Base
-  1-1. Context Assessment — 시나리오 A/B/C/D 판별 후 사용자 확인
-       A: 그린필드  B: 스펙 우선  C: 코드 우선  D: 풀 컨텍스트
-       * 혼합 상태는 가장 가까운 시나리오 선택 후 사용자 확인
-  1-2. Source Scan (시나리오별 조건부 실행)
-  1-3. Glossary + 제약 (TC/BL/OC) + 매니페스트 → knowledge-base.md
-  ↓  [사용자 확인]
-Phase 2: Policy (CLAUDE.md)
-  * knowledge-base.md 링크 포함 필수
-  * 초안 성격 — Non-obvious Gotchas는 Phase 4에서 갱신
-  ↓  [사용자 확인]
-Phase 3: SPEC
-  3-1. SPEC — 아키텍처 결정 + 패키지 구조
-  3-2. Readiness Gate — AI가 현재 상태 요약, 사용자가 통과 여부 결정
-  ↑___________________↓ 미충족 시 해당 Phase 재순환
-Phase 4: Implementation
-  * 완료 기준: 빌드 + 테스트 + PRD 성공 기준 달성 확인
-  * 피드백 루프: 발견 내용 → 해당 Phase 문서 즉시 갱신
+Step 0 — Context Gathering
+  · 요구사항 탐색 (무엇 · 왜 · 제약 — 질문 하나씩)
+  · 명확   → Phase 1~3 충실 작성 후 Phase 4 진입
+  · 불명확 → 탐색 모드: 빈 초안 생성 → Phase 4 직행
+                 ↓
+Phase 1 — Knowledge Base                  [사용자 확인]
+  · Context Assessment — A/B/C/D 시나리오 판별
+  · Source Scan  A: 대화  B: 문서 탐색  C: 코드  D: B+C
+  · knowledge-base.md (Glossary · 제약 · 매니페스트)
+                 ↓
+Phase 2 — Policy (CLAUDE.md)              [사용자 확인]
+  · knowledge-base.md 링크 필수
+  · Non-obvious Gotchas 초안 (Phase 4 피드백으로 갱신)
+                 ↓
+Phase 3 — Spec                            [Readiness Gate]
+  · 아키텍처 결정 + 패키지 구조
+  · Gate: AI가 현재 상태 요약 → 사용자가 통과 여부 결정
+  ↑──────────────────── 미충족 시 해당 Phase 재순환
+                 ↓  Gate 통과
+Phase 4 — Implementation
+  · 빌드 + 테스트 + PRD 성공 기준 달성
+  · 피드백 루프: 발견 내용 → 해당 Phase 문서 즉시 갱신
 ```
 
 **탐색 모드**: 요구사항 불명확 시 Phase 1~3을 빈 초안으로 생성하고 Phase 4로 바로 진입. 구현하며 채워나가다가 사용자가 직접 Readiness Gate를 요청해 본궤도로 전환한다.
