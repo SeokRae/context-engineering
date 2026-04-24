@@ -667,9 +667,9 @@
         });
         svg.appendChild(path);
 
-        // Label near bezier midpoint
-        var lx = 0.25*sx + 0.5*cp_x + 0.25*ex;
-        var ly = 0.25*sy + 0.5*cp_y + 0.25*ey;
+        // Label at t=0.2 (Phase 3 쪽) — 중앙 텍스트와 겹침 방지
+        var lx = 0.64*sx + 0.32*cp_x + 0.04*ex;
+        var ly = 0.64*sy + 0.32*cp_y + 0.04*ey;
 
         var bg = makeSVGEl('rect', {
           x: lx-32, y: ly-10, width: '64', height: '20', rx: '6',
