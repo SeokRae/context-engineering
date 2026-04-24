@@ -46,11 +46,12 @@ Phase 4: Implementation
 |---------|------|---------|
 | `{PROJECT_NAME}` | 프로젝트 이름 | — (사용자 입력) |
 | `{CODE_PATH}` | 코드 저장소 절대 경로 | `@` 인자 |
-| `{OBSIDIAN_AREA}` | Obsidian 노트 영역 (선택) | `--obsidian` 인자 |
-| `{TECH_STACK}` | 기술 스택 | `build.gradle` / `pom.xml` / `package.json` |
+| `{OBSIDIAN_AREA}` | Obsidian 노트 영역 (선택) | `--obsidian` 인자 (vault 루트 기준 상대경로) |
+| `{TECH_STACK}` | 기술 스택 | `build.gradle` / `pom.xml` / `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` |
 | `{BUILD_CMD}` | 빌드 명령어 | 빌드 파일 기반 추론 |
 | `{TEST_CMD}` | 테스트 명령어 | 빌드 파일 기반 추론 |
 | `{SPEC_PATHS}` | 외부 스펙 문서 경로 | `--specs` 인자 |
+| `{OUTPUT_PATH}` | 산출물 저장 경로 | `--obsidian` 지정 시 vault `{OBSIDIAN_AREA}/docs/`, 없으면 `{CODE_PATH}/docs/` |
 
 파라미터 수집 후 요약 출력하고 사용자 확인 요청.
 
@@ -105,7 +106,7 @@ Phase 4: Implementation
 
 **산출물**: `{출력경로}/knowledge-base.md`
 
-> **게이트**: "Phase 1 완료 — Knowledge Base 초안을 출력했습니다. 검토 후 Phase 2 진행할까요?"
+> **게이트**: "Phase 1 완료 — `knowledge-base.md` 초안을 저장했습니다. 검토 후 Phase 2 진행할까요?"
 
 ---
 
@@ -159,7 +160,7 @@ WHAT/WHY/HOW 3섹션 구조:
 
 **산출물**: `{CODE_PATH}/CLAUDE.md` (+ 모듈별 CLAUDE.md)
 
-> **게이트**: "Phase 2 완료 — CLAUDE.md 초안을 출력했습니다. 검토 후 Phase 3 진행할까요?"
+> **게이트**: "Phase 2 완료 — `CLAUDE.md` 초안을 저장했습니다. 검토 후 Phase 3 진행할까요?"
 
 ---
 
@@ -208,7 +209,7 @@ WHAT/WHY/HOW 3섹션 구조:
 
 **산출물**: `{출력경로}/spec/` 또는 Obsidian `docs/`
 
-> **게이트**: "Phase 3 완료 — Spec 초안을 출력했습니다. 검토 후 Phase 4 진행할까요?"
+> **게이트**: "Phase 3 완료 — `spec/` 초안을 저장했습니다. 검토 후 Phase 4 진행할까요?"
 
 ---
 
@@ -218,13 +219,15 @@ WHAT/WHY/HOW 3섹션 구조:
 
 ### 각 WBS 단계마다
 
+**진입 기준**: Phase 3 해당 WBS 항목의 FR-*, D-* 확인 완료
+
 1. 스켈레톤 생성 (패키지 구조, 빈 클래스)
 2. 핵심 도메인 객체 구현
 3. 어댑터 구현
 4. 테스트 작성 + 통과 확인
 5. CLAUDE.md 갱신 (구현 중 발견한 gotchas 추가)
 
-### 검증 체크리스트
+**완료 기준**: 아래 체크리스트 전부 통과 시만 다음 단계로 이동
 
 ```bash
 # 컴파일
@@ -234,9 +237,20 @@ WHAT/WHY/HOW 3섹션 구조:
 {TEST_CMD}
 ```
 
-- [ ] 테스트 통과
-- [ ] Phase 3 설계 결정 준수
+- [ ] 빌드 성공 (컴파일 에러 없음)
+- [ ] 테스트 통과 (신규 + 기존 회귀 없음)
+- [ ] Phase 3 설계 결정(D-*) 준수
 - [ ] CLAUDE.md 최신 상태 반영
+
+### Spec 변경이 필요한 경우 (피드백 루프)
+
+구현 중 Phase 3 Spec이 현실과 맞지 않는 경우:
+
+1. 변경 이유를 간단히 기록
+2. Phase 3 `spec.md`의 해당 FR-* 또는 D-* 항목 갱신
+3. 갱신 후 계속 구현
+
+> **원칙**: 구현을 Spec에 맞추지 말고, Spec을 현실에 맞춰 갱신한다.
 
 ### 사후 문서화
 
