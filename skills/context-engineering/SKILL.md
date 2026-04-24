@@ -33,8 +33,9 @@ Phase 4: Implementation
 
 **예시:**
 ```
-/context-engineering @/Users/sr/IdeaProjects/payment/fx --specs docs/references/
-/context-engineering @/Users/sr/IdeaProjects/payment/fx --output /tmp/context-docs --specs docs/references/
+/context-engineering @/path/to/project
+/context-engineering @/path/to/project --specs docs/references/
+/context-engineering @/path/to/project --output /tmp/context-docs --specs docs/references/
 ```
 
 ---
