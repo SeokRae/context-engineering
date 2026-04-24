@@ -9,7 +9,10 @@ When building complex services with AI tools, you need to answer three questions
 - **How to behave** → Policy (CLAUDE.md)
 - **What to build** → Spec (PRD + technical decisions + implementation plan)
 
-This plugin provides a `/context-engineering` skill that guides you through these phases step by step.
+This plugin provides two ways to use the workflow:
+
+- **`/context-engineering`** — Step 0부터 Phase 4까지 순차 진행 (전체 워크플로우)
+- **Sub-skills** — 특정 Phase에 직접 진입 (재작업·피드백 루프용)
 
 ## Installation
 
@@ -27,7 +30,11 @@ claude plugin install context-engineering
 claude --plugin-dir /path/to/context-engineering
 ```
 
-## Usage
+## Skills
+
+### `/context-engineering` — 전체 워크플로우
+
+Step 0부터 Phase 4까지 순차 진행한다.
 
 ```
 /context-engineering @<code-path> [--output <output-path>] [--specs <spec-docs-path>]
@@ -38,6 +45,25 @@ claude --plugin-dir /path/to/context-engineering
 /context-engineering @/path/to/your/project
 /context-engineering @/path/to/your/project --specs docs/references/
 /context-engineering @/path/to/your/project --output /tmp/context-docs --specs docs/references/
+```
+
+### Sub-skills — Phase별 직접 진입
+
+이미 진행 중인 프로젝트에서 특정 Phase만 재작업하거나, 피드백 루프로 특정 Phase로 돌아가는 경우 사용한다.
+
+| 명령 | 담당 | 사용 시점 |
+|------|------|---------|
+| `/context-engineering:gather` | Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md) | 새 프로젝트 시작, KB·CLAUDE.md 재작업·갱신 |
+| `/context-engineering:spec` | Phase 3 — PRD + SPEC | 요구사항·기술 명세 작성·갱신 |
+| `/context-engineering:impl` | Phase 4 — 구현 | 구현 시작, 피드백 루프 진입 |
+| `/context-engineering:valid` | Readiness Gate | Phase 4 진입 전 검증, 탐색 모드 종료 체크 |
+
+각 sub-skill은 기존 artifacts(knowledge-base.md, CLAUDE.md, prd.md, spec.md)가 있으면 자동 탐지해 재작업/갱신을 선택할 수 있다.
+
+```
+/context-engineering:gather @/path/to/project
+/context-engineering:valid
+/context-engineering:impl @/path/to/project
 ```
 
 ## Workflow
