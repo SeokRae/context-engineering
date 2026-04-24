@@ -16,12 +16,15 @@ AI 도구로 복잡한 서비스를 개발할 때 **"무엇을 알고, 어떻게
 ```
 Step 0: Context Gathering  ←  요구사항 탐색 + 파라미터 수집
   ↓  [HARD-GATE: 요구사항 확인 완료 시만 진입]
-Phase 1: Knowledge Base  →  확인
-  ↓
-Phase 2: Policy (CLAUDE.md)  →  확인
-  ↓
-Phase 3: Spec (구현 명세)  →  확인
-  ↓
+┌──────────────────────────────────────────┐
+│  Phase 1: Knowledge Base                 │
+│    ↓                                     │
+│  Phase 2: Policy (CLAUDE.md)             │
+│    ↓                                     │
+│  Phase 3: Spec  →  [Readiness Gate]      │
+│    ↑_________________↓ 미충족 시 재순환  │
+└──────────────────────────────────────────┘
+  ↓  [HARD-GATE: 계획 준비 완료]
 Phase 4: Implementation
 ```
 
@@ -268,7 +271,21 @@ Ports & Adapters + DDD 기반으로 레이어를 설계한다.
 
 **산출물**: `{OUTPUT_PATH}/spec/`
 
-> **게이트**: "Phase 3 완료 — `spec/` 초안을 저장했습니다. 검토 후 Phase 4 진행할까요?"
+### Step 3-6. Readiness Gate (반복 여부 판단)
+
+아래 기준을 모두 충족해야 Phase 4로 진행한다.
+
+| 기준 | 미충족 시 돌아갈 Phase |
+|------|----------------------|
+| 모든 FR-*에 검증 가능한 수용 기준이 있는가? | Phase 3 |
+| 설계 결정(D-*)에 대안과 근거가 있는가? | Phase 3 |
+| 도메인 용어 미확정 항목이 없는가? | Phase 1 |
+| CLAUDE.md가 실제 제약을 반영하는가? | Phase 2 |
+| WBS 첫 번째 작업을 지금 바로 시작할 수 있는가? | Phase 3 |
+
+하나라도 미충족이면 해당 Phase로 돌아가 보강 후 Phase 3까지 재순환한다.
+
+> **HARD-GATE**: 모두 충족 시 "계획 준비 완료 — Phase 4로 진행합니다." 출력 후 Phase 4 진입.
 
 ---
 
