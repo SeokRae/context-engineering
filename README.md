@@ -14,7 +14,7 @@ This plugin provides a `/context-engineering` skill that guides you through thes
 ## Installation
 
 ```bash
-claude plugin marketplace add context-engineering https://github.com/SeokRae/context-engineering-plugin.git
+claude plugin marketplace add context-engineering https://github.com/SeokRae/context-engineering.git
 claude plugin install context-engineering@context-engineering
 ```
 
