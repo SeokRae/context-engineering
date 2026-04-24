@@ -231,6 +231,8 @@ Phase 1 빈 초안 → Phase 2 최소 버전 → Phase 3 빈 초안 → Phase 4 
 
 WHAT/WHY/HOW 3섹션 구조:
 
+> **아키텍처 섹션 선택 가이드**: 복잡한 도메인 서비스 → Hexagonal + DDD (`references/architecture-principles.md` 참조). 단순 스크립트·파이프라인 → 프로젝트에 맞는 구조를 자유롭게 기술.
+
 ```markdown
 # {PROJECT_NAME}
 
@@ -238,7 +240,7 @@ WHAT/WHY/HOW 3섹션 구조:
 
 ## 아키텍처
 
-{핵심 패턴 3~5가지 — WHY 포함}
+{핵심 패턴 3~5가지 — WHY 포함 / 단순 프로젝트는 모듈 구조만 기술}
 
 ## 빌드 & 테스트
 
