@@ -54,9 +54,10 @@ allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 
 ```
 [요구사항 요약]
-- 무엇: {요약}
-- 왜: {요약}
-- 제약: {요약 또는 "없음"}
+- REQ-1 무엇: {요약}
+- REQ-2 왜: {요약}
+- REQ-3 제약: {요약 또는 "없음"}
+{대화에서 추가 요구사항이 도출되면 REQ-4, REQ-5... 순서로 추가}
 
 이 내용이 맞나요?
 ```
@@ -109,7 +110,20 @@ allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 
 **산출물**: `{OUTPUT_PATH}/knowledge-base.md`
 
-> **게이트**: "Phase 1 완료 — `knowledge-base.md` 저장했습니다. 검토 후 Phase 2 진행할까요?"
+> **게이트**: 일반 모드 — 산출물 저장 후 자체 평가를 수행하고 아래 형식으로 출력한다:
+>
+> ```
+> [Phase 1 자체 평가]
+> | 항목 | 상태 | 조치 |
+> |------|------|------|
+> | 용어 충분성 (5개+) | OK / {부족한 경우: N개, 핵심 누락} | — / Source Scan 보완 |
+> | 제약 분류 (2종+) | OK / {미분류} | — / 제약 레지스트리 보강 |
+> | 출처 명시 | OK / {미기재 항목} | — / 출처 보완 |
+>
+> Phase 1 완료 — `knowledge-base.md` 저장했습니다. 검토 후 Phase 2 진행할까요?
+> ```
+>
+> 탐색 모드 — 자체 평가 생략. 확인 없이 Phase 2로 진행.
 
 ## Phase 2: CLAUDE.md 작성
 
@@ -151,4 +165,17 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 **산출물**: `{CODE_PATH}/CLAUDE.md`
 
-> **완료**: "gather 완료 — `/context-engineering:spec`으로 PRD·SPEC을 작성하거나 `/context-engineering:valid`로 Readiness Gate를 체크할 수 있습니다."
+> **완료**: 일반 모드 — 산출물 저장 후 자체 평가를 수행하고 아래 형식으로 출력한다:
+>
+> ```
+> [Phase 2 자체 평가]
+> | 항목 | 상태 | 조치 |
+> |------|------|------|
+> | 빌드 명령어 검증 | OK / {미확인} | — / 빌드 파일 재확인 |
+> | High 제약 반영 | OK / {누락 제약} | — / 핵심 제약 섹션 보완 |
+> | KB 링크 존재 | OK / 없음 | — / 참고 문서 섹션에 링크 추가 |
+>
+> gather 완료 — `/context-engineering:spec`으로 PRD·SPEC을 작성하거나 `/context-engineering:valid`로 Readiness Gate를 체크할 수 있습니다.
+> ```
+>
+> 탐색 모드 — 자체 평가 생략. 완료 메시지만 출력.
