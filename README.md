@@ -7,7 +7,7 @@ Claude Code plugin for AI-assisted service development using a 4-phase Context E
 When building complex services with AI tools, you need to answer three questions:
 - **What to know** → Knowledge Base (domain specs, constraints)
 - **How to behave** → Policy (CLAUDE.md)
-- **What to build** → Spec (requirements, design decisions, WBS)
+- **What to build** → Spec (PRD + technical decisions + implementation plan)
 
 This plugin provides a `/context-engineering` skill that guides you through these phases step by step.
 
@@ -35,40 +35,53 @@ claude --plugin-dir /path/to/context-engineering
 
 **Examples:**
 ```
-/context-engineering @/Users/sr/IdeaProjects/payment/fx --specs docs/references/
-/context-engineering @/Users/sr/IdeaProjects/payment/fx --output /tmp/context-docs --specs docs/references/
+/context-engineering @/path/to/your/project
+/context-engineering @/path/to/your/project --specs docs/references/
+/context-engineering @/path/to/your/project --output /tmp/context-docs --specs docs/references/
 ```
 
 ## Workflow
 
 ```
 Step 0: Context Gathering
-  0-1. Requirements (what / why / constraints) — HARD-GATE
-  0-2. Tech parameters (code path, build tool, output path)
-  ↓  [user confirms before proceeding]
+  ├─ 요구사항 명확  ─────────────────────────────────────┐
+  └─ 요구사항 불명확 (탐색 모드) → 빈 초안 생성 ─────────┤
+                                                         ↓
 Phase 1: Knowledge Base
   1-1. Context Assessment — scenario A/B/C/D
        A: greenfield  B: spec-first  C: code-first  D: full-context
+       * 혼합 상태는 가장 가까운 시나리오 선택 후 사용자 확인
   1-2. Source Scan (conditional per scenario)
-  1-3. Glossary + Constraints + Manifest → knowledge-base.md
-  ↓  review
-Phase 2: Policy (CLAUDE.md)  →  review
-  ↓
-Phase 3: Spec  →  review
-  ↓
-Phase 4: Implementation (feedback loop → any prior phase)
+  1-3. Glossary + Constraints (TC/BL/OC) + Manifest → knowledge-base.md
+  ↓  [user confirms]
+Phase 2: Policy (CLAUDE.md)
+  * knowledge-base.md 링크 포함 필수
+  * 초안 성격 — Non-obvious Gotchas는 Phase 4에서 갱신
+  ↓  [user confirms]
+Phase 3: PRD + SPEC
+  3-1. PRD — 기능 요구사항 + 성공 기준
+  3-2. SPEC — 아키텍처 결정 + 패키지 구조 + 구현 계획 (병렬 가능 표시)
+  3-3. Readiness Gate — AI가 현재 상태 요약, 사용자가 통과 여부 결정
+  ↑___________________↓ 미충족 시 해당 Phase 재순환
+Phase 4: Implementation
+  * 완료 기준: 빌드 + 테스트 + PRD 성공 기준 달성 확인
+  * 피드백 루프: 발견 내용 → 해당 Phase 문서 즉시 갱신
 ```
+
+**탐색 모드**: 요구사항 불명확 시 Phase 1~3을 빈 초안으로 생성하고 Phase 4로 바로 진입. 구현하며 채워나가다가 사용자가 직접 Readiness Gate를 요청해 본궤도로 전환한다.
 
 ## References
 
-Each phase has a template in `skills/context-engineering/references/`:
+각 Phase 산출물 템플릿은 `skills/context-engineering/references/` 에 있다:
 
-| File | Purpose |
-|------|---------|
-| `phase-checklist.md` | Copy per project, track progress |
-| `knowledge-base-template.md` | Phase 1 output template |
-| `claude-md-policy-template.md` | Phase 2 CLAUDE.md template |
-| `spec-template.md` | Phase 3 FR / design decisions / WBS template |
+| 파일 | 용도 |
+|------|------|
+| `phase-checklist.md` | 프로젝트별 진행 체크리스트 |
+| `knowledge-base-template.md` | Phase 1 산출물 템플릿 |
+| `claude-md-policy-template.md` | Phase 2 CLAUDE.md 템플릿 |
+| `prd-template.md` | Phase 3 PRD 템플릿 |
+| `spec-template.md` | Phase 3 SPEC 템플릿 (아키텍처 결정 + 구현 계획) |
+| `architecture-principles.md` | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택 적용) |
 
 ## License
 
