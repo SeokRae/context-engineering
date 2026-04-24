@@ -352,7 +352,7 @@
         id: 'phase1', label: 'Phase 1', name: 'Knowledge Base',
         angle: -18, color: '#3b82f6',
         icon: 'book',
-        steps: ['Context Assessment (시나리오 A/B/C/D 판별)', 'Source Scan (조건부 — 코드/스펙/없음)', 'Domain Glossary 작성 (용어 테이블)', 'Constraints Registry (TC/BL/OC 분류)', '참조 문서 매니페스트 작성'],
+        steps: ['Context Assessment (시나리오 A/B/C/D 자동 판별)', 'Source Scan (조건부 — 코드/스펙/없음)', 'Domain Glossary 작성 (용어 테이블)', '제약 목록 작성', '참조 문서 매니페스트 작성'],
         gate: 'Phase 1 완료 — knowledge-base.md 검토 후 Phase 2 진행할까요?'
       },
       {
@@ -373,7 +373,7 @@
         id: 'phase4', label: 'Phase 4', name: 'Implementation',
         angle: 198, color: '#10b981',
         icon: 'code',
-        steps: ['WBS 순서대로 스켈레톤 생성', '핵심 도메인 객체 구현', '어댑터 구현 + 테스트 통과', 'Spec 변경 시 Phase 3 갱신 (피드백)', '아키텍처 문서 & 온보딩 가이드'],
+        steps: ['WBS 순서대로 구현', '빌드 + 테스트 통과 확인', '설계 결정(D-*) 준수 확인', '발견 사항 → 해당 Phase 문서 갱신 (피드백)'],
         gate: null
       }
     ];
