@@ -104,12 +104,12 @@ Phase 4: Implementation
 
 | 파일 | 용도 |
 |------|------|
-| `phase-checklist.md` | 프로젝트별 진행 체크리스트 |
-| `knowledge-base-template.md` | Phase 1 산출물 템플릿 |
-| `claude-md-policy-template.md` | Phase 2 CLAUDE.md 템플릿 |
-| `prd-template.md` | Phase 3 PRD 템플릿 |
-| `spec-template.md` | Phase 3 SPEC 템플릿 (아키텍처 결정 + 구현 계획) |
-| `architecture-principles.md` | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택 적용) |
+| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | 프로젝트별 진행 체크리스트 |
+| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 산출물 템플릿 |
+| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | Phase 2 CLAUDE.md 템플릿 |
+| [`prd-template.md`](skills/context-engineering/references/prd-template.md) | Phase 3 PRD 템플릿 |
+| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC 템플릿 (아키텍처 결정 + 구현 계획) |
+| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택 적용) |
 
 ## License
 
