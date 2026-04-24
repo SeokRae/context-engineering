@@ -101,10 +101,9 @@ Phase 2: Policy (CLAUDE.md)
   * knowledge-base.md 링크 포함 필수
   * 초안 성격 — Non-obvious Gotchas는 Phase 4에서 갱신
   ↓  [사용자 확인]
-Phase 3: PRD + SPEC
-  3-1. PRD — 기능 요구사항 + 검증 가능한 성공 기준
-  3-2. SPEC — 아키텍처 결정 + 패키지 구조 + 구현 계획 (병렬 가능 표시)
-  3-3. Readiness Gate — AI가 현재 상태 요약, 사용자가 통과 여부 결정
+Phase 3: SPEC
+  3-1. SPEC — 아키텍처 결정 + 패키지 구조
+  3-2. Readiness Gate — AI가 현재 상태 요약, 사용자가 통과 여부 결정
   ↑___________________↓ 미충족 시 해당 Phase 재순환
 Phase 4: Implementation
   * 완료 기준: 빌드 + 테스트 + PRD 성공 기준 달성 확인
@@ -122,8 +121,7 @@ Phase 4: Implementation
 | [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | 프로젝트별 진행 체크리스트 |
 | [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 산출물 템플릿 |
 | [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | Phase 2 CLAUDE.md 템플릿 |
-| [`prd-template.md`](skills/context-engineering/references/prd-template.md) | Phase 3 PRD 템플릿 |
-| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC 템플릿 (아키텍처 결정 + 구현 계획) |
+| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC 템플릿 (아키텍처 결정 + 패키지 구조) |
 | [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택 적용) |
 
 ## License
