@@ -253,43 +253,35 @@ WHAT/WHY/HOW 3섹션 구조:
 
 ### Step 3-3. 패키지/모듈 구조
 
-기술 스택에 맞는 패키지 또는 모듈 구조를 제안한다. 아래는 언어별 대표 예시이며, 프로젝트 규모와 아키텍처에 맞게 조정한다.
+언어보다 **설계 원칙**을 먼저 정의한다. 폴더명은 원칙에서 파생된다.
 
-**Java (헥사고날)**:
-```
-{루트 패키지}
-├── config/         ← 설정 조립
-├── adapter/        ← 외부 경계 (in/out)
-├── application/    ← 비즈니스 로직
-└── infrastructure/ ← 부가 기능
-```
+**레이어 설계 (SOLID + DDD)**
 
-**Node.js**:
-```
-src/
-├── routes/         ← HTTP 라우터
-├── services/       ← 비즈니스 로직
-├── models/         ← 데이터 모델
-└── utils/          ← 공통 유틸
-```
+| 레이어 | 책임 (SRP) | 의존 규칙 (DIP) | DDD 개념 |
+|--------|-----------|----------------|---------|
+| 도메인 | 비즈니스 규칙·불변식 | 외부 의존 없음 (순수) | Entity, Value Object, Aggregate, Domain Service, Repository 인터페이스 |
+| 애플리케이션 | 유스케이스 조율 | 도메인만 | Application Service, Command/Query |
+| 인프라 | 외부 시스템 구현체 | 도메인 인터페이스 역전(DIP) | Repository 구현, External API Adapter |
+| 진입점 | 입력 수신·변환 | 애플리케이션만 | HTTP Controller, Message Consumer |
+| 설정 | 의존성 조립 | 전 레이어 | DI 설정, 환경 변수 바인딩 |
 
-**Python**:
-```
-src/{패키지}/
-├── api/            ← FastAPI/Flask 라우터
-├── domain/         ← 도메인 모델·서비스
-├── infra/          ← DB·외부 API 어댑터
-└── core/           ← 설정·의존성
-```
+의존 방향: `진입점 → 애플리케이션 → 도메인 ← 인프라` (역방향 금지)
 
-**Go**:
-```
-internal/
-├── handler/        ← HTTP 핸들러
-├── service/        ← 비즈니스 로직
-├── repository/     ← 데이터 접근
-└── domain/         ← 타입·인터페이스
-```
+**레이어별 OCP 적용 기준**
+
+- 도메인 규칙 변경 → 도메인 레이어만 수정
+- 외부 API 교체 → 인프라 레이어만 수정 (도메인·애플리케이션 무변경)
+- 새 유스케이스 추가 → 애플리케이션 레이어 확장 (기존 코드 닫힘)
+
+**언어별 폴더명 대응**
+
+| 레이어 | Java | Node.js | Python | Go |
+|--------|------|---------|--------|----|
+| 도메인 | `domain/` | `domain/` | `domain/` | `internal/domain/` |
+| 애플리케이션 | `application/` | `services/` | `services/` | `internal/service/` |
+| 인프라 | `infrastructure/` | `repositories/` | `infra/` | `internal/repository/` |
+| 진입점 | `adapter/in/` | `routes/` | `api/` | `internal/handler/` |
+| 설정 | `config/` | `config/` | `core/` | `internal/config/` |
 
 ### Step 3-4. WBS
 
