@@ -14,8 +14,17 @@ This plugin provides a `/context-engineering` skill that guides you through thes
 ## Installation
 
 ```bash
-claude plugin marketplace add context-engineering https://github.com/SeokRae/context-engineering.git
-claude plugin install context-engineering@context-engineering
+# 1. 마켓플레이스(저장소)를 등록한다
+claude plugin marketplace add https://github.com/SeokRae/context-engineering.git
+
+# 2. 플러그인을 설치한다
+claude plugin install context-engineering
+```
+
+로컬 디렉토리에서 바로 사용할 때:
+
+```bash
+claude --plugin-dir /path/to/context-engineering
 ```
 
 ## Usage
