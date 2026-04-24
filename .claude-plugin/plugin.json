@@ -1,0 +1,21 @@
+{
+  "name": "context-engineering",
+  "version": "1.0.0",
+  "description": "AI 도구로 복잡한 서비스를 개발할 때의 4단계 Context Engineering 워크플로우: 도메인 지식 수집 → Policy 작성 → 구현 Spec → 단계별 구현",
+  "author": {
+    "name": "SeokRae",
+    "email": "kslbsh@gmail.com"
+  },
+  "homepage": "https://github.com/SeokRae/context-engineering-plugin",
+  "repository": "https://github.com/SeokRae/context-engineering-plugin",
+  "license": "MIT",
+  "keywords": [
+    "context-engineering",
+    "ai-development",
+    "service-dev",
+    "claude-md",
+    "knowledge-base",
+    "spec",
+    "workflow"
+  ]
+}
