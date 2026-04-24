@@ -52,6 +52,8 @@ allowed-tools: Read, Bash, Glob
    → {Phase 1 제약 N개 중 CLAUDE.md 반영 M개}
 ⑤ SPEC 구현 계획의 첫 항목을 지금 바로 시작할 수 있는가?
    → {첫 항목명 + 의존 관계}
+⑥ 모든 REQ-ID가 구현 계획에 매핑되어 있는가?
+   → {REQ N개 중 M개 매핑됨 / 미매핑: REQ-X, REQ-Y}
 
 미충족 항목이 있다면 해당 명령을 사용해 주세요.
 모두 통과라면 "Phase 4 진행" 또는 "/context-engineering:impl" 이라고 알려 주세요.
@@ -64,3 +66,4 @@ allowed-tools: Read, Bash, Glob
 | ③ 도메인 용어 미확정 | `/context-engineering:gather` 로 KB 보완 |
 | ④ CLAUDE.md 제약 미반영 | `/context-engineering:gather` 로 CLAUDE.md 보완 |
 | ⑤ 구현 계획 착수 불가 | `/context-engineering:spec` 으로 SPEC 보완 |
+| ⑥ REQ 미매핑 | `/context-engineering:spec` 으로 요구사항 추적 보완 |
