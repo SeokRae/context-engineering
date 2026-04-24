@@ -23,22 +23,44 @@
 
 ---
 
-## 패키지 구조
+## 패키지/모듈 구조
+
+### 왜 레이어를 나누는가 (SoC + Cohesion/Coupling)
+
+- **High Cohesion**: 같은 이유로 변경되는 코드는 같은 모듈에
+- **Low Coupling**: 다른 이유로 변경되는 코드는 다른 모듈로 분리
+- **SoC**: 도메인 규칙 / 기술 세부사항 / 입출력 변환은 각각 독립된 관심사
+
+### 레이어 설계 (Ports & Adapters + DDD)
+
+| 레이어 | Ports & Adapters | 책임 (SRP) | 의존 규칙 (DIP) | DDD 개념 |
+|--------|-----------------|-----------|----------------|---------|
+| 도메인 | — (순수 도메인) | 비즈니스 규칙·불변식 | 외부 의존 없음 (순수) | Entity, Value Object, Aggregate, Domain Service, Repository 포트(인터페이스) |
+| 애플리케이션 | — (Use Case) | 유스케이스 조율 (CQS 적용) | 도메인만 | Application Service, Command Handler, Query Handler |
+| 인프라 | Driven Adapter (Secondary) | 외부 시스템 구현체 | 도메인 포트 역전(DIP) | Repository 구현, External API Adapter |
+| 진입점 | Driving Adapter (Primary) | 입력 수신·변환 | 애플리케이션만 | HTTP Controller, Message Consumer |
+| 설정 | — | 의존성 조립 | 전 레이어 | DI 설정, 환경 변수 바인딩 |
+
+의존 방향: `진입점(Primary) → 애플리케이션 → 도메인 ← 인프라(Secondary)` (역방향 금지)
+
+**책임 할당 — GRASP Information Expert**: 책임은 그 정보를 가진 객체에 둔다.
+- 주문 총액 계산 → `Order` (항목 정보를 가진 쪽)
+- 할인 정책 적용 → `DiscountPolicy` (정책 규칙을 아는 쪽)
+
+**CQS**: Application Service 메서드는 Command(상태 변경, void) 또는 Query(값 반환, 무변경) 둘 중 하나만.
+
+**OCP**: 외부 API 교체 → Secondary Adapter만 수정. 새 유스케이스 → 애플리케이션 확장(기존 닫힘).
+
+### 이 프로젝트의 구조
 
 ```
-{루트 패키지}
-├── config/           ← Bean 조립, 설정 바인딩
-│   ├── {ConfigClass}.java
-│   └── {RouterClass}.java
-├── adapter/          ← 외부 경계 (in/out)
-│   ├── in/           ← 인바운드 (API, Message)
-│   └── out/          ← 아웃바운드 (DB, 외부 API)
-├── application/      ← 비즈니스 로직
-│   ├── {Service}.java
-│   └── {DomainObject}.java
-└── infrastructure/   ← 부가 기능
-    └── {AlertManager}.java
+{레이어} [{Ports & Adapters 역할}]: {폴더 경로}  ← {담당 DDD 개념}
 ```
+
+> 언어별 폴더명 참고 — Java: `domain/`, `application/`, `infrastructure/`, `adapter/in/`, `config/`
+> / Node.js: `domain/`, `services/`, `repositories/`, `routes/`, `config/`
+> / Python: `domain/`, `services/`, `infra/`, `api/`, `core/`
+> / Go: `internal/domain/`, `internal/service/`, `internal/repository/`, `internal/handler/`, `internal/config/`
 
 ---
 

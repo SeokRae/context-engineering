@@ -14,18 +14,23 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## 아키텍처
 
-{패턴 이름}: {왜 이 패턴을 선택했는가}
+**설계 근거 (SoC + Cohesion/Coupling)**: 같은 이유로 변경되는 코드는 같이, 다른 이유로 변경되는 코드는 분리. 하나의 모듈은 하나의 관심사만.
 
-**레이어 구조**
+**레이어 구조 (Ports & Adapters + DDD)**
 
-| 레이어 | 책임 | 외부 의존 허용 |
-|--------|------|--------------|
-| `config` | Bean 조립, 설정 바인딩 | Spring, 외부 라이브러리 |
-| `adapter` | 외부 경계 변환 | `application` |
-| `application` | 비즈니스 로직 | 없음 |
-| `infrastructure` | 부가 기능 | 외부 시스템 |
+| 레이어 | 폴더 | Ports & Adapters | 책임 (SRP) | 의존 규칙 (DIP) | DDD 개념 |
+|--------|------|-----------------|-----------|----------------|---------|
+| 도메인 | `{경로}` | — (순수 도메인) | 비즈니스 규칙·불변식 | 외부 의존 없음 | Entity, Value Object, Aggregate, Repository 포트 |
+| 애플리케이션 | `{경로}` | — (Use Case) | 유스케이스 조율 (CQS 적용) | 도메인만 | Command Handler, Query Handler |
+| 인프라 | `{경로}` | Driven Adapter (Secondary) | 외부 시스템 구현체 | 도메인 포트 역전(DIP) | Repository 구현, API Adapter |
+| 진입점 | `{경로}` | Driving Adapter (Primary) | 입력 수신·변환 | 애플리케이션만 | Controller, Consumer |
+| 설정 | `{경로}` | — | 의존성 조립 | 전 레이어 | DI 설정 |
 
-의존 방향: adapter → application (역방향 금지)
+의존 방향: `진입점(Primary) → 애플리케이션 → 도메인 ← 인프라(Secondary)` (역방향 금지)
+
+**책임 할당 (GRASP Information Expert)**: 책임은 그 정보를 가진 객체에. 계산 로직은 데이터를 가진 도메인 객체에 두고 Service로 위임하지 않는다.
+
+**레이어 경계 규칙 (OCP)**: 외부 API 교체 → Secondary Adapter만 수정. 새 유스케이스 → 애플리케이션 확장, 기존 닫힘.
 
 ## 빌드 & 테스트
 
