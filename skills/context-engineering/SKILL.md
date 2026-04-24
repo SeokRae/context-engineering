@@ -275,6 +275,8 @@ WHAT/WHY/HOW 3섹션 구조:
 
 **산출물**: `{CODE_PATH}/CLAUDE.md` (+ 모듈별 CLAUDE.md)
 
+> **초안 성격**: Phase 2의 CLAUDE.md는 초안이다. Non-obvious Gotchas와 코딩 컨벤션은 구현해봐야 알 수 있으므로 Phase 4 피드백 루프에서 반드시 갱신한다. 지금은 알 수 있는 것만 채우면 충분하다.
+
 > **게이트**: 일반 모드 — "Phase 2 완료 — `CLAUDE.md` 초안을 저장했습니다. 검토 후 Phase 3 진행할까요?"
 > 탐색 모드 — 확인 없이 Phase 3으로 바로 진행.
 
