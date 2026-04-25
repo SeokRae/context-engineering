@@ -48,7 +48,7 @@ Verify installation:
 ```bash
 claude plugin list
 #   ❯ context-engineering@context-engineering
-#     Version: 1.0.0
+#     Version: 2.0.0
 #     Scope: user
 #     Status: ✔ enabled
 ```

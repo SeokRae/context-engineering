@@ -147,7 +147,7 @@ Entry format rules:
 
 | | Ingest | Query |
 |---|---|---|
-| **Action** | Write each entry file to `{KNOWLEDGE_PATH}/{domain}/{slug}.md`. Update `index.md`: add a new row to the correct domain table (or create the table if the domain is new). | Generate the answer in the requested output format using the assembled context. Honor the format determined in Phase 1. |
+| **Action** | Write each entry file to `{KNOWLEDGE_PATH}/{domain}/{slug}.md`. Update `index.md`: add a new row to the correct domain table. If the domain doesn't yet exist in index.md, create a new `## {domain}` section in alphabetical order among domains. Use the table header: `\| Entry \| Type \| Date \| Reliability \| Tags \| Summary \|` | Generate the answer in the requested output format using the assembled context. Honor the format determined in Phase 1. |
 | **Output** | `Stored: {domain}/{slug}.md` (one line per entry written) | The answer — prose, list, table, code block, analysis, or full document, as appropriate |
 | **Decision** | None | None |
 
@@ -178,7 +178,7 @@ For simple inputs, multiple phases execute in a single step without visible outp
 
 | Scenario | Behavior |
 |----------|----------|
-| Short simple ingest (1–2 sentences, clear domain) | Phases 1–5 execute silently; user sees only Phase 6 confirmation |
+| ≤100 words (or ≤3 sentences) AND single clear domain | Phases 1–5 execute silently; user sees only Phase 6 confirmation |
 | Query with 1–2 matching index entries | Phases 3 and 5 execute silently |
 | Large document ingest (1000+ words) | All phases shown with progress markers |
 | Multi-domain or complex query | All phases shown with progress markers |
@@ -200,7 +200,9 @@ If ALL content is classified as Skip or Merge with no new material:
 **Checkpoint B — After Phase 7 (both modes)**
 
 - Ingest: surface any unresolved conflicts before closing. If none, complete silently.
-- Query: the confidence footer is always shown. If confidence is Low, add: "Consider ingesting more information on this topic before relying on this answer."
+- Query: the confidence footer is always shown.
+  - M (Medium): footer + "Consider ingesting more recent information to improve accuracy."
+  - L (Low): footer + "⚠ Answer relies primarily on general knowledge. Consider ingesting relevant knowledge."
 
 The engine flows without interruption except at these two points and the single-question decision points within each phase.
 
@@ -218,7 +220,7 @@ date: {YYYY-MM-DD}
 reliability: high | medium | low
   # high — direct user statement, official documentation, code in the repository
   # medium — secondhand source, older but verified document
-  # low — inferred behavior, external claim not yet verified
+  # low — speculative, experimental, or user-reported without verification
 tags: [tag1, tag2]
 related: [domain/other-entry]
 ---

@@ -26,9 +26,7 @@ This is a template for generating the knowledge base index. The values below are
 
 # Knowledge Base Index
 
-**Last updated:** 2026-04-25 (example — replace with current date)  
-**Total entries:** 42 (example — replace with actual count)  
-**Domains:** 6 (example — list actual domains: architecture, database, api-design, security, infrastructure, patterns)
+> Last updated: {YYYY-MM-DD} | Total entries: {N} | Domains: {domain-a, domain-b, ...}
 
 ---
 

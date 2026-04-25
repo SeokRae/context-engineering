@@ -40,7 +40,7 @@ These rules must hold for the ke skill and sub-skills:
 
 1. **Mode detection**: `/ke` auto-detects Ingest vs. Query from input signals. Never ask the user which mode unless genuinely ambiguous. Ambiguous → 1 question with options 1/2/3.
 2. **KNOWLEDGE_PATH resolution order**: `--kb` arg → `KNOWLEDGE_PATH` env → `./knowledge/index.md` → `~/knowledge/index.md` → ask user.
-3. **Lightweight gates**: Only 2 checkpoints — after Phase 3 (all-duplicate ingest) and after Phase 7 (conflicts). Never gate on anything else.
+3. **Lightweight gates**: Only 2 checkpoints — after Phase 3 (all-duplicate ingest) and after Phase 7 (conflicts for ingest; confidence footer for query). Never gate on anything else.
 4. **Query is read-only**: `/ke:query` and `/ke:ingest`'s Query mode never write files. Only Ingest writes.
 5. **Concept granularity**: One knowledge entry per concept, not per document or session. Large documents are split into multiple entries.
 6. **Index sync**: index.md is updated atomically on every ingest. Re-sort domain tables by date descending on every update.

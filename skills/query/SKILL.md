@@ -70,9 +70,11 @@ domain/slug.md — relevant because: [reason]
 
 ### Phase 3: Ranking & Selection
 
+**Simple query**: Single-domain query returning ≤2 matching candidates. **Complex query**: Multi-domain OR >2 candidates.
+
 Rank candidates by relevance, recency (prefer newer), and reliability (prefer higher). Keep top candidates.
 
-For simple queries (see simple query definition) with 1–2 matching entries: execute silently, skip to Phase 4.
+For simple queries with 1–2 matching entries: execute silently, skip to Phase 4.
 
 ---
 
@@ -87,7 +89,7 @@ Sequence them logically.
 
 Summarize tangential context to fit the context budget. Prioritize directly relevant information.
 
-For simple queries (see simple query definition): execute silently.
+For simple queries: execute silently.
 
 ---
 
@@ -132,7 +134,5 @@ Consider ingesting more recent information to improve accuracy.
 3. **Phase visibility**: Show phase transitions only for complex multi-domain queries. Simple queries execute Phases 1–5 silently.
 4. **No gates**: Flow without interruption except single-question decision points.
 5. **Always append footer**: Query mode always includes a confidence footer. If Low, add the standard warning (see Phase 7 Verification).
-
-**Simple query definition**: Single-domain query returning ≤2 matching candidates. **Complex query**: Multi-domain OR >2 candidates.
 
 ---

@@ -44,6 +44,8 @@ tags: ["tag1", "tag2", "concept"]
 related: ["domain/related-entry", "domain/another-entry"]
 ---
 
+# {Title}
+
 > One-line summary of this knowledge entry.
 
 ## Key Facts
