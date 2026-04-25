@@ -1,44 +1,45 @@
 ---
 name: context-engineering
 description: >
-  AI 도구(Claude Code)로 복잡한 서비스를 개발할 때 따르는 4단계 Context Engineering 워크플로우.
-  도메인 지식 수집 → Policy(CLAUDE.md) 작성 → 구현 Spec 설계 → 단계별 구현 검증.
-  새 프로젝트 시작, 대형 기능 개발, 외부 API 연동 서비스 구축 시 사용.
-  Keywords: context engineering, AI 개발, 도메인 지식, CLAUDE.md, 서비스 개발, 컨텍스트 엔지니어링,
-  knowledge base, policy, spec, implementation, 구현 명세, 새 프로젝트, service dev
+  4-phase Context Engineering workflow for developing complex services with AI tools.
+  Defines what to know, how to behave, and what to build at each stage:
+  domain knowledge collection → Policy (CLAUDE.md) → implementation Spec → step-by-step implementation.
+  Use for new projects, large feature development, or building services with external API integrations.
+  Keywords: context engineering, AI development, domain knowledge, CLAUDE.md, service development,
+  knowledge base, policy, spec, implementation, new project, service dev
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 ---
 
 # context-engineering
 
-AI 도구로 복잡한 서비스를 개발할 때 **"무엇을 알고, 어떻게 행동하고, 무엇을 만들어야 하는가"** 를 단계별로 정의하는 4단계 워크플로우.
+A 4-phase workflow for developing complex services with AI tools, defining **what to know, how to behave, and what to build** at each stage.
 
 ```
-Step 0: Context Gathering  ←  요구사항 탐색 + 파라미터 수집
+Step 0: Context Gathering  ←  requirements exploration + parameter collection
   ↓
-  ├─ 요구사항 명확  ──────────────────────────────────────────┐
-  │                                                          │
-  └─ 요구사항 불명확 (탐색 모드) ─ 빈 초안 생성 ─────────────┤
-                                                             ↓
-┌──────────────────────────────────────────────────────────────┐
-│  Phase 1: Knowledge Base  (탐색 모드: 빈 초안, 개발하며 채움) │
-│    ↓                                                         │
-│  Phase 2: Policy (CLAUDE.md)  (탐색 모드: 최소 버전)         │
-│    ↓                                                         │
-│  Phase 3: Spec  →  [Readiness Gate]                          │
-│    ↑_______________________↓ 미충족 시 재순환                │
-└──────────────────────────────────────────────────────────────┘
-  ↓  [Readiness Gate 통과 — 스파이럴 종료]
-Phase 4: Implementation (본궤도)
+  ├─ Requirements clear  ─────────────────────────────────────────────┐
+  │                                                                   │
+  └─ Requirements unclear (discovery mode) ─ empty drafts ───────────┤
+                                                                      ↓
+┌───────────────────────────────────────────────────────────────────────┐
+│  Phase 1: Knowledge Base  (discovery: empty draft, fill while coding) │
+│    ↓                                                                  │
+│  Phase 2: Policy (CLAUDE.md)  (discovery: minimal version)           │
+│    ↓                                                                  │
+│  Phase 3: Spec  →  [Readiness Gate]                                  │
+│    ↑______________________________↓ re-cycle if unmet                │
+└───────────────────────────────────────────────────────────────────────┘
+  ↓  [Readiness Gate passed — spiral exit]
+Phase 4: Implementation (main track)
 ```
 
-## 사용법
+## Usage
 
 ```
-/context-engineering @<코드경로> [--output <출력경로>] [--specs <스펙문서경로>]
+/context-engineering @<code-path> [--output <output-path>] [--specs <spec-doc-path>]
 ```
 
-**예시:**
+**Examples:**
 ```
 /context-engineering @/path/to/project
 /context-engineering @/path/to/project --specs docs/references/
@@ -49,421 +50,419 @@ Phase 4: Implementation (본궤도)
 
 ## Step 0: Context Gathering
 
-스킬 시작 시 **두 가지를 순서대로** 수행한다: ① 요구사항 탐색 대화, ② 기술 파라미터 수집.
+At skill start, perform these two steps in order: ① requirements exploration conversation, ② technical parameter collection.
 
-### Step 0-1. 요구사항 탐색 (HARD-GATE)
+### Step 0-1. Requirements Exploration (HARD-GATE)
 
-**질문은 한 번에 하나씩** 던진다. 사용자 답변을 받은 후 다음 질문으로 넘어간다.
+**Ask one question at a time.** Wait for the user's answer before moving to the next.
 
-최소 3가지를 확인한다:
+Confirm at least 3 things:
 
-1. **무엇을 만드는가?**
-   > "이번에 만들려는 것이 무엇인지 한 문장으로 설명해 주세요."
+1. **What are you building?**
+   > "Describe what you're building in one sentence."
 
-2. **왜 만드는가? (목적·동기)**
-   > "이것을 왜 만들어야 하나요? 해결하려는 문제나 달성하려는 목표가 무엇인가요?"
+2. **Why build it? (purpose/motivation)**
+   > "Why does this need to be built? What problem does it solve or what goal does it achieve?"
 
-3. **알려진 제약이 있는가?**
-   > "지금 알고 있는 제약 조건이 있나요? (기술 스택 고정, 마감일, 연동 시스템, 성능 요구사항 등)"
+3. **Are there known constraints?**
+   > "Are there any known constraints? (fixed tech stack, deadlines, integrated systems, performance requirements, etc.)"
 
-3가지 답변이 모이면 요약을 출력하고 사용자에게 확인 요청:
+After all three answers, output a summary and ask for confirmation:
 
 ```
-[요구사항 요약]
-- REQ-1 무엇: {답변 요약}
-- REQ-2 왜: {답변 요약}
-- REQ-3 제약: {답변 요약 또는 "없음"}
-{대화에서 추가 요구사항이 도출되면 REQ-4, REQ-5... 순서로 추가}
+[Requirements Summary]
+- REQ-1 What: {summary}
+- REQ-2 Why: {summary}
+- REQ-3 Constraints: {summary or "none"}
+{If additional requirements emerge from conversation, add REQ-4, REQ-5...}
 
-이 내용이 맞나요? 확인되면 기술 파라미터를 수집하고 Phase 1을 시작합니다.
+Does this look correct? Confirmed — will collect technical parameters and start Phase 1.
 ```
 
-> **HARD-GATE**: 요약 확인 후 두 경로 중 하나를 선택한다.
-> - **요구사항 명확** → 기존 흐름대로 Phase 1~3 충실히 작성 후 Phase 4 진입.
-> - **요구사항 불명확** → 탐색 모드 진입. Phase 1~3을 빈 초안으로 생성하고 Phase 4로 바로 진행. 개발하면서 배운 것을 피드백 루프로 채워 나간다.
+> **HARD-GATE**: After confirmation, choose one of two paths:
+> - **Requirements clear** → follow normal flow: write Phase 1~3 thoroughly, then enter Phase 4.
+> - **Requirements unclear** → enter discovery mode. Generate Phase 1~3 as empty drafts and proceed directly to Phase 4. Fill in via feedback loop as you develop.
 
-### Step 0-2. 기술 파라미터 수집
+### Step 0-2. Technical Parameter Collection
 
-요구사항 확인 후, `@<코드경로>`가 주어지면 빌드 파일에서 자동 감지한다.
+After requirements confirmation, if `@<code-path>` is provided, auto-detect from build files.
 
-| 파라미터 | 설명 | 자동 감지 |
-|---------|------|---------|
-| `{PROJECT_NAME}` | 프로젝트 이름 | — (사용자 입력 또는 디렉토리명) |
-| `{CODE_PATH}` | 코드 저장소 절대 경로 | `@` 인자 |
-| `{TECH_STACK}` | 기술 스택 | `build.gradle` / `pom.xml` / `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` |
-| `{BUILD_CMD}` | 빌드 명령어 | 빌드 파일 기반 추론 |
-| `{TEST_CMD}` | 테스트 명령어 | 빌드 파일 기반 추론 |
-| `{SPEC_PATHS}` | 외부 스펙 문서 경로 | `--specs` 인자 |
-| `{OUTPUT_PATH}` | 산출물 저장 경로 | `--output` 지정 시 해당 경로, 없으면 `{CODE_PATH}/docs/` |
+| Parameter | Description | Auto-detect |
+|-----------|-------------|-------------|
+| `{PROJECT_NAME}` | Project name | — (user input or directory name) |
+| `{CODE_PATH}` | Absolute path to code repo | `@` argument |
+| `{TECH_STACK}` | Tech stack | `build.gradle` / `pom.xml` / `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` |
+| `{BUILD_CMD}` | Build command | inferred from build files |
+| `{TEST_CMD}` | Test command | inferred from build files |
+| `{SPEC_PATHS}` | External spec document paths | `--specs` argument |
+| `{OUTPUT_PATH}` | Output artifact path | `--output` if specified, otherwise `{CODE_PATH}/docs/` |
 
-파라미터 수집 후 최종 요약 출력하고 사용자 확인 요청.
+After collection, output final summary and ask for user confirmation.
 
 ---
 
-## 탐색 모드 (요구사항 불명확 시)
+## Discovery Mode (when requirements are unclear)
 
-Step 0 HARD-GATE에서 요구사항이 불명확하다고 판단되면 탐색 모드로 진입한다.
+Enter when Step 0 HARD-GATE determines requirements are unclear.
 
-**전체 흐름**:
+**Full flow**:
 
 ```
-Phase 1 빈 초안 → Phase 2 최소 버전 → Phase 3 빈 초안 → Phase 4 바로 진입
-       ↑___________________↑_________________↑  피드백 루프로 채워나감
-                                                         ↓
-                                     [사용자가 직접 Readiness Gate 요청]
-                                                         ↓
-                                                 본궤도 구현 전환
+Phase 1 empty draft → Phase 2 minimal → Phase 3 empty draft → enter Phase 4 immediately
+       ↑____________________↑_________________↑  fill via feedback loop
+                                                          ↓
+                                    [user requests Readiness Gate when ready]
+                                                          ↓
+                                            switch to main-track implementation
 ```
 
-**Phase별 탐색 모드 산출물**:
+**Per-phase discovery artifacts**:
 
-| Phase | 초기 상태 | 구현하며 채우는 내용 |
-|-------|---------|-------------------|
-| Phase 1 | Glossary·제약 테이블 빈 행 + `> 🔍 탐색 중` | 발견한 도메인 용어, 새 제약 |
-| Phase 2 | 프로젝트명·빌드 명령어만 + `> 🔍 탐색 중` | Non-obvious Gotchas, 코딩 컨벤션 |
-| Phase 3 | SPEC 제목만 + `> 🔍 탐색 중` | 아키텍처 결정 |
+| Phase | Initial state | Fill while coding |
+|-------|--------------|-------------------|
+| Phase 1 | Glossary/constraint table with empty rows + `> 🔍 Discovering` | discovered domain terms, new constraints |
+| Phase 2 | Project name + build commands only + `> 🔍 Discovering` | non-obvious gotchas, coding conventions |
+| Phase 3 | SPEC title only + `> 🔍 Discovering` | architecture decisions |
 
-**Readiness Gate 전환**: 충분히 탐색했다고 판단할 때 사용자가 직접 Readiness Gate를 요청한다. 게이트 통과 시 본궤도 구현으로 전환된다.
+**Readiness Gate transition**: User directly requests Readiness Gate when they feel sufficiently explored. If gate passes, switch to main-track implementation.
 
-**피드백 루프**: Phase 4 구현 중 발견한 내용은 발견된 성격에 따라 해당 Phase 문서에 즉시 반영한다 (아래 Phase 4 피드백 루프 테이블 참조).
-
-각 Phase의 탐색 모드 세부 사항은 해당 Phase 설명에서 확인한다.
+**Feedback loop**: Findings during Phase 4 are immediately reflected in the relevant phase document based on their nature (see Phase 4 feedback loop table).
 
 ---
 
-## Phase 1: Knowledge Base (도메인 지식 준비)
+## Phase 1: Knowledge Base
 
-**목적**: AI가 이 프로젝트의 도메인을 이해하기 위한 지식 베이스를 구축한다.
+**Purpose**: Build a knowledge base for AI to understand this project's domain.
 
-### Step 1-1. Context Assessment (시나리오 판별)
+### Step 1-1. Context Assessment (Scenario Detection)
 
-프로젝트 상황을 분석해 아래 4가지 시나리오 중 하나를 판별한다:
+Analyze the project state and select one of 4 scenarios:
 
-| 시나리오 | 조건 | 설명 |
-|---------|------|------|
-| **A. 그린필드** | 스펙 문서 없음 + 코드 없음 | 아무것도 없는 새 프로젝트 |
-| **B. 스펙 우선** | 스펙 문서 있음 + 코드 없음 | 문서는 있지만 구현 전 |
-| **C. 코드 우선** | 스펙 문서 없음 + 코드 있음 | 기존 코드가 있지만 문서 없음 |
-| **D. 풀 컨텍스트** | 스펙 문서 있음 + 코드 있음 | 문서와 코드 모두 있음 |
+| Scenario | Condition | Description |
+|----------|-----------|-------------|
+| **A. Greenfield** | no spec + no code | brand new project |
+| **B. Spec-first** | spec exists + no code | docs exist, not yet implemented |
+| **C. Code-first** | no spec + code exists | existing code, no docs |
+| **D. Full context** | spec exists + code exists | both available |
 
-판별 기준:
-- `{SPEC_PATHS}` 유무 → 스펙 문서 존재 여부
-- `{CODE_PATH}` 존재 시 소스 파일 유무 → 코드 존재 여부
+Detection criteria:
+- Presence of `{SPEC_PATHS}` → spec documents exist
+- Source files in `{CODE_PATH}` → code exists
 
-**혼합 상태 처리**: '스펙이 구식', '코드 일부만 문서화' 같은 중간 상태는 가장 가까운 시나리오를 선택하고 판별 근거에 불확실 사항을 명시한다. 잘못된 시나리오 선택은 이후 흐름 전체에 영향을 주므로 사용자 확인이 필요하다.
+**Mixed state handling**: For intermediate states ('spec is outdated', 'code only partially documented'), select the closest scenario and note uncertainties in the rationale. Wrong scenario selection affects the entire downstream flow — user confirmation is required.
 
-판별 결과를 출력하고 사용자에게 확인받은 후 Source Scan으로 진행한다:
+Output detection result and get user confirmation before proceeding to Source Scan:
 
 ```
-[Context Assessment] 시나리오 {A/B/C/D} ({시나리오명}) — {판별 근거 한 줄}
-불확실 사항: {있으면 명시, 없으면 생략}
+[Context Assessment] Scenario {A/B/C/D} ({name}) — {one-line rationale}
+Uncertainties: {list if any, omit if none}
 
-이 판별이 맞나요? 확인되면 Source Scan을 시작합니다.
+Is this assessment correct? Confirmed — will start Source Scan.
 ```
 
-### Step 1-2. Source Scan (조건부 실행)
+### Step 1-2. Source Scan (conditional)
 
-시나리오에 따라 다른 방식으로 지식을 수집한다:
+Collect knowledge differently depending on scenario:
 
-**시나리오 A (그린필드)**:
-- Step 0 대화 내용에서 도메인 개념, 제약, 목적 추출
-- 외부 참조 없이 대화 기반으로 초안 작성
-- 산출물에 "초안 (검증 필요)" 표시
+**Scenario A (Greenfield)**:
+- Extract domain concepts, constraints, purpose from Step 0 conversation
+- Write draft based on conversation without external references
+- Mark artifact as "Draft (verification needed)"
 
-**시나리오 B (스펙 우선)**:
-- `{SPEC_PATHS}` 문서를 Explore 서브에이전트로 병렬 탐색
-- 프로토콜 스펙, API 가이드, 벤더 문서 수집
-- 각 문서를 한 줄 요약으로 압축
+**Scenario B (Spec-first)**:
+- Explore `{SPEC_PATHS}` documents in parallel with Explore sub-agent
+- Collect protocol specs, API guides, vendor docs
+- Compress each document to a one-line summary
 
-**시나리오 C (코드 우선)**:
-- `{CODE_PATH}` 코드베이스 스캔
-- 패키지 구조, 주요 클래스/모듈 패턴
-- 이미 적용된 설계 패턴, 기존 테스트 전략
+**Scenario C (Code-first)**:
+- Scan `{CODE_PATH}` codebase
+- Package structure, key class/module patterns
+- Existing design patterns, existing test strategy
 
-**시나리오 D (풀 컨텍스트)**:
-- 시나리오 B + C 병렬 실행 (스펙 탐색과 코드 스캔을 동시에)
+**Scenario D (Full context)**:
+- Run Scenario B + C in parallel (spec exploration and code scan simultaneously)
 
-### Step 1-3. Knowledge Base 조립
+### Step 1-3. Knowledge Base Assembly
 
-시나리오와 무관하게 항상 실행. 수집된 정보를 아래 구조로 정리한다.
+Always execute regardless of scenario. Organize collected information into the following structure.
 
-**도메인 용어 (Glossary)**:
+**Domain Glossary**:
 
 ```markdown
-| 용어 | 정의 | 출처 |
-|------|------|------|
-| {용어} | {한 줄 정의} | {문서명 또는 "대화"} |
+| Term | Definition | Source |
+|------|-----------|--------|
+| {term} | {one-line definition} | {document name or "conversation"} |
 ```
 
-**제약 목록** (`knowledge-base-template.md`와 동일한 5컬럼 형식):
+**Constraint Registry** (same 5-column format as `knowledge-base-template.md`):
 
 ```markdown
-| ID | 분류 | 설명 | 영향 | 우선순위 |
-|----|------|------|------|---------|
-| TC-1 | 기술 | {제약 설명} | {영향} | High |
-| BL-1 | 비즈니스 | {규칙 설명} | {영향} | Medium |
-| OC-1 | 조직 | {일정·접근 제한} | {영향} | Low |
+| ID | Category | Description | Impact | Priority |
+|----|----------|-------------|--------|----------|
+| TC-1 | Technical | {constraint description} | {impact} | High |
+| BL-1 | Business | {rule description} | {impact} | Medium |
+| OC-1 | Organizational | {schedule/access limit} | {impact} | Low |
 ```
 
-분류: `TC` 기술 제약, `BL` 비즈니스 규칙, `OC` 조직 제약 (일정·외부 의존)
+Categories: `TC` technical constraint, `BL` business rule, `OC` organizational constraint (schedule/external dependencies)
 
-**참조 문서 매니페스트** (시나리오 A는 생략):
+**Reference Document Manifest** (omit for Scenario A):
 
 ```markdown
-| 경로 | 유형 | 요약 | 갱신일 |
-|------|------|------|--------|
-| {경로} | spec/code/api | {한 줄} | {날짜} |
+| Path | Type | Summary | Updated |
+|------|------|---------|---------|
+| {path} | spec/code/api | {one line} | {date} |
 ```
 
-**산출물**: `{OUTPUT_PATH}/knowledge-base.md`
-- 시나리오 A: 파일 상단에 `> ⚠️ 초안 — Step 0 대화 기반, 구현 진행 중 검증 필요` 표시
-- 탐색 모드: 테이블을 빈 행으로만 생성하고 `> 🔍 탐색 중 — 개발하면서 채워 나갑니다.` 표시
+**Output**: `{OUTPUT_PATH}/knowledge-base.md`
+- Scenario A: add `> ⚠️ Draft — based on Step 0 conversation, verify during implementation` at top
+- Discovery mode: create tables with empty rows + `> 🔍 Discovering — fill in as you develop.`
 
-> **활용 경로**: 이 파일은 Phase 2에서 `CLAUDE.md`의 참고 문서 섹션에 링크로 연결된다. 링크가 없으면 다음 세션에서 AI가 이 파일을 발견하지 못한다.
+> **Usage path**: This file is linked in Phase 2 CLAUDE.md references section. Without the link, AI won't find this file in future sessions.
 
-> **게이트**: 일반 모드 — 산출물 저장 후 자체 평가를 수행하고 아래 형식으로 출력한다:
+> **Gate**: Normal mode — after saving, run self-assessment and output:
 >
 > ```
-> [Phase 1 자체 평가]
-> | 항목 | 상태 | 조치 |
-> |------|------|------|
-> | 용어 충분성 (5개+) | OK / {부족한 경우: N개, 핵심 누락} | — / Source Scan 보완 |
-> | 제약 분류 (2종+) | OK / {미분류} | — / 제약 레지스트리 보강 |
-> | 출처 명시 | OK / {미기재 항목} | — / 출처 보완 |
+> [Phase 1 Self-Assessment]
+> | Item | Status | Action |
+> |------|--------|--------|
+> | Term sufficiency (5+) | OK / {N terms, key ones missing} | — / supplement Source Scan |
+> | Constraint categories (2+) | OK / {uncategorized} | — / expand constraint registry |
+> | Source attribution | OK / {items without source} | — / add sources |
 >
-> Phase 1 완료 — `knowledge-base.md` 초안을 저장했습니다. 검토 후 Phase 2 진행할까요?
+> Phase 1 complete — `knowledge-base.md` draft saved. Review and proceed to Phase 2?
 > ```
 >
-> 탐색 모드 — 자체 평가 생략. 확인 없이 Phase 2로 바로 진행.
+> Discovery mode — skip self-assessment. Proceed to Phase 2 without confirmation.
 
 ---
 
-## Phase 2: Policy (CLAUDE.md 작성)
+## Phase 2: Policy (CLAUDE.md)
 
-**목적**: AI가 이 프로젝트에서 어떻게 행동해야 하는지 정책을 정의한다.
+**Purpose**: Define policy for how AI should behave in this project.
 
-### Step 2-1. CLAUDE.md 레벨 결정
+### Step 2-1. CLAUDE.md Level Decision
 
-| 레벨 | 위치 | 줄 수 제한 | 용도 |
-|------|------|----------|------|
-| 프로젝트 | `{CODE_PATH}/CLAUDE.md` | 100~150줄 | 전체 프로젝트 공통 |
-| 모듈 | `{CODE_PATH}/{모듈}/CLAUDE.md` | 60~100줄 | 모듈별 특화 |
+| Level | Location | Line limit | Purpose |
+|-------|----------|-----------|---------|
+| Project | `{CODE_PATH}/CLAUDE.md` | 100~150 lines | project-wide common |
+| Module | `{CODE_PATH}/{module}/CLAUDE.md` | 60~100 lines | module-specific |
 
-### Step 2-2. CLAUDE.md 작성
+### Step 2-2. CLAUDE.md Writing
 
-WHAT/WHY/HOW 3섹션 구조:
+WHAT/WHY/HOW 3-section structure:
 
-> **아키텍처 섹션 선택 가이드**: 복잡한 도메인 서비스 → Hexagonal + DDD (`references/architecture-principles.md` 참조). 단순 스크립트·파이프라인 → 프로젝트에 맞는 구조를 자유롭게 기술.
+> **Architecture section guide**: Complex domain services → Hexagonal + DDD (see `references/architecture-principles.md`). Simple scripts/pipelines → describe module structure freely.
 
 ```markdown
 # {PROJECT_NAME}
 
-> {한 줄 설명}
+> {one-line description}
 
-## 아키텍처
+## Architecture
 
-{핵심 패턴 3~5가지 — WHY 포함 / 단순 프로젝트는 모듈 구조만 기술}
+{3~5 core patterns — include WHY / simple projects: module structure only}
 
-## 빌드 & 테스트
+## Build & Test
 
 \`\`\`bash
 {BUILD_CMD}
 {TEST_CMD}
 \`\`\`
 
-## 포트 / 엔드포인트
+## Ports / Endpoints
 
-| 포트 | 용도 |
-|------|------|
+| Port | Purpose |
+|------|---------|
 
-## 핵심 제약
+## Core Constraints
 
-{Phase 1 제약 목록 중 개발에 직접 영향을 주는 것}
+{Phase 1 constraints that directly affect development}
 
 ## Non-obvious Gotchas
 
-- {함정 1}
-- {함정 2}
+- {gotcha 1}
+- {gotcha 2}
 
-## 참고 문서
+## References
 
-- [Knowledge Base]({OUTPUT_PATH}/knowledge-base.md): Phase 1 도메인 지식 베이스
+- [Knowledge Base]({OUTPUT_PATH}/knowledge-base.md): Phase 1 domain knowledge base
 ```
 
-> **필수**: `knowledge-base.md` 링크를 참고 문서 섹션에 반드시 포함한다. 이 링크가 없으면 다음 세션에서 AI가 KB를 발견하지 못한다.
+> **Required**: Always include `knowledge-base.md` link in the References section. Without this link, AI won't find the KB in future sessions.
 
-150줄 초과 항목은 별도 문서로 분리 후 링크.
-탐색 모드: 프로젝트명·기술스택·빌드 명령어만 채우고 `> 🔍 탐색 중` 표시. 나머지는 개발하면서 추가.
+Items exceeding 150 lines → split to separate document and link.
+Discovery mode: fill project name, tech stack, build commands only + `> 🔍 Discovering`. Add the rest while developing.
 
-**산출물**: `{CODE_PATH}/CLAUDE.md` (+ 모듈별 CLAUDE.md)
+**Output**: `{CODE_PATH}/CLAUDE.md` (+ per-module CLAUDE.md)
 
-> **초안 성격**: Phase 2의 CLAUDE.md는 초안이다. Non-obvious Gotchas와 코딩 컨벤션은 구현해봐야 알 수 있으므로 Phase 4 피드백 루프에서 반드시 갱신한다. 지금은 알 수 있는 것만 채우면 충분하다.
+> **Draft nature**: Phase 2 CLAUDE.md is a draft. Non-obvious Gotchas and coding conventions can only be known after implementation — update in Phase 4 feedback loop. Fill only what's knowable now.
 
-> **게이트**: 일반 모드 — 산출물 저장 후 자체 평가를 수행하고 아래 형식으로 출력한다:
+> **Gate**: Normal mode — after saving, run self-assessment and output:
 >
 > ```
-> [Phase 2 자체 평가]
-> | 항목 | 상태 | 조치 |
-> |------|------|------|
-> | 빌드 명령어 검증 | OK / {미확인} | — / 빌드 파일 재확인 |
-> | High 제약 반영 | OK / {누락 제약} | — / 핵심 제약 섹션 보완 |
-> | KB 링크 존재 | OK / 없음 | — / 참고 문서 섹션에 링크 추가 |
+> [Phase 2 Self-Assessment]
+> | Item | Status | Action |
+> |------|--------|--------|
+> | Build command verified | OK / {unverified} | — / re-check build files |
+> | High constraints reflected | OK / {missing constraints} | — / add to Core Constraints |
+> | KB link exists | OK / missing | — / add to References section |
 >
-> Phase 2 완료 — `CLAUDE.md` 초안을 저장했습니다. 검토 후 Phase 3 진행할까요?
+> Phase 2 complete — `CLAUDE.md` draft saved. Review and proceed to Phase 3?
 > ```
 >
-> 탐색 모드 — 자체 평가 생략. 확인 없이 Phase 3으로 바로 진행.
+> Discovery mode — skip self-assessment. Proceed to Phase 3 without confirmation.
 
 ---
 
 ## Phase 3: SPEC
 
-**목적**: 어떻게 만들지 아키텍처 결정을 문서화한다.
+**Purpose**: Document architecture decisions for how to build it.
 
-### Step 3-1. SPEC (기술 명세)
+### Step 3-1. SPEC (Technical Specification)
 
 ```markdown
 # SPEC — {PROJECT_NAME}
 
-## 아키텍처 결정
-| 결정 사항 | 대안 | 선택 | 근거 |
-|---------|------|------|------|
+## Architecture Decisions
+| Decision | Alternatives | Choice | Rationale |
+|----------|-------------|--------|-----------|
 
-## 패키지 구조
-의존 방향: `진입점 → 애플리케이션 → 도메인 ← 인프라` (역방향 금지)
+## Package Structure
+Dependency direction: `entry → application → domain ← infrastructure` (reverse forbidden)
 → [references/architecture-principles.md](references/architecture-principles.md)
 
-## 구현 계획
-| 순서 | 구현 항목 | REQ | 의존 | 완료 기준 |
-|------|---------|-----|------|---------|
-| 1 | {구현 단위} | REQ-1 | — | {검증 가능한 기준} |
+## Implementation Plan
+| # | Item | REQ | Depends | Done Criteria |
+|---|------|-----|---------|--------------|
+| 1 | {unit} | REQ-1 | — | {verifiable criterion} |
 
-## 요구사항 추적
-| REQ-ID | 요구사항 | PRD 기능 | 구현 항목 | 상태 |
-|--------|---------|---------|---------|------|
-| REQ-1 | {무엇} | {기능명} | 구현 계획 #1 | 미구현 |
-| REQ-2 | {왜} | {기능명} | 구현 계획 #N | 미구현 |
-| REQ-3 | {제약} | {비기능/기능명} | 구현 계획 #N | 미구현 |
+## Requirements Traceability
+| REQ-ID | Requirement | PRD Feature | Implementation Item | Status |
+|--------|-------------|-------------|---------------------|--------|
+| REQ-1 | {what} | {feature} | Plan #1 | not implemented |
+| REQ-2 | {why} | {feature} | Plan #N | not implemented |
+| REQ-3 | {constraint} | {non-func/feature} | Plan #N | not implemented |
 ```
 
-탐색 모드: SPEC을 빈 초안으로 생성하고 `> 🔍 탐색 중` 표시. 요구사항 추적 섹션도 `> 🔍 탐색 중 — 요구사항이 확정되면 채웁니다.`로 표시. 개발하면서 채워 나간다.
+Discovery mode: generate SPEC as empty draft + `> 🔍 Discovering`. Requirements traceability also `> 🔍 Discovering — fill in as requirements are confirmed.` Fill in while developing.
 
-**산출물**: `{OUTPUT_PATH}/spec.md`
+**Output**: `{OUTPUT_PATH}/spec.md`
 
-### Step 3-2. Readiness Gate (반복 여부 판단)
+### Step 3-2. Readiness Gate (decide whether to iterate)
 
-**HARD-GATE (사용자 확인 필수)**: AI는 각 기준의 현재 상태를 요약해 제시한다. 통과 여부는 사용자가 직접 판단한다. AI가 스스로 "통과"를 선언하지 않는다.
+**HARD-GATE (user confirmation required)**: AI summarizes the current state of each criterion. User makes the pass/fail decision. AI must not declare "passed" unilaterally.
 
-아래 형식으로 출력한다. Gate 출력 전 Phase 3 자체 평가를 먼저 수행한다:
+Run Phase 3 self-assessment first, then output the gate:
 
 ```
-[Phase 3 자체 평가]
-| 항목 | 상태 | 조치 |
-|------|------|------|
-| 결정 근거 완전성 | OK / {근거 없는 결정 N개} | — / 해당 항목 보완 |
-| 구현 순서 의존관계 | OK / {미기재 항목} | — / 구현 계획 보완 |
-| REQ 커버리지 | OK / {미매핑 REQ-ID} | — / 요구사항 추적 테이블 보완 |
+[Phase 3 Self-Assessment]
+| Item | Status | Action |
+|------|--------|--------|
+| Decision rationale completeness | OK / {N decisions without rationale} | — / improve those items |
+| Implementation order dependencies | OK / {items missing dependency} | — / update plan |
+| REQ coverage | OK / {unmapped REQ-IDs} | — / update traceability table |
 
 [Readiness Gate]
-① SPEC의 아키텍처 결정에 대안과 근거가 있는가?
-   → {현재 상태: 결정 N개 중 M개 근거 있음 / 근거 없는 항목: ...}
-② 도메인 용어 미확정 항목이 없는가?
-   → {현재 상태: 미확정 N개 — 항목명 나열}
-③ CLAUDE.md가 실제 제약을 반영하는가?
-   → {현재 상태: Phase 1 제약 N개 중 CLAUDE.md 반영 M개}
-④ PRD 기능에 검증 가능한 성공 기준이 있는가?
-   → {현재 상태: 기능 N개 중 M개 성공 기준 있음}
-⑤ 구현 계획의 첫 번째 항목을 바로 시작할 수 있는가?
-   → {현재 상태: 진입 가능 / 블로커: ...}
-⑥ 모든 REQ-ID가 구현 계획에 매핑되어 있는가?
-   → {현재 상태: REQ N개 중 M개 매핑됨 / 미매핑: REQ-X, REQ-Y}
+① Do all SPEC architecture decisions include alternatives and rationale?
+   → {current state: N decisions, M with rationale / missing: ...}
+② Are there no unresolved domain terms?
+   → {current state: N unresolved — list names}
+③ Does CLAUDE.md reflect actual constraints?
+   → {current state: N Phase 1 constraints, M reflected in CLAUDE.md}
+④ Do all PRD features have verifiable success criteria?
+   → {current state: N features, M with success criteria}
+⑤ Can the first implementation plan item start immediately?
+   → {current state: ready / blockers: ...}
+⑥ Are all REQ-IDs mapped to implementation plan items?
+   → {current state: N REQs, M mapped / unmapped: REQ-X, REQ-Y}
 
-미충족 항목이 있다면 해당 Phase를 지정해 주세요.
-모두 통과라면 "Phase 4 진행"이라고 알려 주세요.
+If any criterion is unmet, specify which phase to return to.
+If all pass, say "Proceed to Phase 4".
 ```
 
-| 기준 | 미충족 시 돌아갈 Phase |
-|------|----------------------|
-| ① SPEC의 아키텍처 결정에 대안과 근거가 있는가? | Phase 3 |
-| ② 도메인 용어 미확정 항목이 없는가? | Phase 1 |
-| ③ CLAUDE.md가 실제 제약을 반영하는가? | Phase 2 |
+| Criterion | Phase to return to if unmet |
+|-----------|----------------------------|
+| ① SPEC architecture decisions lack rationale | Phase 3 |
+| ② Unresolved domain terms | Phase 1 |
+| ③ CLAUDE.md missing constraints | Phase 2 |
 
-하나라도 미충족이면 해당 Phase로 돌아가 보강 후 Phase 3까지 재순환한다.
+If any is unmet, return to the corresponding phase, reinforce, then re-cycle back to Phase 3.
 
-탐색 모드에서는 이 게이트가 **스파이럴 종료 체크포인트**가 된다. 체크 시점은 사용자가 직접 판단한다 — 충분히 탐색했다고 느낄 때 Readiness Gate를 요청하면 된다. AI가 현재 상태를 정리해 제시하면, 사용자가 최종 전환 여부를 결정한다.
+In discovery mode, this gate becomes the **spiral exit checkpoint**. The user decides when to check — when they feel sufficiently explored, they request the Readiness Gate. AI presents the current state; user makes the final transition decision.
 
 ---
 
-## Phase 4: Implementation (단계별 구현)
+## Phase 4: Implementation
 
-**목적**: 계획(또는 탐색)을 기반으로 구현하고 각 단계에서 검증한다.
+**Purpose**: Implement based on the plan (or exploration) and verify at each step.
 
-### 각 구현 단위마다
+### Per Implementation Unit
 
-**진입 기준**:
-- 일반 모드: SPEC 확인 완료
-- 탐색 모드: SPEC 빈 초안 생성 완료 (비어있어도 진입 가능)
+**Entry criteria**:
+- Normal mode: SPEC confirmed
+- Discovery mode: SPEC empty draft generated (entry allowed even if empty)
 
-**완료 기준**: 아래 체크리스트 전부 통과 시만 다음 단계로 이동
+**Done criteria**: all checklist items must pass before moving to the next unit
 
-- [ ] `{BUILD_CMD}` 성공
-- [ ] `{TEST_CMD}` 통과 (신규 + 기존 회귀 없음)
-- [ ] SPEC 아키텍처 결정 준수 — 탐색 모드에서 SPEC이 비어있으면 생략
-- [ ] 발견 사항 해당 단계 문서에 반영 완료
-- [ ] 요구사항 추적 테이블 상태 갱신 — 완료된 REQ-ID를 "구현 완료"로 업데이트
+- [ ] `{BUILD_CMD}` succeeds
+- [ ] `{TEST_CMD}` passes (new + no regression)
+- [ ] SPEC architecture decisions followed — skip in discovery mode if SPEC is empty
+- [ ] Findings reflected in the relevant phase document
+- [ ] Requirements traceability table updated — mark completed REQ-IDs as "implemented"
 
-### 피드백 루프 — 구현 중 발견 시 해당 단계로 돌아간다
+### Feedback Loop — return to the relevant phase when findings arise
 
-구현 중 현실과 맞지 않는 내용이 발견되면, Spec만 고치는 것이 아니라 **발견된 내용의 성격에 따라 해당 단계로 돌아가** 갱신한다.
+When implementation reveals mismatches, update the appropriate phase document based on the nature of the finding.
 
-| 발견 내용 | 갱신 대상 |
-|---------|---------|
-| 도메인 개념 오류, 용어 불일치, 새 제약 발견 | Phase 1 `knowledge-base.md` |
-| AI 행동 규칙 변경 필요, 새 gotcha 발견 | Phase 2 `CLAUDE.md` |
-| 아키텍처 결정 번복, 패키지 구조 변경 | Phase 3 `spec.md` |
+| Finding | Update target |
+|---------|--------------|
+| Domain concept error, term mismatch, new constraint | Phase 1 `knowledge-base.md` |
+| AI behavior rule change needed, new gotcha | Phase 2 `CLAUDE.md` |
+| Architecture decision reversal, package structure change | Phase 3 `spec.md` |
 
-갱신 절차:
-1. 발견 내용과 이유를 한 줄로 기록
-2. 해당 단계 문서의 항목 갱신
-3. 갱신 후 구현 계속
+Update procedure:
+1. Record the finding and reason in one line
+2. Update the item in the relevant phase document
+3. Continue implementation after updating
 
-> **원칙**: 구현을 문서에 맞추지 말고, 문서를 현실에 맞춰 갱신한다. 발견은 전 단계 어디든 반영될 수 있다.
+> **Principle**: Don't fit implementation to documents — update documents to match reality. Findings can be reflected in any earlier phase.
 
-### Phase 4 완료 후: 구현 회고
+### Post-Phase 4: Implementation Retrospective
 
-모든 구현 단위가 완료 기준을 통과하면 아래 형식으로 회고를 출력한다.
+After all implementation units pass their done criteria, output the following retrospective.
 
-탐색 모드: "탐색 회고" 축약판 (발견 지식 요약 + 빈 항목 수 + 우선 보강 영역)을 사용한다.
+Discovery mode: use abbreviated "discovery retrospective" (discovered knowledge summary + empty item count + priority improvement areas).
 
 ```
-[구현 회고]
+[Implementation Retrospective]
 
-## 요구사항 달성
-| REQ-ID | 요구사항 | 달성 | 비고 |
-|--------|---------|:---:|------|
-| REQ-1 | {무엇} | ✅/❌ | {한 줄} |
-| REQ-2 | {왜} | ✅/❌ | {한 줄} |
-| REQ-3 | {제약} | ✅/❌ | {한 줄} |
+## Requirements Achievement
+| REQ-ID | Requirement | Achieved | Notes |
+|--------|-------------|:--------:|-------|
+| REQ-1 | {what} | ✅/❌ | {one line} |
+| REQ-2 | {why} | ✅/❌ | {one line} |
+| REQ-3 | {constraint} | ✅/❌ | {one line} |
 
-## 프로세스 회고
-- 잘한 점: {Phase 1~4 중 효과적이었던 판단·접근}
-- 늦게 발견된 것: {피드백 루프에서 Phase 1/2/3에 반영한 내용 요약}
-- 개선할 점: {다음 프로젝트에서 개선할 워크플로우 포인트}
+## Process Retrospective
+- What worked well: {effective decisions/approaches across Phase 1~4}
+- Discovered late: {items fed back to Phase 1/2/3 during implementation}
+- Improvements: {workflow points to improve in next project}
 
-## 문서 최종 상태
-| 문서 | 최종 갱신 내용 | 피드백 루프 갱신 횟수 |
-|------|-------------|:------------------:|
-| knowledge-base.md | {마지막 갱신 내용 요약} | {N}회 |
-| CLAUDE.md | {마지막 갱신 내용 요약} | {N}회 |
-| spec.md | {마지막 갱신 내용 요약} | {N}회 |
+## Final Document State
+| Document | Last update summary | Feedback loop updates |
+|----------|--------------------:|:--------------------:|
+| knowledge-base.md | {summary} | {N} |
+| CLAUDE.md | {summary} | {N} |
+| spec.md | {summary} | {N} |
 ```
 
 ---
 
-## 참조 문서
+## References
 
-- [4단계 체크리스트](references/phase-checklist.md)
-- [Knowledge Base 템플릿](references/knowledge-base-template.md)
-- [CLAUDE.md 정책 템플릿](references/claude-md-policy-template.md)
-- [SPEC 템플릿](references/spec-template.md)
-- [아키텍처 원칙](references/architecture-principles.md)
+- [4-Phase Checklist](references/phase-checklist.md)
+- [Knowledge Base Template](references/knowledge-base-template.md)
+- [CLAUDE.md Policy Template](references/claude-md-policy-template.md)
+- [SPEC Template](references/spec-template.md)
+- [Architecture Principles](references/architecture-principles.md)

@@ -1,18 +1,18 @@
 ---
 name: valid
 description: >
-  context-engineering Readiness Gate 체크.
-  Phase 3 완료 후 Phase 4 진입 전, 또는 탐색 모드 종료 시점에 사용.
-  AI는 현재 상태 요약만 제시하고 사용자가 통과 여부를 결정한다.
-  Keywords: readiness gate, 검증, valid, gate, 스파이럴 종료, 체크포인트
+  context-engineering Readiness Gate check.
+  Use after Phase 3, before Phase 4, or to exit discovery mode.
+  AI summarizes current state only — user decides whether to pass.
+  Keywords: readiness gate, validation, valid, gate, spiral exit, checkpoint
 allowed-tools: Read, Bash, Glob
 ---
 
 # context-engineering:valid
 
-현재 프로젝트 artifacts 상태를 점검하고 Readiness Gate 결과를 사용자에게 제시한다.
+Inspect current project artifacts and present Readiness Gate results to the user.
 
-## 사용법
+## Usage
 
 ```
 /context-engineering:valid [@<code-path>] [--output <output-path>]
@@ -20,50 +20,50 @@ allowed-tools: Read, Bash, Glob
 
 ## Context Resolution
 
-경로를 다음 순서로 결정한다:
+Resolve paths in this order:
 
-1. `@<code-path>` 인자 있음 → `{CODE_PATH}` = 해당 경로
-2. 없음 → 현재 디렉토리에서 `docs/prd.md` 또는 `docs/spec.md` 탐색
-3. 탐색 실패 → "프로젝트 경로를 알려주세요 (예: `@/path/to/project`)"
+1. `@<code-path>` provided → `{CODE_PATH}` = that path
+2. Not provided → search current directory for `docs/prd.md` or `docs/spec.md`
+3. Not found → ask "Please provide the project path (e.g. `@/path/to/project`)"
 
-`{OUTPUT_PATH}` = `--output` 지정 시 해당 경로, 없으면 `{CODE_PATH}/docs/`
+`{OUTPUT_PATH}` = `--output` value if specified, otherwise `{CODE_PATH}/docs/`
 
-## Artifacts 탐색
+## Artifact Scan
 
-다음 파일을 읽어 현재 상태를 파악한다:
-- `{OUTPUT_PATH}/knowledge-base.md` — 도메인 용어·제약
-- `{CODE_PATH}/CLAUDE.md` — 정책
-- `{OUTPUT_PATH}/prd.md` — 기능 요구사항·성공 기준
-- `{OUTPUT_PATH}/spec.md` — 아키텍처 결정·구현 계획
+Read the following files to assess current state:
+- `{OUTPUT_PATH}/knowledge-base.md` — domain terms and constraints
+- `{CODE_PATH}/CLAUDE.md` — policy
+- `{OUTPUT_PATH}/prd.md` — feature requirements and success criteria
+- `{OUTPUT_PATH}/spec.md` — architecture decisions and implementation plan
 
-## Readiness Gate 출력
+## Readiness Gate Output
 
-**HARD-GATE (사용자 확인 필수)**: AI는 각 기준의 현재 상태만 요약한다. 통과 여부는 사용자가 결정한다. AI가 스스로 "통과"를 선언하지 않는다.
+**HARD-GATE (user confirmation required)**: AI presents current state summary only. User decides whether to pass. AI must not declare "passed" unilaterally.
 
 ```
 [Readiness Gate]
-① PRD의 모든 기능에 검증 가능한 성공 기준이 있는가?
-   → {기능 N개 중 M개 성공 기준 기재됨 / 미기재 항목: ...}
-② SPEC의 아키텍처 결정에 대안과 근거가 있는가?
-   → {결정 N개 중 M개 근거 있음 / 근거 없는 항목: ...}
-③ 도메인 용어 미확정 항목이 없는가?
-   → {미확정 N개 — 항목명 나열 / 없으면 "없음"}
-④ CLAUDE.md가 실제 제약을 반영하는가?
-   → {Phase 1 제약 N개 중 CLAUDE.md 반영 M개}
-⑤ SPEC 구현 계획의 첫 항목을 지금 바로 시작할 수 있는가?
-   → {첫 항목명 + 의존 관계}
-⑥ 모든 REQ-ID가 구현 계획에 매핑되어 있는가?
-   → {REQ N개 중 M개 매핑됨 / 미매핑: REQ-X, REQ-Y}
+① Do all PRD features have verifiable success criteria?
+   → {N features, M with criteria / missing: ...}
+② Do all SPEC architecture decisions include alternatives and rationale?
+   → {N decisions, M with rationale / missing: ...}
+③ Are there no unresolved domain terms?
+   → {N unresolved — list names / "none"}
+④ Does CLAUDE.md reflect actual constraints?
+   → {N Phase 1 constraints, M reflected in CLAUDE.md}
+⑤ Can the first implementation plan item start immediately?
+   → {first item name + dependencies}
+⑥ Are all REQ-IDs mapped to implementation plan items?
+   → {N REQs, M mapped / unmapped: REQ-X, REQ-Y}
 
-미충족 항목이 있다면 해당 명령을 사용해 주세요.
-모두 통과라면 "Phase 4 진행" 또는 "/context-engineering:impl" 이라고 알려 주세요.
+If any criterion is unmet, use the corresponding command below.
+If all pass, say "Proceed to Phase 4" or "/context-engineering:impl".
 ```
 
-| 기준 | 미충족 시 |
-|------|---------|
-| ① PRD 성공 기준 누락 | `/context-engineering:spec` 으로 PRD 보완 |
-| ② SPEC 근거 누락 | `/context-engineering:spec` 으로 SPEC 보완 |
-| ③ 도메인 용어 미확정 | `/context-engineering:gather` 로 KB 보완 |
-| ④ CLAUDE.md 제약 미반영 | `/context-engineering:gather` 로 CLAUDE.md 보완 |
-| ⑤ 구현 계획 착수 불가 | `/context-engineering:spec` 으로 SPEC 보완 |
-| ⑥ REQ 미매핑 | `/context-engineering:spec` 으로 요구사항 추적 보완 |
+| Criterion | Unmet action |
+|-----------|-------------|
+| ① PRD success criteria missing | `/context-engineering:spec` to improve PRD |
+| ② SPEC rationale missing | `/context-engineering:spec` to improve SPEC |
+| ③ Unresolved domain terms | `/context-engineering:gather` to improve KB |
+| ④ CLAUDE.md constraints missing | `/context-engineering:gather` to update CLAUDE.md |
+| ⑤ Implementation plan not ready | `/context-engineering:spec` to improve SPEC |
+| ⑥ REQ unmapped | `/context-engineering:spec` to update requirements traceability |
