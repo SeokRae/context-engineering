@@ -1,17 +1,17 @@
 ---
 name: spec
 description: >
-  context-engineering Phase 3 — PRD(제품 요구사항) + SPEC(기술 명세) 작성.
-  새로 작성하거나 기존 PRD·SPEC 재작업·갱신 시 사용.
-  Keywords: PRD, SPEC, 요구사항 명세, 기술 명세, 구현 계획, spec
+  context-engineering Phase 3 — PRD (product requirements) + SPEC (technical specification).
+  Use to write new or rework/update existing PRD and SPEC.
+  Keywords: PRD, SPEC, requirements, technical spec, implementation plan, spec
 allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 # context-engineering:spec
 
-PRD(제품 요구사항)와 SPEC(기술 명세)를 작성한다.
+Write PRD (product requirements) and SPEC (technical specification).
 
-## 사용법
+## Usage
 
 ```
 /context-engineering:spec [@<code-path>] [--output <output-path>]
@@ -19,26 +19,26 @@ PRD(제품 요구사항)와 SPEC(기술 명세)를 작성한다.
 
 ## Context Resolution
 
-경로를 다음 순서로 결정한다:
+Resolve paths in this order:
 
-1. `@<code-path>` 인자 있음 → `{CODE_PATH}` = 해당 경로
-2. 없음 → 현재 디렉토리에서 `docs/prd.md` 또는 `docs/spec.md` 탐색
-3. 탐색 실패 → "프로젝트 경로를 알려주세요 (예: `@/path/to/project`)"
+1. `@<code-path>` provided → `{CODE_PATH}` = that path
+2. Not provided → search current directory for `docs/prd.md` or `docs/spec.md`
+3. Not found → ask "Please provide the project path (e.g. `@/path/to/project`)"
 
-`{OUTPUT_PATH}` = `--output` 지정 시 해당 경로, 없으면 `{CODE_PATH}/docs/`
+`{OUTPUT_PATH}` = `--output` value if specified, otherwise `{CODE_PATH}/docs/`
 
-## 기존 Artifacts 확인
+## Existing Artifacts Check
 
-**Knowledge Base 로드**: `{OUTPUT_PATH}/knowledge-base.md` 있으면 도메인 용어·제약을 컨텍스트로 활용한다.
+**Knowledge Base load**: If `{OUTPUT_PATH}/knowledge-base.md` exists, use domain terms and constraints as context.
 
-**PRD·SPEC 탐지**: `{OUTPUT_PATH}/prd.md`, `{OUTPUT_PATH}/spec.md` 존재 시:
+**PRD/SPEC detection**: If `{OUTPUT_PATH}/prd.md` or `{OUTPUT_PATH}/spec.md` exist:
 
 ```
-[현재 상태]
-- prd.md: {존재하면 기능 N개, 없으면 "없음"}
-- spec.md: {존재하면 아키텍처 결정 N개, 없으면 "없음"}
+[Current State]
+- prd.md: {N features if exists / "not found"}
+- spec.md: {N architecture decisions if exists / "not found"}
 
-재작업(처음부터) 또는 갱신(기존 내용 유지·수정)?
+Rework (start over) or update (keep existing, modify parts)?
 ```
 
 ## Phase 3-1: PRD
@@ -46,77 +46,77 @@ PRD(제품 요구사항)와 SPEC(기술 명세)를 작성한다.
 ```markdown
 # PRD — {PROJECT_NAME}
 
-## 목적
-{이 제품/기능이 해결하는 문제 — 한 문단}
+## Purpose
+{Problem this product/feature solves — one paragraph}
 
-## 사용 시나리오
-{누가, 어떤 상황에서 사용하는가}
+## Usage Scenarios
+{Who uses it, in what situations}
 
-## 기능 요구사항
-| REQ | 기능 | 성공 기준 | 우선순위 |
-|-----|------|---------|---------|
-| REQ-1 | {기능명}: {한 줄 설명} | {검증 가능한 기준} | High/Medium/Low |
+## Feature Requirements
+| REQ | Feature | Success Criteria | Priority |
+|-----|---------|-----------------|----------|
+| REQ-1 | {feature name}: {one-line description} | {verifiable criterion} | High/Medium/Low |
 
-## 제약
-| 제약 | 영향 | 우선순위 |
-|------|------|---------|
-| {제약 설명} | {영향} | High/Medium/Low |
+## Constraints
+| Constraint | Impact | Priority |
+|------------|--------|----------|
+| {description} | {impact} | High/Medium/Low |
 ```
 
-**산출물**: `{OUTPUT_PATH}/prd.md`
+**Output**: `{OUTPUT_PATH}/prd.md`
 
 ## Phase 3-2: SPEC
 
 ```markdown
 # SPEC — {PROJECT_NAME}
 
-## 아키텍처 결정
-| 결정 사항 | 고려한 대안 | 선택 | 근거 |
-|---------|-----------|------|------|
-| {무엇을 결정했나} | {대안1}, {대안2} | {선택한 것} | {이유} |
+## Architecture Decisions
+| Decision | Alternatives considered | Choice | Rationale |
+|----------|------------------------|--------|-----------|
+| {what was decided} | {alt1}, {alt2} | {chosen} | {reason} |
 
-## 패키지 구조
-의존 방향: `진입점 → 애플리케이션 → 도메인 ← 인프라` (역방향 금지)
-* 단순 프로젝트(CLI, 스크립트 등)는 이 구조 대신 프로젝트에 맞는 모듈 구조를 정의한다.
+## Package Structure
+Dependency direction: `entry → application → domain ← infrastructure` (reverse forbidden)
+* Simple projects (CLI, scripts) may use a different module structure appropriate for the project.
 
-\`\`\`
-{레이어}: {폴더 경로}  ← {담당 역할}
-\`\`\`
-
-## 데이터 흐름
-\`\`\`
-{입력} → {컴포넌트A} → {컴포넌트B} → {출력}
-\`\`\`
-
-## 구현 계획
-| 순서 | 구현 대상 | REQ | 의존 | 완료 기준 |
-|------|---------|-----|------|---------|
-| 1 | {모듈/기능} | REQ-1 | — | {검증 가능한 기준} |
-| 2 | {모듈/기능} | REQ-2 | 1 | {검증 가능한 기준} |
-
-## 요구사항 추적
-| REQ-ID | 요구사항 | PRD 기능 | 구현 항목 | 상태 |
-|--------|---------|---------|---------|------|
-| REQ-1 | {무엇} | {기능명} | 구현 계획 #1 | 미구현 |
-| REQ-2 | {왜} | {기능명} | 구현 계획 #N | 미구현 |
-| REQ-3 | {제약} | {비기능/기능명} | 구현 계획 #N | 미구현 |
+```
+{layer}: {folder path}  ← {responsibility}
 ```
 
-탐색 모드: 요구사항 추적 섹션에 `> 🔍 탐색 중 — 요구사항이 확정되면 채웁니다.` 표시.
+## Data Flow
+```
+{input} → {ComponentA} → {ComponentB} → {output}
+```
 
-**산출물**: `{OUTPUT_PATH}/spec.md`
+## Implementation Plan
+| # | Item | REQ | Depends | Done Criteria |
+|---|------|-----|---------|--------------|
+| 1 | {module/feature} | REQ-1 | — | {verifiable criterion} |
+| 2 | {module/feature} | REQ-2 | 1 | {verifiable criterion} |
 
-> **완료**: 일반 모드 — 산출물 저장 후 자체 평가를 수행하고 아래 형식으로 출력한다:
+## Requirements Traceability
+| REQ-ID | Requirement | PRD Feature | Implementation Item | Status |
+|--------|-------------|-------------|---------------------|--------|
+| REQ-1 | {what} | {feature} | Plan #1 | not implemented |
+| REQ-2 | {why} | {feature} | Plan #N | not implemented |
+| REQ-3 | {constraint} | {non-func/feature} | Plan #N | not implemented |
+```
+
+Discovery mode: add `> 🔍 Discovering — fill in as requirements are confirmed.` to requirements traceability section.
+
+**Output**: `{OUTPUT_PATH}/spec.md`
+
+> **Completion**: Normal mode — after saving, run self-assessment and output in this format:
 >
 > ```
-> [Phase 3 자체 평가]
-> | 항목 | 상태 | 조치 |
-> |------|------|------|
-> | 결정 근거 완전성 | OK / {근거 없는 결정 N개} | — / 해당 항목 보완 |
-> | 구현 순서 의존관계 | OK / {미기재 항목} | — / 구현 계획 보완 |
-> | REQ 커버리지 | OK / {미매핑 REQ-ID} | — / 요구사항 추적 테이블 보완 |
+> [Phase 3 Self-Assessment]
+> | Item | Status | Action |
+> |------|--------|--------|
+> | Decision rationale completeness | OK / {N decisions without rationale} | — / improve those items |
+> | Implementation order dependencies | OK / {items missing dependency info} | — / update plan |
+> | REQ coverage | OK / {unmapped REQ-IDs} | — / update traceability table |
 >
-> `prd.md`·`spec.md` 저장했습니다. `/context-engineering:valid`로 Readiness Gate를 체크하거나 `/context-engineering:impl`로 구현을 시작할 수 있습니다.
+> `prd.md` and `spec.md` saved. Use `/context-engineering:valid` to check the Readiness Gate or `/context-engineering:impl` to start implementation.
 > ```
 >
-> 탐색 모드 — 자체 평가 생략. 완료 메시지만 출력.
+> Discovery mode — skip self-assessment. Output completion message only.
