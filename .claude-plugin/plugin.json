@@ -1,7 +1,7 @@
 {
   "name": "context-engineering",
-  "version": "2.0.0",
-  "description": "Context Engineering plugin: universal knowledge engine (/ke) for accumulating and querying knowledge across any domain, plus 4-phase service development workflow (/context-engineering)",
+  "version": "3.0.0",
+  "description": "7-Phase Context Engineering plugin: 단일 파이프라인으로 AI 컨텍스트를 수집·선택·구조화·압축·생성·검증한다.",
   "author": {
     "name": "SeokRae",
     "email": "kslbsh@gmail.com"
@@ -11,16 +11,13 @@
   "license": "MIT",
   "keywords": [
     "context-engineering",
-    "ai-development",
-    "service-dev",
-    "claude-md",
+    "ai-context",
+    "7-phase",
+    "gather",
+    "build",
+    "compose",
+    "verify",
     "knowledge-base",
-    "spec",
-    "workflow",
-    "ke",
-    "knowledge-engine",
-    "ingest",
-    "query",
-    "universal"
+    "workflow"
   ]
 }

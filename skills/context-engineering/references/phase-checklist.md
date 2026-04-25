@@ -1,106 +1,95 @@
-# Context Engineering 4-Phase Checklist
+# Context Engineering 7-Phase 체크리스트
 
-Copy this file when starting a new project.
-
----
-
-## Project Info
-
-- **Project**: 
-- **Code path**: 
-- **Output path**: 
-- **Tech stack**: 
-- **Start date**: 
+프로젝트 시작 시 복사하여 사용한다.
 
 ---
 
-## Step 0: Context Gathering
+## 프로젝트 정보
 
-- [ ] Requirements exploration — confirm What / Why / known constraints
-- [ ] Requirements summary user confirmation (HARD-GATE passed)
-- [ ] Technical parameters collected (PROJECT_NAME, CODE_PATH, TECH_STACK, etc.)
-- [ ] Final parameter summary user confirmation
-
-## Phase 1: Knowledge Base
-
-- [ ] Context Assessment — scenario detection (A/B/C/D) + user confirmation
-- [ ] Source Scan complete (conditional on scenario)
-  - [ ] A: Extract domain concepts from Step 0 conversation
-  - [ ] B: Explore sub-agent parallel scan of spec documents
-  - [ ] C: Codebase scan (package structure, patterns, test strategy)
-  - [ ] D: B + C run in parallel
-- [ ] Domain Glossary written (minimum 5 terms)
-- [ ] Constraint Registry written (TC/BL/OC categories)
-- [ ] Reference Document Manifest written (scenarios B/C/D)
-- [ ] `knowledge-base.md` saved (Scenario A marked as "Draft")
-- [ ] **Self-Assessment performed** (normal mode) — output with gate message
-
-## Phase 2: Policy (CLAUDE.md)
-
-- [ ] CLAUDE.md level decided (project / module)
-- [ ] Architecture rules defined (layer separation, pattern constraints)
-- [ ] Coding conventions documented (naming, test patterns)
-- [ ] Build & Test commands verified
-- [ ] Non-obvious gotchas recorded
-- [ ] Items exceeding 150 lines split to separate document + linked
-- [ ] `{CODE_PATH}/CLAUDE.md` saved
-- [ ] **Self-Assessment performed** (normal mode) — output with gate message
-
-## Phase 3: Spec
-
-- [ ] Architecture decision rationale complete (D-*) — alternatives / choice / rationale included
-- [ ] Package/module structure finalized
-- [ ] **Requirements traceability table written** — REQ-ID → PRD feature → implementation item
-- [ ] **Self-Assessment performed** — before Readiness Gate output
-- [ ] `spec.md` saved
-
-## Phase 4: Implementation
-
-- [ ] Per-module skeleton generated
-- [ ] Core domain objects implemented
-- [ ] Adapters implemented
-- [ ] Tests written + passing
-- [ ] Feedback loop applied (findings → update relevant phase)
-  - [ ] Domain/term error → Phase 1 `knowledge-base.md` updated
-  - [ ] AI behavior rule change → Phase 2 `CLAUDE.md` updated
-  - [ ] Architecture/design change → Phase 3 `spec.md` updated
-- [ ] **Requirements traceability table updated** — completed REQ-IDs marked as "implemented"
-- [ ] Architecture documentation written
-- [ ] Onboarding guide written
-- [ ] **Implementation Retrospective completed** — requirements achievement / process retrospective / final document state
+- **프로젝트**: 
+- **실행 날짜**: 
+- **목적**: 
 
 ---
 
-## Artifact Self-Assessment Criteria
+## gather (Phase 1-3)
 
-Performed immediately before the phase gate, in normal mode only. Format:
+### Phase 1. 문제 정의
 
-```
-| Item | Status | Action |
-|------|--------|--------|
-| {criterion} | OK / {gap description} | — / {specific action} |
-```
+- [ ] 질문 1 완료: purpose (해결하려는 문제)
+- [ ] 질문 2 완료: constraints (필요한 배경 정보)
+- [ ] 질문 3 완료: success criteria (결과물 형태)
+- [ ] Role 자동 추론 완료
+- [ ] G1 통과: purpose / constraints / success criteria 모두 명확
 
-**Phase 1 (Knowledge Base)**
+### Phase 2. 컨텍스트 후보 수집
 
-| Criterion | Met condition | Action if unmet |
-|-----------|--------------|-----------------|
-| Term sufficiency | Glossary 5+ terms, no key domain concepts missing | Re-run Source Scan or supplement Step 0 conversation |
-| Constraint categories | At least 2 of TC/BL/OC categories used | Expand constraint registry entries |
-| Source attribution | All terms have source (document name / conversation) recorded | Supplement items missing source |
+- [ ] Phase 1 신호 기반 소스 결정
+- [ ] 결정된 소스에서 후보 수집 완료
+- [ ] G2 통과: 필요한 소스 모두 수집, 명백한 누락 없음
 
-**Phase 2 (CLAUDE.md)**
+### Phase 3. 컨텍스트 선택
 
-| Criterion | Met condition | Action if unmet |
-|-----------|--------------|-----------------|
-| Build command verified | BUILD_CMD, TEST_CMD execution confirmed | Re-check build files and update |
-| High constraints reflected | Phase 1 High-priority constraints included in Core Constraints section | Supplement Core Constraints section |
-| KB link exists | `knowledge-base.md` link present in References section | Add link to References section |
+- [ ] 관련성 / 최신성 / 신뢰성 기준 적용
+- [ ] Keep / Skip / Merge 분류 완료
+- [ ] G3 통과: 기준 일관 적용, Skip 이유 명확
 
-**Phase 3 (Spec)**
+---
 
-| Criterion | Met condition | Action if unmet |
-|-----------|--------------|-----------------|
-| Decision rationale completeness | All architecture decisions include alternatives and rationale | Supplement missing decision entries |
-| Implementation plan dependencies mapped | Implementation plan includes dependency relationships and done criteria | Supplement implementation plan entries |
-| REQ coverage verified | All REQ-IDs mapped to implementation plan items | Supplement requirements traceability table |
+## build (Phase 4-5)
+
+### Phase 4. 컨텍스트 구조화
+
+- [ ] Key Facts 섹션 작성
+- [ ] Constraints 섹션 작성
+- [ ] Decisions 섹션 작성
+- [ ] Notes 섹션 작성 (해당 시)
+- [ ] 빈 섹션 제거
+- [ ] G4 통과: 모호한 항목 없음, 섹션 간 중복 없음
+
+### Phase 5. 컨텍스트 압축
+
+- [ ] 중복 항목 제거
+- [ ] 접선 정보 한 줄 요약으로 대체
+- [ ] Constraints / Decisions 원문 유지 확인
+- [ ] G5 통과: Constraints / Decisions 압축 후에도 살아있음
+
+---
+
+## compose (Phase 6)
+
+### Phase 6. 실행 지시 생성
+
+- [ ] Phase 1 success criteria 신호 재확인
+- [ ] 출력 형식 결정 (지시문 / KB 엔트리 / 프로젝트 산출물)
+- [ ] 출력물 생성 완료
+- [ ] G6 통과: success criteria 일치, 누락·충돌·추측 없음
+
+**출력 형식**: ☐ 지시문  ☐ KB 엔트리  ☐ 프로젝트 산출물
+
+---
+
+## verify (Phase 7) — G6 실패 시 또는 수동 실행
+
+### Phase 7. 최종 검증
+
+- [ ] 누락 점검: Phase 1 purpose/constraints 반영 여부
+- [ ] 충돌 점검: 출력물 내 모순 없음
+- [ ] 추측 점검: 근거 없는 주장 없음
+- [ ] 일관성 점검: 출력 형식과 success criteria 일치
+- [ ] 신뢰도 표시: H / M / L
+- [ ] 피드백 루프 필요 시 해당 Phase 복귀
+
+---
+
+## 자가 점검 기준
+
+| Phase | 핵심 기준 |
+|-------|---------|
+| G1 | purpose / constraints / success criteria 3개 모두 명확 |
+| G2 | 필요한 소스 모두 수집, 명백한 누락 없음 |
+| G3 | 관련성·최신성·신뢰성 일관 적용, Skip 이유 명확 |
+| G4 | 모호한 항목 없음, 섹션 간 중복 없음 |
+| G5 | Constraints / Decisions 압축 후에도 살아있음 |
+| G6 | success criteria 일치, 누락·충돌·추측 없음 |
+| G7 | 신뢰도 H/M/L 표시, 피드백 루프 완료 |
