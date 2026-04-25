@@ -48,23 +48,16 @@ claude --plugin-dir /path/to/context-engineering
 
 ## 파이프라인
 
-```mermaid
-flowchart LR
-    P1["Phase 1\n정의"] -->|G1| P2["Phase 2\n수집"]
-    P2 -->|G2| P3["Phase 3\n선택"]
-    P3 -->|G3| P4["Phase 4\n구조화"]
-    P4 -->|G4| P5["Phase 5\n압축"]
-    P5 -->|G5| P6["Phase 6\n생성"]
-    P6 -->|"G6 ✓"| OUT["출력\nA / B / C"]
-    P6 -->|"G6 ✗"| P7["Phase 7\n검증"]
-    P7 -->|재수집| P1
-    P7 -->|재구조화| P4
-
-    style OUT fill:#10b981,color:#fff,stroke:none
-    style P7  fill:#f59e0b,color:#fff,stroke:none
+```
+Phase 1 --[G1]--> Phase 2 --[G2]--> Phase 3 --[G3]-->
+Phase 4 --[G4]--> Phase 5 --[G5]--> Phase 6 --[G6]--> [출력]
+                                                          |
+                                                     (G6 실패)
+                                                          v
+                                                       Phase 7
 ```
 
-> **인터랙티브 시각화** → [context-engineering-cycle.html](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)
+> **인터랙티브 시각화** → [English](https://seokrae.github.io/context-engineering/context-engineering-cycle.html) | [한국어](https://seokrae.github.io/context-engineering/context-engineering-cycle.ko.html)
 
 | 서브스킬 | Phase | 역할 |
 |---------|-------|------|
