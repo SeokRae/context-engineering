@@ -48,14 +48,23 @@ claude --plugin-dir /path/to/context-engineering
 
 ## Pipeline
 
+```mermaid
+flowchart LR
+    P1["Phase 1\nDefine"] -->|G1| P2["Phase 2\nCollect"]
+    P2 -->|G2| P3["Phase 3\nSelect"]
+    P3 -->|G3| P4["Phase 4\nStructure"]
+    P4 -->|G4| P5["Phase 5\nCompress"]
+    P5 -->|G5| P6["Phase 6\nCompose"]
+    P6 -->|"G6 ✓"| OUT["Output\nA / B / C"]
+    P6 -->|"G6 ✗"| P7["Phase 7\nVerify"]
+    P7 -->|re-gather| P1
+    P7 -->|re-build| P4
+
+    style OUT fill:#10b981,color:#fff,stroke:none
+    style P7  fill:#f59e0b,color:#fff,stroke:none
 ```
-Phase 1 --[G1]--> Phase 2 --[G2]--> Phase 3 --[G3]-->
-Phase 4 --[G4]--> Phase 5 --[G5]--> Phase 6 --[G6]--> [Output]
-                                                          |
-                                                     (G6 fail)
-                                                          v
-                                                       Phase 7
-```
+
+> **Interactive visualization** → [context-engineering-cycle.html](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)
 
 | Sub-skill | Phases | What it does |
 |-----------|--------|--------------|
