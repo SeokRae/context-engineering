@@ -300,7 +300,11 @@
       </div>
       <div class="legend-item">
         <div class="legend-line dashed"></div>
-        <span>피드백 루프 (Spec 갱신)</span>
+        <span>Spec 갱신 (Phase 4 → 3)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line dashed" style="background: repeating-linear-gradient(90deg, #06b6d4 0, #06b6d4 4px, transparent 4px, transparent 9px);"></div>
+        <span>KB 갱신 (Phase 4 → 1)</span>
       </div>
       <div class="legend-item">
         <div class="legend-line dashed" style="background: linear-gradient(90deg, #f59e0b 60%, transparent 60%); background-size: 10px 2px;"></div>
@@ -629,6 +633,7 @@
       var guideColor  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
       var fbColor     = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.22)';
       var refineColor = isDark ? '#f59e0b' : '#d97706';
+      var kbColor     = isDark ? '#06b6d4' : '#0891b2';
 
       /* --- DEFS --- */
       var defs = makeSVGEl('defs', {});
@@ -658,6 +663,14 @@
       });
       var pref = makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: refineColor });
       mref.appendChild(pref); defs.appendChild(mref);
+
+      // KB/Policy feedback arrow marker (cyan)
+      var mkb = makeSVGEl('marker', {
+        id: 'arr-kb', markerWidth: '8', markerHeight: '6',
+        refX: '7', refY: '3', orient: 'auto'
+      });
+      var pkb = makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: kbColor });
+      mkb.appendChild(pkb); defs.appendChild(mkb);
 
       // Glow filters
       PHASES.forEach(function(p) {
@@ -825,6 +838,50 @@
         svg.appendChild(lbl);
       })();
 
+      /* --- FEEDBACK ARROW: Phase 4 → Phase 1 (KB/Policy 갱신, dashed cyan) --- */
+      (function() {
+        var f = PHASES[4], t = PHASES[1]; // Phase 4 → Phase 1
+        var dx = t.cx - f.cx, dy = t.cy - f.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+
+        var sx = f.cx + nx*(NR+3), sy = f.cy + ny*(NR+3);
+        var ex = t.cx - nx*(NR+12), ey = t.cy - ny*(NR+12);
+
+        // Phase 4 and Phase 1 are at the same y — push control point toward center
+        var mx = (sx+ex)/2, my = (sy+ey)/2;
+        var dcx = CX - mx, dcy = CY - my;
+        var dcd = Math.sqrt(dcx*dcx + dcy*dcy);
+        var cp_x = mx + (dcx/dcd)*90;
+        var cp_y = my + (dcy/dcd)*90;
+
+        var path = makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
+          fill: 'none', stroke: kbColor, 'stroke-width': '1.5',
+          'stroke-dasharray': '4,5', 'stroke-linecap': 'round',
+          'marker-end': 'url(#arr-kb)'
+        });
+        svg.appendChild(path);
+
+        // Label near midpoint, shifted up slightly to avoid center text
+        var lx = 0.25*sx + 0.5*cp_x + 0.25*ex;
+        var ly = (0.25*sy + 0.5*cp_y + 0.25*ey) - 14;
+
+        var bg = makeSVGEl('rect', {
+          x: lx-30, y: ly-10, width: '60', height: '20', rx: '6',
+          fill: surfaceColor, stroke: kbColor, 'stroke-width': '1'
+        });
+        svg.appendChild(bg);
+
+        var lbl = makeSVGEl('text', {
+          x: lx, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: kbColor, 'font-size': '11',
+          'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
+        });
+        lbl.textContent = 'KB 갱신';
+        svg.appendChild(lbl);
+      })();
+
       /* --- NODES --- */
       PHASES.forEach(function(p, idx) {
         var g = makeSVGEl('g', { class: 'svg-node', 'data-idx': idx });
@@ -912,6 +969,26 @@
         });
         overlay.addEventListener('click', function() { handleNodeClick(idx); });
         g.appendChild(overlay);
+
+        // Gate badge: Phase 1/2/3 자체 평가 표시 (directly above each node)
+        if (p.confirmLabel) {
+          var bx = p.cx;
+          var by = p.cy - NR - 16;
+          var bw = 44, bh = 14;
+          var brect = makeSVGEl('rect', {
+            x: bx - bw/2, y: by - bh/2, width: bw, height: bh, rx: '7',
+            fill: p.color + '22', stroke: p.color, 'stroke-width': '0.8',
+            opacity: '0.95'
+          });
+          g.appendChild(brect);
+          var btxt = makeSVGEl('text', {
+            x: bx, y: by, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+            fill: p.color, 'font-size': '8.5',
+            'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '700'
+          });
+          btxt.textContent = '✓ 자체 평가';
+          g.appendChild(btxt);
+        }
 
         svg.appendChild(g);
       });
