@@ -4,6 +4,15 @@
 
 A Claude Code plugin that defines step-by-step **"what to know, how to behave, and what to build"** when developing complex services with AI tools.
 
+## Skills Overview
+
+This plugin provides two independent skill sets:
+
+| Skill | Command | Purpose |
+|-------|---------|---------|
+| **Knowledge Engine** | `/ke`, `/ke:ingest`, `/ke:query` | Accumulate knowledge from any domain, query it to produce any output |
+| **Service Development** | `/context-engineering`, sub-skills | 4-phase workflow for building complex services with AI |
+
 ## What is Context Engineering?
 
 Context Engineering is **the practice of designing what goes into an LLM's context window**. It goes beyond writing a single good prompt — it decides what information to give to AI, when, and in what structure. RAG, memory architecture, token budget management, and system prompt design all fall under this category.
@@ -39,7 +48,7 @@ Verify installation:
 ```bash
 claude plugin list
 #   ❯ context-engineering@context-engineering
-#     Version: 1.0.0
+#     Version: 2.0.0
 #     Scope: user
 #     Status: ✔ enabled
 ```
@@ -85,6 +94,37 @@ Each sub-skill auto-detects existing artifacts (knowledge-base.md, CLAUDE.md, pr
 /context-engineering:valid
 /context-engineering:impl @/path/to/project
 ```
+
+## Knowledge Engine (`/ke`)
+
+A universal 7-phase engine for accumulating knowledge and producing AI-powered output. Not tied to software development — works for any domain and any output type.
+
+### Two modes
+
+- **Ingest** — store information systematically into a knowledge base
+- **Query** — use stored knowledge to answer questions or produce output (code, analysis, reports, documents)
+
+### Commands
+
+```
+/ke                    — auto-detect mode from your input
+/ke:ingest             — force ingest mode
+/ke:query              — force query mode
+/ke --kb /path/to/kb   — use a specific knowledge base location
+```
+
+### How it works
+
+Knowledge is stored as plain markdown files — works with any tool (Obsidian, VS Code, GitHub, etc.).
+
+```
+~/knowledge/             ← default location
+  index.md               ← master index (all entries, searchable)
+  {domain}/
+    {entry-slug}.md      ← one concept per file
+```
+
+Each knowledge entry has frontmatter (title, domain, type, source, date, reliability, tags) and structured body sections (Key Facts, Constraints, Decisions, Notes).
 
 ## Workflow
 
