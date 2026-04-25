@@ -72,7 +72,7 @@ domain/slug.md — relevant because: [reason]
 
 Rank candidates by relevance, recency (prefer newer), and reliability (prefer higher). Keep top candidates.
 
-For simple queries with 1–2 matching entries: execute silently, skip to Phase 4.
+For simple queries (see simple query definition) with 1–2 matching entries: execute silently, skip to Phase 4.
 
 ---
 
@@ -87,7 +87,7 @@ Sequence them logically.
 
 Summarize tangential context to fit the context budget. Prioritize directly relevant information.
 
-For simple queries: execute silently.
+For simple queries (see simple query definition): execute silently.
 
 ---
 
@@ -103,19 +103,24 @@ Supported formats (non-exhaustive): prose narrative, bullet list, comparison tab
 
 Check the answer for unsupported claims, internal contradictions, and gaps relative to stored knowledge.
 
-Append a confidence footer:
-```
-[Confidence: H/M/L] — based on N entries. Gaps: {gap description or "none"}
-```
+**Confidence levels and footer format**:
 
-**Confidence levels**:
 - **H (High)**: 3+ consistent recent entries; answer is well-grounded
-- **M (Medium)**: 1–2 entries or dated entries; gaps noted, answer is reasonable
-- **L (Low)**: 0 relevant entries or contradictory entries; answer relies on general knowledge — always warn
+  - Append footer only: `[Confidence: H] — based on N entries. Gaps: {gap description or "none"}`
 
-Example footer:
+- **M (Medium)**: 1–2 entries or dated entries; gaps noted, answer is reasonable
+  - Append footer: `[Confidence: M] — based on N entries. Gaps: {gap description or "none"}`
+  - Add note: *"Consider ingesting more recent information to improve accuracy."*
+
+- **L (Low)**: 0 relevant entries or contradictory entries; answer relies on general knowledge — always warn
+  - Append footer: `[Confidence: L] — based on N entries. Gaps: {gap description or "none"}`
+  - Add warning: *"⚠ Answer relies primarily on general knowledge, not stored entries. Consider ingesting relevant knowledge before relying on this answer."*
+
+Example footer (M confidence):
 ```
 [Confidence: M] — based on 1 entry (older). Gaps: no recent updates on authentication changes
+
+Consider ingesting more recent information to improve accuracy.
 ```
 
 ---
@@ -126,6 +131,8 @@ Example footer:
 2. **Graceful degradation**: Missing or empty KB → answer from general knowledge, noted in confidence footer.
 3. **Phase visibility**: Show phase transitions only for complex multi-domain queries. Simple queries execute Phases 1–5 silently.
 4. **No gates**: Flow without interruption except single-question decision points.
-5. **Always append footer**: Query mode always includes a confidence footer. If Low, add: *"Consider ingesting more information on this topic before relying on this answer."*
+5. **Always append footer**: Query mode always includes a confidence footer. If Low, add the standard warning (see Phase 7 Verification).
+
+**Simple query definition**: Single-domain query returning ≤2 matching candidates. **Complex query**: Multi-domain OR >2 candidates.
 
 ---
