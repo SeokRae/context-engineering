@@ -1,7 +1,7 @@
 {
   "name": "context-engineering",
-  "version": "1.0.0",
-  "description": "4-phase Context Engineering workflow for developing complex services with AI tools: domain knowledge collection → Policy (CLAUDE.md) → implementation Spec → step-by-step implementation",
+  "version": "2.0.0",
+  "description": "Context Engineering plugin: universal knowledge engine (/ke) for accumulating and querying knowledge across any domain, plus 4-phase service development workflow (/context-engineering)",
   "author": {
     "name": "SeokRae",
     "email": "kslbsh@gmail.com"
@@ -16,6 +16,11 @@
     "claude-md",
     "knowledge-base",
     "spec",
-    "workflow"
+    "workflow",
+    "ke",
+    "knowledge-engine",
+    "ingest",
+    "query",
+    "universal"
   ]
 }
