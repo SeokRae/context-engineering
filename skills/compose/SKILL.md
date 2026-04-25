@@ -94,6 +94,22 @@ MCP Tools (해당 시):
 - "웹", "브라우저", "UI" 신호 → playwright MCP 포함
 - 도구 필요 신호 없으면 → `## Tools` 섹션 생략
 
+### 컨텍스트 유지 지시 (실행 지시문 전용)
+
+실행 지시문(A 형식)이 **3단계 이상** 작업을 지시하는 경우, 지시문 하단에 다음 블록을 추가한다:
+
+    ## Context Checkpoints
+
+    이 작업이 3단계 이상이면:
+    1. 각 주요 단계 완료 후 `_context-session.md`에 기록:
+       - 현재까지 완료한 것
+       - 발견한 핵심 사실
+       - 다음 단계에 필요한 정보
+    2. 다음 단계 시작 전 `_context-session.md`를 다시 읽는다
+    3. 모든 단계 완료 후 `_context-session.md`를 삭제한다
+
+참조: [Context Session Template](../context-engineering/references/context-session-template.md)
+
 ---
 
 ### B. KB 엔트리
