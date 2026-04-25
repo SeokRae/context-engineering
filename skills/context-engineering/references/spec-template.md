@@ -1,50 +1,49 @@
 # SPEC — {PROJECT_NAME}
 
-> Phase 3 산출물. 어떻게 만들지 기술적으로 정의한다.
+> Phase 3 artifact. Technical definition of how to build it.
 
 ---
 
-## 아키텍처 결정
+## Architecture Decisions
 
-| 결정 사항 | 고려한 대안 | 선택 | 근거 |
+| Decision | Alternatives | Choice | Rationale |
 |---------|-----------|------|------|
-| {무엇을 결정했나} | {대안1}, {대안2} | {선택한 것} | {이유} |
+| {what was decided} | {alt1}, {alt2} | {chosen} | {reason} |
 
 ---
 
-## 패키지 구조
+## Package Structure
 
-의존 방향: `진입점 → 애플리케이션 → 도메인 ← 인프라` (역방향 금지)
+Dependency direction: `entry -> application -> domain <- infrastructure` (reverse forbidden)
 
 ```
-{레이어}: {폴더 경로}  ← {담당 역할}
+{layer}: {folder path}  ← {responsibility}
 ```
 
-> 원칙·레이어 정의·언어별 폴더명 → [architecture-principles.md](architecture-principles.md)
+> Principles, layer definitions, language-specific folder names → [references/architecture-principles.md](references/architecture-principles.md)
 
 ---
 
-## 데이터 흐름
+## Data Flow
 
 ```
-{입력} → {컴포넌트A} → {컴포넌트B} → {출력}
+{input} → {ComponentA} → {ComponentB} → {output}
 ```
 
 ---
 
-## 구현 계획
+## Implementation Plan
 
-| 순서 | 구현 항목 | REQ | 의존 | 완료 기준 |
+| # | Item | REQ | Depends | Done Criteria |
 |------|---------|-----|------|---------|
-| 1 | {첫 번째 구현 단위} | REQ-1 | — | {검증 가능한 기준} |
+| 1 | {first implementation unit} | REQ-1 | — | {verifiable criterion} |
 
 ---
 
-## 요구사항 추적
+## Requirements Traceability
 
-| REQ-ID | 요구사항 | PRD 기능 | 구현 항목 | 상태 |
+| REQ-ID | Requirement | PRD Feature | Implementation Item | Status |
 |--------|---------|---------|---------|------|
-| REQ-1 | {무엇} | {기능명} | 구현 계획 #1 | 미구현 |
-| REQ-2 | {왜/목적} | {기능명} | 구현 계획 #N | 미구현 |
-| REQ-3 | {제약} | {기능명 또는 "비기능"} | 구현 계획 #N | 미구현 |
-
+| REQ-1 | {what} | {feature} | Implementation Plan #1 | not implemented |
+| REQ-2 | {why} | {feature} | Implementation Plan #N | not implemented |
+| REQ-3 | {constraint} | {non-func/feature} | Implementation Plan #N | not implemented |

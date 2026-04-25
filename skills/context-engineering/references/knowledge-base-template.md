@@ -1,55 +1,55 @@
 # Knowledge Base — {PROJECT_NAME}
 
-> Phase 1 산출물. AI가 이 프로젝트의 도메인을 이해하기 위한 지식 베이스.
+> Phase 1 artifact. Knowledge base for AI to understand this project's domain.
 
 ---
 
-## 도메인 용어 (Glossary)
+## Domain Glossary
 
-| 용어 | 정의 | 출처 |
-|------|------|------|
-| {용어} | {한 줄 정의} | {문서명} |
-
----
-
-## 제약조건 레지스트리
-
-| ID | 분류 | 설명 | 영향 | 우선순위 |
-|----|------|------|------|---------|
-| TC-1 | 기술 | | | High |
-| BL-1 | 비즈니스 | | | Medium |
-| OC-1 | 조직 | | | Low |
-
-**분류 기준**
-- `TC` (Technical Constraint): 기술 스택, 버전, 프로토콜 제약
-- `BL` (Business Logic): 비즈니스 규칙, 계산 방식, 허용 범위
-- `OC` (Organizational Constraint): 일정, 외부 의존성, 접근 제한
+| Term | Definition | Source |
+|------|-----------|--------|
+| {term} | {one-line definition} | {document name} |
 
 ---
 
-## 참조 문서 매니페스트
+## Constraint Registry
 
-| 경로 | 유형 | 요약 | 갱신일 |
-|------|------|------|--------|
-| {경로} | spec | {한 줄 요약} | {YYYY-MM-DD} |
-| {경로} | api-guide | {한 줄 요약} | {YYYY-MM-DD} |
-| {경로} | meeting | {한 줄 요약} | {YYYY-MM-DD} |
+| ID | Category | Description | Impact | Priority |
+|----|----------|-------------|--------|---------|
+| TC-1 | Technical | | | High |
+| BL-1 | Business | | | Medium |
+| OC-1 | Organizational | | | Low |
 
----
-
-## 기술 스택
-
-| 기술 | 버전 | 용도 |
-|------|------|------|
-| {언어} | {버전} | |
-| {프레임워크} | {버전} | |
-| {외부 라이브러리} | {버전} | |
+**Category reference**
+- `TC` (Technical Constraint): tech stack, version, protocol constraints
+- `BL` (Business Logic): business rules, calculation methods, allowed ranges
+- `OC` (Organizational Constraint): schedule, external dependencies, access restrictions
 
 ---
 
-## 기존 코드 패턴 (있을 경우)
+## Reference Document Manifest
 
-- **패키지 구조**: 
-- **주요 패턴**: 
-- **테스트 전략**: 
-- **네이밍 컨벤션**: 
+| Path | Type | Summary | Updated |
+|------|------|---------|---------|
+| {path} | spec | {one line} | {YYYY-MM-DD} |
+| {path} | api-guide | {one line} | {YYYY-MM-DD} |
+| {path} | meeting | {one line} | {YYYY-MM-DD} |
+
+---
+
+## Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| {language} | {version} | |
+| {framework} | {version} | |
+| {external library} | {version} | |
+
+---
+
+## Existing Code Patterns (if applicable)
+
+- **Package structure**: 
+- **Key patterns**: 
+- **Test strategy**: 
+- **Naming conventions**: 
