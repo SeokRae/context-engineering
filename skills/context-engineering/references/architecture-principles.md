@@ -1,6 +1,6 @@
 # Architecture Principles
 
-**Optionally** referenced during Phase 3 package/module structure design.
+**Optionally** referenced during Phase 6 (Format C) package/module structure design.
 
 > **Applies to**: Services requiring external API integration, complex business rules, or a domain model.
 > Simple CLI scripts, data pipelines, and analysis tools should define their own structure directly instead of following these principles.
