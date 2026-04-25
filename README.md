@@ -69,7 +69,7 @@ Restart Claude Code after installation for changes to take effect.
 ```bash
 claude plugin list
 #   ❯ context-engineering@context-engineering
-#     Version: 3.0.0
+#     Version: 3.1.0
 #     Scope: user
 #     Status: ✔ enabled
 ```
@@ -166,12 +166,12 @@ Phase artifact templates are in `skills/context-engineering/references/`:
 ```
 context-engineering/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin metadata (v3.0.0)
+│   ├── plugin.json          # Plugin metadata (v3.1.0)
 │   └── marketplace.json     # Marketplace registration
 ├── skills/
 │   ├── context-engineering/
 │   │   ├── SKILL.md         # Orchestrator — full 7-phase pipeline
-│   │   └── references/      # 8 artifact templates
+│   │   └── references/      # 10 artifact templates and reference docs
 │   ├── gather/SKILL.md      # Phase 1–3
 │   ├── build/SKILL.md       # Phase 4–5
 │   ├── compose/SKILL.md     # Phase 6
