@@ -1,6 +1,6 @@
 # CLAUDE.md Policy Template
 
-> Phase 2 artifact. Use this template to write `{CODE_PATH}/CLAUDE.md`. Target length: 100~150 lines. Move overflows to separate documents.
+> Phase 6 artifact. Use this template to write `{CODE_PATH}/CLAUDE.md`. Target length: 100~150 lines. Move overflows to separate documents.
 
 ---
 

@@ -1,6 +1,6 @@
 # SPEC — {PROJECT_NAME}
 
-> Phase 3 artifact. Technical definition of how to build it.
+> Phase 6 artifact. Technical definition of how to build it.
 
 ---
 

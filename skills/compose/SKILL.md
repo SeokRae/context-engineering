@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Bash, Grep, Glob
 실행 전 build 산출물 확인:
 
 ```
-Phase 1 분석 결과 (purpose / constraints / success criteria / Role)
+Phase 1 분석 결과 (purpose / constraints / success criteria / Role / scope-declaration)
 구조화·압축된 컨텍스트 블록 (Key Facts / Constraints / Decisions / Notes)
 ```
 
@@ -58,6 +58,31 @@ Phase 1의 success criteria 답변에서 신호를 읽어 형식을 결정한다
 
 신호가 모호하면 1회만 질문:
 > "출력 형식을 선택해주세요: (A) 실행 지시문  (B) KB 엔트리  (C) 프로젝트 산출물"
+
+---
+
+## G6 게이트
+
+compose 완료 후 AI가 자동 평가:
+
+| 기준 | 평가 |
+|------|------|
+| success criteria 일치 | 출력물이 Phase 1에서 정의한 결과물의 형태와 일치하는가 |
+| 누락 없음 | Phase 1 purpose/constraints가 출력에 모두 반영됐는가 |
+| 충돌 없음 | 출력 내 모순이 없는가 |
+| 추측 없음 | 근거 없는 주장이 포함되지 않았는가 |
+
+**G6 통과**: 완료 — 출력물 제시
+
+**G6 실패**: Phase 7 자동 호출
+```
+G6 미충족: {기준} — {이유}
+verify를 실행하여 상세 검증을 진행합니다.
+```
+
+---
+
+> 각 형식의 상세 구조는 아래를 참조한다.
 
 ---
 
@@ -147,16 +172,16 @@ related: []
 > {one-line summary}
 
 ## Key Facts
-{Phase 4의 Key Facts 항목}
+{build 산출물의 Key Facts 항목}
 
 ## Constraints
-{Phase 4의 Constraints 항목}
+{build 산출물의 Constraints 항목}
 
 ## Decisions
-{Phase 4의 Decisions 항목}
+{build 산출물의 Decisions 항목}
 
 ## Notes
-{Phase 4의 Notes 항목}
+{build 산출물의 Notes 항목}
 ```
 
 저장 경로: `{KNOWLEDGE_PATH}/{domain}/{slugified-title}.md`
@@ -167,7 +192,7 @@ related: []
 - 헤더 카운트 재계산 (Total entries, Domains)
 - 날짜 내림차순 정렬 유지
 
-참조: [Entry Template](../context-engineering/references/entry-template.md)
+참조: [Entry Template](../context-engineering/references/entry-template.md) | [Index Template](../context-engineering/references/index-template.md)
 
 ---
 
@@ -201,7 +226,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 - [Knowledge Base]({OUTPUT_PATH}/knowledge-base.md)
 ```
 
-참조: [CLAUDE.md Template](../context-engineering/references/claude-md-policy-template.md)
+참조: [CLAUDE.md Template](../context-engineering/references/claude-md-policy-template.md) | [Knowledge Base Template](../context-engineering/references/knowledge-base-template.md)
 
 **spec.md** (기술 명세):
 
@@ -224,24 +249,3 @@ This file provides guidance to Claude Code when working with code in this reposi
 참조: [Spec Template](../context-engineering/references/spec-template.md)
 
 **구현 계획**: 첫 번째 구현 항목을 즉시 시작할 수 있는 수준으로 기술.
-
----
-
-## G6 게이트
-
-compose 완료 후 AI가 자동 평가:
-
-| 기준 | 평가 |
-|------|------|
-| success criteria 일치 | 출력물이 Phase 1에서 정의한 결과물의 형태와 일치하는가 |
-| 누락 없음 | Phase 1 purpose/constraints가 출력에 모두 반영됐는가 |
-| 충돌 없음 | 출력 내 모순이 없는가 |
-| 추측 없음 | 근거 없는 주장이 포함되지 않았는가 |
-
-**G6 통과**: 완료 — 출력물 제시
-
-**G6 실패**: Phase 7 자동 호출
-```
-G6 미충족: {기준} — {이유}
-verify를 실행하여 상세 검증을 진행합니다.
-```

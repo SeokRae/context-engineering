@@ -53,7 +53,7 @@
 - [ ] 중복 항목 제거
 - [ ] 접선 정보 한 줄 요약으로 대체
 - [ ] Constraints / Decisions 원문 유지 확인
-- [ ] G5 통과: Constraints / Decisions 압축 후에도 살아있음
+- [ ] G5 통과: Constraints / Decisions 보존 + 예산 준수 + 과압축 방지
 
 ---
 
@@ -91,6 +91,6 @@
 | G2 | 필요한 소스 모두 수집, 명백한 누락 없음 |
 | G3 | 관련성·최신성·신뢰성 일관 적용, Skip 이유 명확 |
 | G4 | 모호한 항목 없음, 섹션 간 중복 없음 |
-| G5 | Constraints / Decisions 압축 후에도 살아있음 |
+| G5 | Constraints / Decisions 보존, 예산 준수, 과압축 방지 |
 | G6 | success criteria 일치, 누락·충돌·추측 없음 |
 | G7 | 신뢰도 H/M/L 표시, 피드백 루프 완료 |
