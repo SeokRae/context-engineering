@@ -19,8 +19,9 @@
 - [ ] 질문 1 완료: purpose (해결하려는 문제)
 - [ ] 질문 2 완료: constraints (필요한 배경 정보)
 - [ ] 질문 3 완료: success criteria (결과물 형태)
+- [ ] Scope Reduction 완료: 세션 범위 선언 블록 생성 (최소 문제 / Must-have / Nice-to-have / 제외)
 - [ ] Role 자동 추론 완료
-- [ ] G1 통과: purpose / constraints / success criteria 모두 명확
+- [ ] G1 통과: purpose / constraints / success criteria / scope 모두 명확
 
 ### Phase 2. 컨텍스트 후보 수집
 
@@ -86,7 +87,7 @@
 
 | Phase | 핵심 기준 |
 |-------|---------|
-| G1 | purpose / constraints / success criteria 3개 모두 명확 |
+| G1 | purpose / constraints / success criteria 3개 모두 명확 + 세션 범위 선언 블록 생성 |
 | G2 | 필요한 소스 모두 수집, 명백한 누락 없음 |
 | G3 | 관련성·최신성·신뢰성 일관 적용, Skip 이유 명확 |
 | G4 | 모호한 항목 없음, 섹션 간 중복 없음 |

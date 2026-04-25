@@ -68,7 +68,7 @@ Phase 1 →[G1]→ Phase 2 →[G2]→ Phase 3 →[G3]
 `/context-engineering:gather` — Phase 1-3 + G1-G3
 
 완료 기준:
-- Phase 1 분석 결과 (purpose / constraints / success criteria / Role)
+- Phase 1 분석 결과 (purpose / constraints / success criteria / Role / scope-declaration)
 - Phase 3 선택 결과 (Keep 항목 목록)
 
 ### 2단계: build 실행
