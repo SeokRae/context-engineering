@@ -75,7 +75,7 @@ Phase 1 →[G1]→ Phase 2 →[G2]→ Phase 3 →[G3]
 `/context-engineering:build` — Phase 4-5 + G4-G5
 
 완료 기준:
-- 구조화·압축된 컨텍스트 블록 (Key Facts / Constraints / Decisions / Notes)
+- 구조화·압축된 컨텍스트 블록 (Key Facts / Constraints / Decisions / Notes(해당 시))
 
 ### 3단계: compose 실행
 `/context-engineering:compose` — Phase 6 + G6
@@ -108,6 +108,8 @@ Phase 1 success criteria에 따라 자동 결정:
 ---
 
 > 파이프라인 실패 시나리오 + 복구 프로토콜 → [Failure Cases & Recovery](references/failure-cases.md)
+
+> 전체 Phase 진행 상황 추적 → [Phase Checklist](references/phase-checklist.md)
 
 ## 스킬 수정 가이드라인
 

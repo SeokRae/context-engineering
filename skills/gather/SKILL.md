@@ -82,6 +82,22 @@ Phase 1 결과:
 
 ---
 
+### 컴팩션 대비 Phase 1 결과 보존
+
+G1 통과 후, 컨텍스트 컴팩션 시 유실 방지를 위해 `_phase1-result.md`에 기록한다:
+
+    --- Phase 1 결과 ---
+    purpose: {확정된 purpose}
+    constraints: {확정된 constraints}
+    success criteria: {확정된 success criteria}
+    Role: {추론된 역할}
+    scope-declaration: {세션 범위 선언 블록}
+
+Phase 2 시작 시 대화 컨텍스트에 Phase 1 결과가 없으면 `_phase1-result.md`에서 복원한다.
+파이프라인 완료(G6 통과 또는 G7 통과) 후 삭제한다.
+
+---
+
 ## Phase 2. 컨텍스트 후보 수집
 
 **목적**: Phase 1 답변을 바탕으로 소스를 결정하고 후보 컨텍스트를 수집한다.

@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Bash, Grep, Glob
 실행 전 gather 산출물 확인:
 
 ```
-Phase 1 분석 결과 (purpose / constraints / success criteria / Role)
+Phase 1 분석 결과 (purpose / constraints / success criteria / Role / scope-declaration)
 Phase 3 선택 결과 (Keep 항목 목록)
 ```
 

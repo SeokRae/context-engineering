@@ -1,6 +1,6 @@
 # Knowledge Base — {PROJECT_NAME}
 
-> Phase 1 artifact. Knowledge base for AI to understand this project's domain.
+> Phase 6 artifact (Format C). Knowledge base scaffold for AI to understand this project's domain.
 
 ---
 

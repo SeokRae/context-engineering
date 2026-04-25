@@ -26,7 +26,8 @@
         "build",
         "compose",
         "verify",
-        "knowledge-base"
+        "knowledge-base",
+        "workflow"
       ]
     }
   ],
