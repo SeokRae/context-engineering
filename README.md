@@ -1,39 +1,39 @@
 # context-engineering
 
-AI 도구로 복잡한 서비스를 개발할 때 **"무엇을 알고, 어떻게 행동하고, 무엇을 만들어야 하는가"** 를 단계별로 정의하는 Claude Code 플러그인.
+A Claude Code plugin that defines step-by-step **"what to know, how to behave, and what to build"** when developing complex services with AI tools.
 
-## Context Engineering이란?
+## What is Context Engineering?
 
-Context Engineering은 **LLM의 컨텍스트 윈도우에 무엇을 넣을지 설계하는 기술**이다. 프롬프트 한 줄을 잘 쓰는 것을 넘어, 어떤 정보를 언제 어떤 구조로 AI에게 제공할지를 결정한다. RAG, 메모리 아키텍처, 토큰 예산 관리, 시스템 프롬프트 설계 등이 모두 이 범주에 속한다.
+Context Engineering is **the practice of designing what goes into an LLM's context window**. It goes beyond writing a single good prompt — it decides what information to give to AI, when, and in what structure. RAG, memory architecture, token budget management, and system prompt design all fall under this category.
 
-이 플러그인은 그 중 **지속성 컨텍스트 준비(persistent context preparation)** 한 가지를 다룬다 — 개발 세션마다 AI가 올바른 도메인 지식과 행동 규칙을 가지고 시작하도록 `knowledge-base.md`와 `CLAUDE.md`를 체계적으로 만들고 유지하는 워크플로우다.
+This plugin addresses one aspect of that — **persistent context preparation** — a workflow to systematically create and maintain `knowledge-base.md` and `CLAUDE.md` so AI starts each development session with the right domain knowledge and behavior rules.
 
-## 개요
+## Overview
 
-복잡한 서비스를 AI와 함께 개발할 때 세 가지 질문에 답해야 한다:
+When developing complex services with AI, three questions must be answered:
 
-- **무엇을 알아야 하는가** → Knowledge Base (도메인 지식, 제약)
-- **어떻게 행동해야 하는가** → Policy (CLAUDE.md)
-- **무엇을 만들어야 하는가** → Spec (PRD + 기술 결정 + 구현 계획)
+- **What to know** → Knowledge Base (domain knowledge, constraints)
+- **How to behave** → Policy (CLAUDE.md)
+- **What to build** → Spec (PRD + architecture decisions + implementation plan)
 
-이 플러그인은 두 가지 방식으로 사용할 수 있다:
+This plugin can be used in two ways:
 
-- **`/context-engineering`** — Step 0부터 Phase 4까지 순차 진행 (전체 워크플로우)
-- **Sub-skills** — 특정 Phase에 직접 진입 (재작업·피드백 루프용)
+- **`/context-engineering`** — Sequential flow from Step 0 to Phase 4 (full workflow)
+- **Sub-skills** — Direct entry to a specific phase (for rework or feedback loop)
 
-## 설치
+## Installation
 
 ```bash
-# 1. 마켓플레이스 등록
+# 1. Add to marketplace
 claude plugin marketplace add https://github.com/SeokRae/context-engineering.git
 
-# 2. 플러그인 설치
+# 2. Install plugin
 claude plugin install context-engineering
 ```
 
-설치 후 Claude Code를 재시작해야 적용된다.
+Restart Claude Code after installation for changes to take effect.
 
-설치 확인:
+Verify installation:
 ```bash
 claude plugin list
 #   ❯ context-engineering@context-engineering
@@ -42,40 +42,40 @@ claude plugin list
 #     Status: ✔ enabled
 ```
 
-로컬 디렉토리에서 바로 사용할 때:
+To use directly from a local directory:
 ```bash
 claude --plugin-dir /path/to/context-engineering
 ```
 
-## 스킬
+## Skills
 
-### `/context-engineering` — 전체 워크플로우
+### `/context-engineering` — Full workflow
 
-Step 0부터 Phase 4까지 순차 진행한다.
+Runs sequentially from Step 0 through Phase 4.
 
 ```
-/context-engineering @<코드경로> [--output <출력경로>] [--specs <스펙문서경로>]
+/context-engineering @<code-path> [--output <output-path>] [--specs <spec-doc-path>]
 ```
 
-**예시:**
+**Examples:**
 ```
 /context-engineering @/path/to/project
 /context-engineering @/path/to/project --specs docs/references/
 /context-engineering @/path/to/project --output /tmp/context-docs --specs docs/references/
 ```
 
-### Sub-skills — Phase별 직접 진입
+### Sub-skills — Direct entry by phase
 
-이미 진행 중인 프로젝트에서 특정 Phase만 재작업하거나, 피드백 루프로 특정 Phase로 돌아가는 경우 사용한다.
+Use when reworking a specific phase in an ongoing project, or returning to a phase via the feedback loop.
 
-| 명령 | 담당 | 사용 시점 |
-|------|------|---------|
-| `/context-engineering:gather` | Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md) | 새 프로젝트 시작, KB·CLAUDE.md 재작업·갱신 |
-| `/context-engineering:spec` | Phase 3 — PRD + SPEC | 요구사항·기술 명세 작성·갱신 |
-| `/context-engineering:impl` | Phase 4 — 구현 | 구현 시작, 피드백 루프 진입 |
-| `/context-engineering:valid` | Readiness Gate | Phase 4 진입 전 검증, 탐색 모드 종료 체크 |
+| Command | Handles | When to use |
+|---------|---------|-------------|
+| `/context-engineering:gather` | Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md) | New project start, KB or CLAUDE.md rework/update |
+| `/context-engineering:spec` | Phase 3 — PRD + SPEC | Writing or updating requirements and technical spec |
+| `/context-engineering:impl` | Phase 4 — Implementation | Starting implementation, entering feedback loop |
+| `/context-engineering:valid` | Readiness Gate | Pre-Phase 4 validation, discovery mode exit check |
 
-각 sub-skill은 기존 artifacts(knowledge-base.md, CLAUDE.md, prd.md, spec.md)가 있으면 자동 탐지해 재작업/갱신을 선택할 수 있다.
+Each sub-skill auto-detects existing artifacts (knowledge-base.md, CLAUDE.md, prd.md, spec.md) and offers rework or update options.
 
 ```
 /context-engineering:gather @/path/to/project
@@ -84,52 +84,52 @@ Step 0부터 Phase 4까지 순차 진행한다.
 /context-engineering:impl @/path/to/project
 ```
 
-## 워크플로우
+## Workflow
 
-> **[📊 인터랙티브 다이어그램](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)** — 각 Phase를 클릭하면 단계별 작업 내용을 확인할 수 있다.
+> **[📊 Interactive Diagram](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)** — Click each phase to see the step-by-step details.
 
 ```
 Step 0 — Context Gathering
-  · 요구사항 탐색 (무엇 · 왜 · 제약 — 질문 하나씩)
-  · 요약 확정 시 REQ-ID 부여 (REQ-1 · REQ-2 · REQ-3…)
-  · 명확   → Phase 1~3 충실 작성 후 Phase 4 진입
-  · 불명확 → 탐색 모드: 빈 초안 생성 → Phase 4 직행
+  · Requirements exploration (What · Why · Constraints — one question at a time)
+  · Assign REQ-IDs when summary is confirmed (REQ-1 · REQ-2 · REQ-3…)
+  · Clear     → write Phase 1~3 thoroughly, then enter Phase 4
+  · Unclear   → discovery mode: generate empty drafts → go directly to Phase 4
                  ↓
-Phase 1 — Knowledge Base           [자체 평가] [사용자 확인]
-  · Context Assessment — A/B/C/D 시나리오 판별
-  · Source Scan  A: 대화  B: 문서 탐색  C: 코드  D: B+C
-  · knowledge-base.md (Glossary · 제약 · 매니페스트)
+Phase 1 — Knowledge Base           [Self-Assessment] [User confirmation]
+  · Context Assessment — A/B/C/D scenario detection
+  · Source Scan  A: conversation  B: spec docs  C: code  D: B+C
+  · knowledge-base.md (Glossary · Constraints · Manifest)
                  ↓
-Phase 2 — Policy (CLAUDE.md)       [자체 평가] [사용자 확인]
-  · knowledge-base.md 링크 필수
-  · Non-obvious Gotchas 초안 (Phase 4 피드백으로 갱신)
+Phase 2 — Policy (CLAUDE.md)       [Self-Assessment] [User confirmation]
+  · knowledge-base.md link required
+  · Non-obvious Gotchas draft (updated via Phase 4 feedback)
                  ↓
-Phase 3 — Spec              [자체 평가] [Readiness Gate ⑥REQ]
-  · PRD 기능 요구사항 + SPEC 아키텍처 결정 + 패키지 구조
-  · 요구사항 추적 (REQ-ID → PRD 기능 → SPEC → 구현 계획)
-  · Gate: AI가 현재 상태 요약 → 사용자가 통과 여부 결정
-  ↑──────────────────── 미충족 시 해당 Phase 재순환
-                 ↓  Gate 통과
-Phase 4 — Implementation                          [회고]
-  · 빌드 + 테스트 + PRD 성공 기준 달성
-  · 완료마다 REQ-ID 상태 갱신 (미구현 → 구현 완료)
-  · 피드백 루프: 발견 내용 → 해당 Phase 문서 즉시 갱신
-  · 전체 완료 시 구현 회고 출력 (달성 · 프로세스 · 문서)
+Phase 3 — Spec              [Self-Assessment] [Readiness Gate ⑥REQ]
+  · PRD feature requirements + SPEC architecture decisions + package structure
+  · Requirements traceability (REQ-ID → PRD feature → SPEC → implementation plan)
+  · Gate: AI summarizes current state → user decides pass/fail
+  ↑──────────────────── re-cycle to relevant phase if unmet
+                 ↓  Gate passed
+Phase 4 — Implementation                          [Retrospective]
+  · Build + Test + PRD success criteria achieved
+  · Update REQ-ID status on each completion (not implemented → implemented)
+  · Feedback loop: findings → immediately update the relevant phase document
+  · Output Implementation Retrospective when all done (achievement · process · documents)
 ```
 
-**탐색 모드**: 요구사항 불명확 시 Phase 1~3을 빈 초안으로 생성하고 Phase 4로 바로 진입. 구현하며 채워나가다가 사용자가 직접 Readiness Gate를 요청해 본궤도로 전환한다.
+**Discovery mode**: When requirements are unclear, generate Phase 1~3 as empty drafts and go directly to Phase 4. Fill in while developing, then switch to the main track when the user requests the Readiness Gate.
 
-## 참고 문서
+## Reference Documents
 
-각 Phase 산출물 템플릿은 `skills/context-engineering/references/` 에 있다:
+Phase artifact templates are in `skills/context-engineering/references/`:
 
-| 파일 | 용도 |
-|------|------|
-| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | 프로젝트별 진행 체크리스트 |
-| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 산출물 템플릿 |
-| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | Phase 2 CLAUDE.md 템플릿 |
-| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC 템플릿 (아키텍처 결정 + 패키지 구조) |
-| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택 적용) |
+| File | Purpose |
+|------|---------|
+| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | Per-project progress checklist |
+| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 artifact template |
+| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | Phase 2 CLAUDE.md template |
+| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC template (architecture decisions + package structure) |
+| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD principles (for complex services, optional) |
 
 ## License
 

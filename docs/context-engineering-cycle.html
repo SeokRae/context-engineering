@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="theme-dark">
+<html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -283,67 +283,67 @@
   <main id="main-content" role="main">
     <section class="page-header">
       <h1 class="animate">Context Engineering Cycle</h1>
-      <p class="animate delay-1">AI 도구로 복잡한 서비스를 개발하는 반복 가능한 5단계 워크플로우</p>
+      <p class="animate delay-1">A repeatable 5-step workflow for developing complex services with AI tools</p>
     </section>
 
     <section class="diagram-wrap animate delay-2" aria-label="Context Engineering cycle diagram">
       <svg id="cycle-svg" viewBox="0 0 980 820" xmlns="http://www.w3.org/2000/svg"
-           role="img" aria-label="Step 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → 피드백 루프 순환 다이어그램">
-        <!-- JS로 그림 -->
+           role="img" aria-label="Step 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → feedback loop cycle diagram">
+        <!-- drawn by JS -->
       </svg>
     </section>
 
     <div class="legend animate delay-3">
       <div class="legend-item">
         <div class="legend-line solid"></div>
-        <span>메인 플로우</span>
+        <span>Main flow</span>
       </div>
       <div class="legend-item">
         <div class="legend-line dashed"></div>
-        <span>Spec 갱신 (Phase 4 → 3)</span>
+        <span>Spec update (Phase 4 → 3)</span>
       </div>
       <div class="legend-item">
         <div class="legend-line dashed" style="background: repeating-linear-gradient(90deg, #06b6d4 0, #06b6d4 4px, transparent 4px, transparent 9px);"></div>
-        <span>KB 갱신 (Phase 4 → 1)</span>
+        <span>KB update (Phase 4 → 1)</span>
       </div>
       <div class="legend-item">
         <div class="legend-line dashed" style="background: linear-gradient(90deg, #f59e0b 60%, transparent 60%); background-size: 10px 2px;"></div>
-        <span>재순환 (Readiness Gate 미충족)</span>
+        <span>Re-cycle (Readiness Gate unmet)</span>
       </div>
     </div>
 
     <section class="cards-section" data-reveal>
-      <h2>단계별 작업 내용</h2>
+      <h2>Phase Details</h2>
       <div class="cards-grid" id="phaseCardsGrid"></div>
     </section>
 
     <section class="subskill-section" data-reveal>
-      <h2>Sub-skills — Phase별 직접 진입</h2>
+      <h2>Sub-skills — Direct Phase Entry</h2>
       <div class="subskill-grid" id="subskillGrid"></div>
     </section>
 
     <section class="scenario-section" data-reveal>
-      <h2>Phase 1 시나리오 분기</h2>
+      <h2>Phase 1 Scenario Branching</h2>
       <div class="scenario-grid">
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#10b981;">A. 그린필드</div>
-          <div class="scenario-title">아무것도 없음</div>
-          <div class="scenario-desc">Step 0 대화에서 용어·제약 직접 추출. 최소 Knowledge Base로 Phase 2 진행.</div>
+          <div class="scenario-id" style="color:#10b981;">A. Greenfield</div>
+          <div class="scenario-title">Nothing yet</div>
+          <div class="scenario-desc">Extract terms and constraints directly from Step 0 conversation. Proceed to Phase 2 with a minimal Knowledge Base.</div>
         </div>
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#3b82f6;">B. 스펙 문서</div>
-          <div class="scenario-title">--specs 문서 있음</div>
-          <div class="scenario-desc">병렬 Explore 에이전트로 문서 탐색 → 용어·제약·참조 매니페스트 작성.</div>
+          <div class="scenario-id" style="color:#3b82f6;">B. Spec docs</div>
+          <div class="scenario-title">--specs documents available</div>
+          <div class="scenario-desc">Explore documents with parallel Explore agents → write terms, constraints, and reference manifest.</div>
         </div>
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#f59e0b;">C. 기존 코드</div>
-          <div class="scenario-title">코드베이스 있음</div>
-          <div class="scenario-desc">코드 스캔 → 기존 패턴·용어·제약 추출. 충돌 가능성 사전 파악.</div>
+          <div class="scenario-id" style="color:#f59e0b;">C. Existing code</div>
+          <div class="scenario-title">Codebase available</div>
+          <div class="scenario-desc">Code scan → extract existing patterns, terms, and constraints. Identify potential conflicts early.</div>
         </div>
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#8b5cf6;">D. 둘 다</div>
-          <div class="scenario-title">코드 + 스펙</div>
-          <div class="scenario-desc">B + C 병렬 수행. 가장 풍부한 Knowledge Base. 불일치 감지 포함.</div>
+          <div class="scenario-id" style="color:#8b5cf6;">D. Both</div>
+          <div class="scenario-title">Code + Spec</div>
+          <div class="scenario-desc">Run B + C in parallel. Richest Knowledge Base. Includes inconsistency detection.</div>
         </div>
       </div>
     </section>
@@ -417,25 +417,25 @@
         cmd: '/context-engineering:gather',
         covers: 'Step 0 · Phase 1 · Phase 2',
         color: '#6366f1',
-        desc: '새 프로젝트 시작 또는 KB·CLAUDE.md 재작업·갱신. 요구사항 탐색 → Knowledge Base → Policy(CLAUDE.md) 작성.'
+        desc: 'New project start or KB·CLAUDE.md rework/update. Requirements exploration → Knowledge Base → Policy (CLAUDE.md).'
       },
       {
         cmd: '/context-engineering:spec',
         covers: 'Phase 3',
         color: '#f59e0b',
-        desc: 'PRD(제품 요구사항) + SPEC(기술 명세) 작성. 기존 문서가 있으면 자동 탐지해 갱신.'
+        desc: 'Write PRD (product requirements) + SPEC (technical spec). Auto-detects existing documents for update.'
       },
       {
         cmd: '/context-engineering:valid',
         covers: 'Readiness Gate',
         color: '#8b5cf6',
-        desc: 'Phase 4 진입 전 체크포인트. AI가 현재 상태 요약 → 사용자가 통과 여부 결정.'
+        desc: 'Checkpoint before entering Phase 4. AI summarizes current state → user decides pass/fail.'
       },
       {
         cmd: '/context-engineering:impl',
         covers: 'Phase 4',
         color: '#10b981',
-        desc: 'SPEC 구현 계획 순서대로 구현. 완료 기준 검증 + 피드백 루프 반복.'
+        desc: 'Implement in SPEC plan order. Verify done criteria + repeat feedback loop.'
       }
     ];
 
@@ -447,14 +447,14 @@
         subskill: '/context-engineering:gather',
         confirmLabel: null,
         steps: [
-          '요구사항 탐색 — 무엇·왜·제약 (질문 1개씩, 답변 후 다음)',
-          '요구사항 요약 확정 시 REQ-ID 부여 (REQ-1·REQ-2·REQ-3…)',
-          '요구사항 요약 → 사용자 확인 (HARD-GATE)',
-          '코드 경로(@인자) + 빌드 파일에서 기술 스택 자동 감지'
+          'Requirements exploration — What·Why·Constraints (one question at a time, wait for answer)',
+          'Assign REQ-IDs when summary is confirmed (REQ-1·REQ-2·REQ-3…)',
+          'Requirements summary → user confirmation (HARD-GATE)',
+          'Auto-detect tech stack from code path (@arg) + build files'
         ],
         branches: [
-          { label: '명확', desc: 'Phase 1~3 충실 작성 후 Phase 4 진입' },
-          { label: '불명확', desc: '탐색 모드: 빈 초안 생성 → Phase 4 직행' }
+          { label: 'Clear', desc: 'Write Phase 1~3 thoroughly, then enter Phase 4' },
+          { label: 'Unclear', desc: 'Discovery mode: generate empty drafts → go directly to Phase 4' }
         ],
         gate: null
       },
@@ -463,32 +463,32 @@
         angle: -18, color: '#3b82f6',
         icon: 'book',
         subskill: '/context-engineering:gather',
-        confirmLabel: '사용자 확인',
+        confirmLabel: 'User confirmation',
         steps: [
-          'Context Assessment — A/B/C/D 판별 후 사용자 확인 필수',
-          'Source Scan — A: 대화 기반 / B: 스펙 탐색 / C: 코드 스캔 / D: B+C 병렬',
-          'Domain Glossary 작성 (용어 테이블)',
-          '제약 목록 작성 (TC/BL/OC 5컬럼)',
-          '참조 문서 매니페스트 작성',
-          '자체 평가 — 용어 충분성·제약 분류·출처 명시 (일반 모드)'
+          'Context Assessment — detect A/B/C/D scenario, user confirmation required',
+          'Source Scan — A: conversation / B: spec docs / C: code scan / D: B+C parallel',
+          'Write Domain Glossary (term table)',
+          'Write Constraint Registry (TC/BL/OC 5-column)',
+          'Write Reference Document Manifest',
+          'Self-Assessment — term sufficiency, constraint categories, source attribution (normal mode)'
         ],
-        gate: '일반 모드: 자체 평가 테이블 출력 후 사용자 확인 — knowledge-base.md 검토 후 Phase 2 진행? / 탐색 모드: 자체 평가 생략, 확인 없이 Phase 2 진행.'
+        gate: 'Normal mode: output Self-Assessment table then user confirmation — review knowledge-base.md, proceed to Phase 2? / Discovery mode: skip Self-Assessment, proceed to Phase 2 without confirmation.'
       },
       {
         id: 'phase2', label: 'Phase 2', name: 'Policy (CLAUDE.md)',
         angle: 54, color: '#8b5cf6',
         icon: 'shield',
         subskill: '/context-engineering:gather',
-        confirmLabel: '사용자 확인',
+        confirmLabel: 'User confirmation',
         steps: [
-          'CLAUDE.md 레벨 결정 (프로젝트/모듈)',
-          '아키텍처 — 복잡한 서비스: Hexagonal+DDD / 단순 프로젝트: 자유 기술',
-          '빌드 & 테스트 명령어 정리',
-          'knowledge-base.md 링크 참고 문서 섹션에 필수 포함',
-          'Non-obvious Gotchas 초안 (Phase 4 피드백 루프에서 갱신)',
-          '자체 평가 — 빌드 명령어·High 제약 반영·KB 링크 (일반 모드)'
+          'Decide CLAUDE.md level (project/module)',
+          'Architecture — complex service: Hexagonal+DDD / simple project: describe freely',
+          'Set up Build & Test commands',
+          'Must include knowledge-base.md link in References section',
+          'Non-obvious Gotchas draft (updated via Phase 4 feedback loop)',
+          'Self-Assessment — build commands, High constraints reflected, KB link (normal mode)'
         ],
-        gate: '일반 모드: 자체 평가 테이블 출력 후 사용자 확인 — CLAUDE.md 검토 후 Phase 3 진행? / 탐색 모드: 자체 평가 생략, 확인 없이 Phase 3 진행.'
+        gate: 'Normal mode: output Self-Assessment table then user confirmation — review CLAUDE.md, proceed to Phase 3? / Discovery mode: skip Self-Assessment, proceed to Phase 3 without confirmation.'
       },
       {
         id: 'phase3', label: 'Phase 3', name: 'Spec',
@@ -497,14 +497,14 @@
         subskill: '/context-engineering:spec',
         confirmLabel: 'Readiness Gate',
         steps: [
-          'PRD — 기능 요구사항 + 검증 가능한 성공 기준',
-          'SPEC — 아키텍처 결정 (대안/선택/근거)',
-          '패키지/모듈 구조 확정',
-          'SPEC 구현 계획 — 의존성·병렬 가능·완료 기준 (REQ 컬럼 포함)',
-          '요구사항 추적 테이블 — REQ-ID → PRD 기능 → SPEC 구현 매핑',
-          '자체 평가 후 Readiness Gate — AI 요약, 사용자 통과 여부 결정 (⑥ REQ 매핑 포함)'
+          'PRD — feature requirements + verifiable success criteria',
+          'SPEC — architecture decisions (alternatives/choice/rationale)',
+          'Finalize package/module structure',
+          'SPEC implementation plan — dependencies, parallelizable, done criteria (REQ column included)',
+          'Requirements traceability table — REQ-ID → PRD feature → SPEC implementation mapping',
+          'Self-Assessment then Readiness Gate — AI summarizes, user decides pass/fail (⑥ REQ mapping included)'
         ],
-        gate: '일반 모드: 자체 평가 후 6항목 Gate 확인 (⑥ REQ 매핑 포함) — 미충족 → 해당 Phase 재순환. 탐색 모드: 사용자가 직접 Gate 요청 → 충족 시 Phase 4 진입.'
+        gate: 'Normal mode: Self-Assessment then 6-item Gate check (⑥ REQ mapping included) — unmet → re-cycle to relevant phase. Discovery mode: user requests Gate directly → pass leads to Phase 4.'
       },
       {
         id: 'phase4', label: 'Phase 4', name: 'Implementation',
@@ -513,13 +513,13 @@
         subskill: '/context-engineering:impl',
         confirmLabel: null,
         steps: [
-          'SPEC 구현 계획 순서대로 구현',
-          '빌드 + 테스트 통과 확인',
-          'SPEC 아키텍처 결정 준수 확인',
-          'PRD 기능별 성공 기준 달성 확인 (빌드 성공과 별개)',
-          '완료마다 요구사항 추적 테이블 REQ-ID 상태 갱신 (미구현 → 구현 완료)',
-          '발견 내용 성격별 → Phase 1/2/3 해당 문서 즉시 갱신',
-          '전체 완료 시 구현 회고 출력 (요구사항 달성·프로세스·문서 최종 상태)'
+          'Implement in SPEC plan order',
+          'Verify build + tests pass',
+          'Verify SPEC architecture decisions are followed',
+          'Verify PRD per-feature success criteria achieved (separate from build success)',
+          'Update requirements traceability table REQ-ID status on each completion (not implemented → implemented)',
+          'Based on finding type → immediately update the relevant Phase 1/2/3 document',
+          'Output Implementation Retrospective when all done (requirements achieved · process · final document state)'
         ],
         gate: null
       }
@@ -790,7 +790,7 @@
           fill: textColor, 'font-size': '11',
           'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
         });
-        lbl.textContent = 'Spec 갱신';
+        lbl.textContent = 'Spec update';
         svg.appendChild(lbl);
       })();
 
@@ -819,7 +819,7 @@
         });
         svg.appendChild(path);
 
-        // Label at t=0.2 (Phase 3 쪽) — 중앙 텍스트와 겹침 방지
+        // Label at t=0.2 (Phase 3 side) — avoid overlap with center text
         var lx = 0.64*sx + 0.32*cp_x + 0.04*ex;
         var ly = 0.64*sy + 0.32*cp_y + 0.04*ey;
 
@@ -834,11 +834,11 @@
           fill: refineColor, 'font-size': '11',
           'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
         });
-        lbl.textContent = '재순환';
+        lbl.textContent = 'Re-cycle';
         svg.appendChild(lbl);
       })();
 
-      /* --- FEEDBACK ARROW: Phase 4 → Phase 1 (KB/Policy 갱신, dashed cyan) --- */
+      /* --- FEEDBACK ARROW: Phase 4 → Phase 1 (KB/Policy update, dashed cyan) --- */
       (function() {
         var f = PHASES[4], t = PHASES[1]; // Phase 4 → Phase 1
         var dx = t.cx - f.cx, dy = t.cy - f.cy;
@@ -878,7 +878,7 @@
           fill: kbColor, 'font-size': '11',
           'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
         });
-        lbl.textContent = 'KB 갱신';
+        lbl.textContent = 'KB update';
         svg.appendChild(lbl);
       })();
 
@@ -970,7 +970,7 @@
         overlay.addEventListener('click', function() { handleNodeClick(idx); });
         g.appendChild(overlay);
 
-        // Gate badge: Phase 1/2/3 자체 평가 표시 (directly above each node)
+        // Gate badge: Phase 1/2/3 Self-Assessment indicator (directly above each node)
         if (p.confirmLabel) {
           var bx = p.cx;
           var by = p.cy - NR - 16;
@@ -986,7 +986,7 @@
             fill: p.color, 'font-size': '8.5',
             'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '700'
           });
-          btxt.textContent = '✓ 자체 평가';
+          btxt.textContent = '✓ Self-Assess';
           g.appendChild(btxt);
         }
 

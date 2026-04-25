@@ -2,25 +2,25 @@
 
 This file provides guidance to Claude Code when working with code in this repository.
 
-> AI 도구로 복잡한 서비스를 개발할 때의 4단계 Context Engineering 워크플로우 Claude Code 플러그인
+> 4-phase Context Engineering workflow Claude Code plugin for developing complex services with AI tools
 
-## 프로젝트 성격
+## Project Nature
 
-소스 코드 없음. **순수 마크다운** Claude Code 플러그인:
-- `plugin.json` — 플러그인 메타데이터
-- `skills/context-engineering/SKILL.md` — 전체 워크플로우 스킬 (Step 0 → Phase 4)
-- `skills/context-engineering/references/` — 각 Phase 산출물 템플릿
-- `skills/gather/SKILL.md` — 서브스킬: Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md)
-- `skills/spec/SKILL.md` — 서브스킬: Phase 3 (PRD + SPEC)
-- `skills/valid/SKILL.md` — 서브스킬: Readiness Gate 검증
-- `skills/impl/SKILL.md` — 서브스킬: Phase 4 (구현)
+No source code. **Pure markdown** Claude Code plugin:
+- `plugin.json` — plugin metadata
+- `skills/context-engineering/SKILL.md` — full workflow skill (Step 0 → Phase 4)
+- `skills/context-engineering/references/` — phase artifact templates
+- `skills/gather/SKILL.md` — sub-skill: Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md)
+- `skills/spec/SKILL.md` — sub-skill: Phase 3 (PRD + SPEC)
+- `skills/valid/SKILL.md` — sub-skill: Readiness Gate validation
+- `skills/impl/SKILL.md` — sub-skill: Phase 4 (implementation)
 
-## 스킬 수정 시 주의사항
+## Skill Modification Guidelines
 
-1. **변수 일관성**: `{OUTPUT_PATH}` 등 Step 0에서 정의한 변수만 이후 Phase에서 참조
-2. **템플릿 동기화**: `references/` 템플릿과 SKILL.md 본문의 산출물 구조 일치 유지
-3. **게이트 메시지 형식**: `"Phase {N} 완료 — \`{산출물}\` 초안을 저장했습니다. 검토 후 Phase {N+1} 진행할까요?"` 통일
+1. **Variable consistency**: only reference variables defined in Step 0 (e.g., `{OUTPUT_PATH}`) in later phases
+2. **Template sync**: keep `references/` templates and SKILL.md inline artifact structures in sync
+3. **Gate message format**: standardize to `"Phase {N} complete — \`{artifact}\` draft saved. Review and proceed to Phase {N+1}?"`
 
-## 검증
+## Verification
 
-스킬 변경 후 실제 프로젝트에서 `/context-engineering @<경로>`를 실행해 Step 0 파라미터 수집이 정상인지 확인.
+After modifying a skill, run `/context-engineering @<path>` in a real project to confirm Step 0 parameter collection works correctly.

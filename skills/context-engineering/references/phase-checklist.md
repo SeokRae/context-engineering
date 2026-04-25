@@ -1,106 +1,106 @@
-# Context Engineering 4단계 체크리스트
+# Context Engineering 4-Phase Checklist
 
-새 프로젝트 시작 시 이 파일을 복사해서 사용한다.
+Copy this file when starting a new project.
 
 ---
 
-## 프로젝트 정보
+## Project Info
 
-- **프로젝트**: 
-- **코드 경로**: 
-- **출력 경로**: 
-- **기술 스택**: 
-- **시작일**: 
+- **Project**: 
+- **Code path**: 
+- **Output path**: 
+- **Tech stack**: 
+- **Start date**: 
 
 ---
 
 ## Step 0: Context Gathering
 
-- [ ] 요구사항 탐색 — 무엇을/왜/알려진 제약 확인
-- [ ] 요구사항 요약 사용자 확인 (HARD-GATE 통과)
-- [ ] 기술 파라미터 수집 (PROJECT_NAME, CODE_PATH, TECH_STACK 등)
-- [ ] 파라미터 최종 요약 사용자 확인
+- [ ] Requirements exploration — confirm What / Why / known constraints
+- [ ] Requirements summary user confirmation (HARD-GATE passed)
+- [ ] Technical parameters collected (PROJECT_NAME, CODE_PATH, TECH_STACK, etc.)
+- [ ] Final parameter summary user confirmation
 
 ## Phase 1: Knowledge Base
 
-- [ ] Context Assessment — 시나리오 판별 (A/B/C/D) + 사용자 확인
-- [ ] Source Scan 실행 (시나리오에 따라 조건부)
-  - [ ] A: Step 0 대화에서 도메인 개념 추출
-  - [ ] B: 스펙 문서 Explore 에이전트 병렬 탐색
-  - [ ] C: 코드베이스 스캔 (패키지 구조, 패턴, 테스트 전략)
-  - [ ] D: B + C 병렬 실행
-- [ ] 도메인 용어 Glossary 작성 (최소 5개)
-- [ ] 제약조건 레지스트리 작성 (TC/BL/OC 분류)
-- [ ] 참조 문서 매니페스트 작성 (시나리오 B/C/D)
-- [ ] `knowledge-base.md` 저장 (시나리오 A는 "초안" 표시)
-- [ ] **자체 평가 수행** (일반 모드) — 게이트 메시지와 함께 출력
+- [ ] Context Assessment — scenario detection (A/B/C/D) + user confirmation
+- [ ] Source Scan complete (conditional on scenario)
+  - [ ] A: Extract domain concepts from Step 0 conversation
+  - [ ] B: Explore sub-agent parallel scan of spec documents
+  - [ ] C: Codebase scan (package structure, patterns, test strategy)
+  - [ ] D: B + C run in parallel
+- [ ] Domain Glossary written (minimum 5 terms)
+- [ ] Constraint Registry written (TC/BL/OC categories)
+- [ ] Reference Document Manifest written (scenarios B/C/D)
+- [ ] `knowledge-base.md` saved (Scenario A marked as "Draft")
+- [ ] **Self-Assessment performed** (normal mode) — output with gate message
 
 ## Phase 2: Policy (CLAUDE.md)
 
-- [ ] CLAUDE.md 레벨 결정 (프로젝트 / 모듈)
-- [ ] 아키텍처 규칙 정의 (레이어 분리, 패턴 제약)
-- [ ] 코딩 컨벤션 문서화 (네이밍, 테스트 패턴)
-- [ ] 빌드/테스트 명령어 정리
-- [ ] Non-obvious gotchas 기록
-- [ ] 150줄 초과 항목은 별도 문서 분리 + 링크
-- [ ] `{CODE_PATH}/CLAUDE.md` 저장
-- [ ] **자체 평가 수행** (일반 모드) — 게이트 메시지와 함께 출력
+- [ ] CLAUDE.md level decided (project / module)
+- [ ] Architecture rules defined (layer separation, pattern constraints)
+- [ ] Coding conventions documented (naming, test patterns)
+- [ ] Build & Test commands verified
+- [ ] Non-obvious gotchas recorded
+- [ ] Items exceeding 150 lines split to separate document + linked
+- [ ] `{CODE_PATH}/CLAUDE.md` saved
+- [ ] **Self-Assessment performed** (normal mode) — output with gate message
 
 ## Phase 3: Spec
 
-- [ ] 설계 결정 (D-*) — 대안/선택/근거 포함
-- [ ] 패키지/모듈 구조 확정
-- [ ] **요구사항 추적 테이블 작성** — REQ-ID → PRD 기능 → 구현 항목
-- [ ] **자체 평가 수행** — Readiness Gate 출력 전
-- [ ] `spec.md` 저장
+- [ ] Architecture decision rationale complete (D-*) — alternatives / choice / rationale included
+- [ ] Package/module structure finalized
+- [ ] **Requirements traceability table written** — REQ-ID → PRD feature → implementation item
+- [ ] **Self-Assessment performed** — before Readiness Gate output
+- [ ] `spec.md` saved
 
 ## Phase 4: Implementation
 
-- [ ] 모듈별 스켈레톤 생성
-- [ ] 핵심 도메인 객체 구현
-- [ ] 어댑터 구현
-- [ ] 테스트 작성 + 통과
-- [ ] 피드백 루프 반영 (발견 내용 → 해당 단계 갱신)
-  - [ ] 도메인/용어 오류 → Phase 1 `knowledge-base.md` 갱신
-  - [ ] AI 행동 규칙 변경 → Phase 2 `CLAUDE.md` 갱신
-  - [ ] 아키텍처·설계 변경 → Phase 3 `spec.md` 갱신
-- [ ] **요구사항 추적 상태 갱신** — 완료된 REQ-ID → "구현 완료"
-- [ ] 아키텍처 문서 작성
-- [ ] 온보딩 가이드 작성
-- [ ] **구현 회고 수행** — 요구사항 달성 / 프로세스 회고 / 문서 최종 상태
+- [ ] Per-module skeleton generated
+- [ ] Core domain objects implemented
+- [ ] Adapters implemented
+- [ ] Tests written + passing
+- [ ] Feedback loop applied (findings → update relevant phase)
+  - [ ] Domain/term error → Phase 1 `knowledge-base.md` updated
+  - [ ] AI behavior rule change → Phase 2 `CLAUDE.md` updated
+  - [ ] Architecture/design change → Phase 3 `spec.md` updated
+- [ ] **Requirements traceability table updated** — completed REQ-IDs marked as "implemented"
+- [ ] Architecture documentation written
+- [ ] Onboarding guide written
+- [ ] **Implementation Retrospective completed** — requirements achievement / process retrospective / final document state
 
 ---
 
-## 산출물 자체 평가 기준
+## Artifact Self-Assessment Criteria
 
-Phase 게이트 직전, 일반 모드에서만 수행. 형식:
+Performed immediately before the phase gate, in normal mode only. Format:
 
 ```
-| 항목 | 상태 | 조치 |
-|------|------|------|
-| {기준} | OK / {갭 설명} | — / {구체적 조치} |
+| Item | Status | Action |
+|------|--------|--------|
+| {criterion} | OK / {gap description} | — / {specific action} |
 ```
 
 **Phase 1 (Knowledge Base)**
 
-| 기준 | 충족 조건 | 미충족 시 조치 |
-|------|---------|------------|
-| 용어 충분성 | Glossary 5개 이상, 핵심 도메인 개념 누락 없음 | Source Scan 재수행 또는 Step 0 대화 보완 |
-| 제약 분류 | TC/BL/OC 중 최소 2개 분류 사용 | 제약 레지스트리 항목 보강 |
-| 출처 명시 | 모든 용어에 출처(문서명/대화) 기재 | 출처 불명 항목 보완 |
+| Criterion | Met condition | Action if unmet |
+|-----------|--------------|-----------------|
+| Term sufficiency | Glossary 5+ terms, no key domain concepts missing | Re-run Source Scan or supplement Step 0 conversation |
+| Constraint categories | At least 2 of TC/BL/OC categories used | Expand constraint registry entries |
+| Source attribution | All terms have source (document name / conversation) recorded | Supplement items missing source |
 
 **Phase 2 (CLAUDE.md)**
 
-| 기준 | 충족 조건 | 미충족 시 조치 |
-|------|---------|------------|
-| 빌드 명령어 검증 | BUILD_CMD, TEST_CMD 실행 확인 완료 | 빌드 파일 재확인 후 갱신 |
-| High 제약 반영 | Phase 1 High 우선순위 제약이 핵심 제약 섹션에 포함 | 핵심 제약 섹션 보완 |
-| KB 링크 존재 | 참고 문서 섹션에 `knowledge-base.md` 링크 있음 | 참고 문서 섹션에 링크 추가 |
+| Criterion | Met condition | Action if unmet |
+|-----------|--------------|-----------------|
+| Build command verified | BUILD_CMD, TEST_CMD execution confirmed | Re-check build files and update |
+| High constraints reflected | Phase 1 High-priority constraints included in Core Constraints section | Supplement Core Constraints section |
+| KB link exists | `knowledge-base.md` link present in References section | Add link to References section |
 
 **Phase 3 (Spec)**
 
-| 기준 | 충족 조건 | 미충족 시 조치 |
-|------|---------|------------|
-| 결정 근거 완전성 | 모든 아키텍처 결정에 대안과 근거 기재 | 미기재 결정 항목 보완 |
-| 구현 순서 의존관계 | 구현 계획에 의존 관계와 완료 기준 기재 | 구현 계획 항목 보완 |
-| REQ 커버리지 | 모든 REQ-ID가 구현 계획에 매핑됨 | 요구사항 추적 테이블 보완 |
+| Criterion | Met condition | Action if unmet |
+|-----------|--------------|-----------------|
+| Decision rationale completeness | All architecture decisions include alternatives and rationale | Supplement missing decision entries |
+| Implementation plan dependencies mapped | Implementation plan includes dependency relationships and done criteria | Supplement implementation plan entries |
+| REQ coverage verified | All REQ-IDs mapped to implementation plan items | Supplement requirements traceability table |
