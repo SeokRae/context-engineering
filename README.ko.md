@@ -1,29 +1,24 @@
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
+![License](https://img.shields.io/github/license/SeokRae/context-engineering)
+![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-Plugin-blueviolet)
+
 # context-engineering
 
-> 한국어 | [English](README.md)
+> [English](README.md)
 
-AI 도구로 복잡한 서비스를 개발할 때 **"무엇을 알아야 하고, 어떻게 행동해야 하고, 무엇을 만들어야 하는가"** 를 단계별로 정의하는 Claude Code 플러그인.
+AI에게 컨텍스트를 전달하기 전에 체계적으로 준비하는 7-Phase 파이프라인 Claude Code 플러그인 — 어떤 정보를, 어떤 구조로, 어느 수준으로 압축해서 넣을지를 결정한다.
 
-## Context Engineering이란?
+## 특징
 
 Context Engineering은 **LLM의 컨텍스트 창에 무엇을 넣을지 설계하는 실천법**입니다. 단순히 좋은 프롬프트를 작성하는 것을 넘어, AI에게 어떤 정보를, 언제, 어떤 구조로 줄지를 결정합니다. RAG, 메모리 아키텍처, 토큰 예산 관리, 시스템 프롬프트 설계가 모두 여기에 해당합니다.
 
-이 플러그인은 그 중 **지속적 컨텍스트 준비(persistent context preparation)** 라는 측면을 다룹니다 — AI가 매 개발 세션을 올바른 도메인 지식과 행동 규칙으로 시작할 수 있도록 `knowledge-base.md`와 `CLAUDE.md`를 체계적으로 작성·유지하는 워크플로우입니다.
+- **7-Phase 게이트 파이프라인** — 각 Phase가 기준을 평가하여 자동 통과하거나 확인을 요청
+- **4개의 모듈형 서브스킬** — 이전 Phase가 이미 완료된 경우 특정 Phase부터 직접 진입 가능
+- **3가지 출력 형식** 자동 결정 — 의도 신호에 따라 (실행 지시 / KB 엔트리 / 프로젝트 산출물)
+- **KB 유지보수 모드** — `--consolidate`로 중복·오래된·고아 엔트리 감지
+- **순수 마크다운** — 런타임 의존성 없음, 빌드 단계 없음
 
-## 개요
-
-AI로 복잡한 서비스를 개발할 때 세 가지 질문에 답해야 합니다:
-
-- **무엇을 알아야 하는가** → Knowledge Base (도메인 지식, 제약 사항)
-- **어떻게 행동해야 하는가** → Policy (CLAUDE.md)
-- **무엇을 만들어야 하는가** → Spec (PRD + 아키텍처 결정 + 구현 계획)
-
-이 플러그인은 두 가지 방식으로 사용할 수 있습니다:
-
-- **`/context-engineering`** — Step 0부터 Phase 4까지 순차적 전체 흐름
-- **서브스킬** — 특정 Phase에 직접 진입 (재작업 또는 피드백 루프용)
-
-## 설치
+## 빠른 시작
 
 ```bash
 # 1. 마켓플레이스에 추가
@@ -35,104 +30,131 @@ claude plugin install context-engineering
 
 설치 후 Claude Code를 재시작해야 변경 사항이 적용됩니다.
 
-설치 확인:
+**설치 확인:**
 ```bash
 claude plugin list
 #   ❯ context-engineering@context-engineering
-#     Version: 1.0.0
+#     Version: 3.0.0
 #     Scope: user
 #     Status: ✔ enabled
 ```
+
+**첫 사용:** `/context-engineering`을 입력하고 목적, 제약사항, 성공 기준에 관한 3가지 질문에 답하세요. 파이프라인이 나머지를 처리합니다.
 
 로컬 디렉토리에서 직접 사용하려면:
 ```bash
 claude --plugin-dir /path/to/context-engineering
 ```
 
-## 스킬
-
-### `/context-engineering` — 전체 워크플로우
-
-Step 0부터 Phase 4까지 순차적으로 실행합니다.
+## 파이프라인
 
 ```
-/context-engineering @<코드-경로> [--output <출력-경로>] [--specs <스펙-문서-경로>]
+Phase 1 --[G1]--> Phase 2 --[G2]--> Phase 3 --[G3]-->
+Phase 4 --[G4]--> Phase 5 --[G5]--> Phase 6 --[G6]--> [출력]
+                                                          |
+                                                     (G6 실패)
+                                                          v
+                                                       Phase 7
 ```
 
-**예시:**
-```
-/context-engineering @/path/to/project
-/context-engineering @/path/to/project --specs docs/references/
-/context-engineering @/path/to/project --output /tmp/context-docs --specs docs/references/
-```
+| 서브스킬 | Phase | 역할 |
+|---------|-------|------|
+| `/context-engineering:gather` | 1–3 | 문제 정의 (3가지 질문) → 후보 수집 → 선택 (Keep/Skip/Merge) |
+| `/context-engineering:build` | 4–5 | Key Facts/Constraints/Decisions/Notes로 구조화 → 토큰 예산 기반 압축 |
+| `/context-engineering:compose` | 6 | 형식(A/B/C) 자동 결정 후 출력 생성 |
+| `/context-engineering:verify` | 7 | 4가지 검증 (누락/충돌/추측/일관성) + 신뢰도 평가 |
 
-### 서브스킬 — Phase별 직접 진입
+각 게이트는 기준이 명확히 충족되면 자동 통과합니다. 모호한 경우 파이프라인이 멈추고 사용자 확인을 요청합니다.
 
-진행 중인 프로젝트에서 특정 Phase를 재작업하거나, 피드백 루프를 통해 Phase로 돌아올 때 사용합니다.
+## 출력 형식
 
-| 커맨드 | 담당 | 사용 시점 |
-|--------|------|----------|
-| `/context-engineering:gather` | Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md) | 새 프로젝트 시작, KB 또는 CLAUDE.md 재작업/업데이트 |
-| `/context-engineering:spec` | Phase 3 — PRD + SPEC | 요구사항 및 기술 스펙 작성 또는 업데이트 |
-| `/context-engineering:impl` | Phase 4 — 구현 | 구현 시작, 피드백 루프 진입 |
-| `/context-engineering:valid` | Readiness Gate | Phase 4 사전 검증, 탐색 모드 종료 확인 |
+Phase 6은 Phase 1 success criteria 신호에 따라 출력 형식을 자동 결정합니다:
 
-각 서브스킬은 기존 아티팩트(knowledge-base.md, CLAUDE.md, prd.md, spec.md)를 자동 감지하고 재작업 또는 업데이트 옵션을 제공합니다.
+| 형식 | 트리거 신호 | 출력 |
+|------|-----------|------|
+| **A — 실행 지시** | "프롬프트 만들어줘", "어떻게 써야 해", "지시해줘" | Role + Task + Constraints + Output Format |
+| **B — KB 엔트리** | "저장해줘", "기억해줘", "노트해줘" | frontmatter + Key Facts / Constraints / Decisions / Notes |
+| **C — 프로젝트 산출물** | "프로젝트 시작", "코드베이스 분석", "개발하고 싶어" | CLAUDE.md + spec.md + implementation plan |
 
-```
-/context-engineering:gather @/path/to/project
-/context-engineering:spec @/path/to/project
-/context-engineering:valid
-/context-engineering:impl @/path/to/project
-```
+신호가 모호한 경우 Phase 6이 A/B/C 중 하나를 선택하도록 한 번 묻습니다.
 
-## 워크플로우
+## 사용법
 
-> **[📊 인터랙티브 다이어그램](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)** — 각 Phase를 클릭하면 단계별 상세 내용을 확인할 수 있습니다.
+### 전체 파이프라인
+
+Phase 1부터 Phase 6까지 7개 단계를 순차적으로 실행합니다 (Phase 6 게이트 실패 시 Phase 7 자동 진입).
 
 ```
-Step 0 — 컨텍스트 수집
-  · 요구사항 탐색 (What · Why · 제약 — 질문 하나씩)
-  · 요약 확인 시 REQ-ID 부여 (REQ-1 · REQ-2 · REQ-3…)
-  · 명확    → Phase 1~3을 충실히 작성한 후 Phase 4 진입
-  · 불명확  → 탐색 모드: 빈 초안 생성 → Phase 4로 직행
-                 ↓
-Phase 1 — Knowledge Base           [자체 평가] [사용자 확인]
-  · 컨텍스트 평가 — A/B/C/D 시나리오 감지
-  · 소스 스캔  A: 대화  B: 스펙 문서  C: 코드  D: B+C
-  · knowledge-base.md (용어집 · 제약 사항 · 매니페스트)
-                 ↓
-Phase 2 — Policy (CLAUDE.md)       [자체 평가] [사용자 확인]
-  · knowledge-base.md 연결 필수
-  · 비직관적 주의사항 초안 (Phase 4 피드백으로 업데이트)
-                 ↓
-Phase 3 — Spec              [자체 평가] [Readiness Gate ⑥REQ]
-  · PRD 기능 요구사항 + SPEC 아키텍처 결정 + 패키지 구조
-  · 요구사항 추적성 (REQ-ID → PRD 기능 → SPEC → 구현 계획)
-  · Gate: AI가 현재 상태 요약 → 사용자가 통과/실패 결정
-  ↑──────────────────── 미충족 시 해당 Phase로 재순환
-                 ↓  Gate 통과
-Phase 4 — 구현                                [회고]
-  · 빌드 + 테스트 + PRD 성공 기준 달성
-  · 완료마다 REQ-ID 상태 업데이트 (미구현 → 구현됨)
-  · 피드백 루프: 발견 사항 → 즉시 해당 Phase 문서 업데이트
-  · 전부 완료 시 구현 회고 출력 (달성 · 프로세스 · 문서)
+/context-engineering
 ```
 
-**탐색 모드**: 요구사항이 불명확할 때 Phase 1~3을 빈 초안으로 생성하고 Phase 4로 직행합니다. 개발하면서 채워나가다가 사용자가 Readiness Gate를 요청하면 메인 트랙으로 전환합니다.
+### 서브스킬 — 특정 Phase 직접 진입
 
-## 참고 문서
+특정 Phase를 재작업하거나, 피드백 루프를 통해 돌아오거나, 이전 Phase가 이미 완료된 경우에 사용합니다.
+
+| 커맨드 | Phase | 사용 시점 |
+|--------|-------|----------|
+| `/context-engineering:gather` | 1–3 | 새 문제 정의, 또는 범위 재정의 / 소스 재수집 |
+| `/context-engineering:build` | 4–5 | 기존 컨텍스트 재구조화 또는 재압축 |
+| `/context-engineering:compose` | 6 | 업데이트된 컨텍스트로 출력 재생성 |
+| `/context-engineering:verify` | 7 | 수동 검증 또는 `--consolidate` KB 유지보수 |
+
+```
+/context-engineering:gather
+/context-engineering:build
+/context-engineering:compose
+/context-engineering:verify
+/context-engineering:verify --consolidate
+```
+
+## 참고 템플릿
 
 Phase 아티팩트 템플릿은 `skills/context-engineering/references/`에 있습니다:
 
-| 파일 | 용도 |
-|------|------|
-| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | 프로젝트별 진행 체크리스트 |
-| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 아티팩트 템플릿 |
-| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | Phase 2 CLAUDE.md 템플릿 |
-| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC 템플릿 (아키텍처 결정 + 패키지 구조) |
-| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택 사항) |
+| 파일 | Phase | 용도 |
+|------|-------|------|
+| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | 전체 | 7-Phase 진행 체크리스트 |
+| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | 1 | KB 아티팩트 템플릿 |
+| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | 2 | CLAUDE.md 템플릿 |
+| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | 3 | 아키텍처 결정 + 패키지 구조 |
+| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | — | Hexagonal + DDD 원칙 (복잡한 서비스용, 선택사항) |
+| [`entry-template.md`](skills/context-engineering/references/entry-template.md) | 6-B | KB 엔트리 형식 (frontmatter + 본문) |
+| [`index-template.md`](skills/context-engineering/references/index-template.md) | 6-B | KB 인덱스 형식 |
+| [`context-session-template.md`](skills/context-engineering/references/context-session-template.md) | 6-A | 다단계 태스크 스크래치 파일 (완료 후 삭제) |
+
+## 프로젝트 구조
+
+```
+context-engineering/
+├── .claude-plugin/
+│   ├── plugin.json          # 플러그인 메타데이터 (v3.0.0)
+│   └── marketplace.json     # 마켓플레이스 등록
+├── skills/
+│   ├── context-engineering/
+│   │   ├── SKILL.md         # 오케스트레이터 — 전체 7-Phase 파이프라인
+│   │   └── references/      # 8개 아티팩트 템플릿
+│   ├── gather/SKILL.md      # Phase 1–3
+│   ├── build/SKILL.md       # Phase 4–5
+│   ├── compose/SKILL.md     # Phase 6
+│   └── verify/SKILL.md      # Phase 7
+├── README.md
+├── README.ko.md
+└── LICENSE
+```
+
+## 기여
+
+1. 저장소를 Fork하고 Clone하세요
+2. 관련 `SKILL.md` 파일을 수정하세요
+3. 실제 Claude Code 세션에서 `/context-engineering`을 실행하여 변경 사항을 테스트하세요
+4. Phase 1 질문이 정상적으로 나타나고 게이트가 올바르게 동작하는지 확인하세요
+5. Pull Request를 제출하세요
+
+스킬 수정 시 [`CLAUDE.md`](CLAUDE.md)의 가이드라인을 따르세요:
+- Phase 일관성 유지 (gather → build → compose → verify)
+- `references/` 템플릿과 SKILL.md 인라인 구조를 항상 동기화
+- 각 SKILL.md의 핵심 행동 계약을 첫 5,000 토큰 내에 배치 (압축 안전성)
 
 ## 라이선스
 
-MIT
+[MIT](LICENSE)
