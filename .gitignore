@@ -1,3 +1,6 @@
 .omx/
 .claude/
 .worktrees/
+.idea/
+.playwright-mcp/
+*.png
