@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "context-engineering",
-  "description": "4-phase Context Engineering workflow plugin for developing complex services with AI tools",
+  "description": "7-Phase Context Engineering pipeline plugin — problem definition, collection, selection, structuring, compression, output generation, and verification",
   "owner": {
     "name": "SeokRae",
     "email": "kslbsh@gmail.com"
@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "context-engineering",
-      "description": "4-phase workflow for developing complex services with AI tools: domain knowledge collection → Policy (CLAUDE.md) → Spec design → step-by-step implementation with verification",
-      "version": "1.0.0",
+      "description": "7-phase pipeline for AI context engineering: define the problem → collect candidates → select → structure → compress → generate output → verify",
+      "version": "3.0.0",
       "author": {
         "name": "SeokRae",
         "email": "kslbsh@gmail.com"
@@ -20,13 +20,15 @@
       "homepage": "https://github.com/SeokRae/context-engineering",
       "tags": [
         "context-engineering",
-        "ai-development",
-        "knowledge-base",
-        "claude-md",
-        "spec",
-        "workflow"
+        "ai-context",
+        "7-phase",
+        "gather",
+        "build",
+        "compose",
+        "verify",
+        "knowledge-base"
       ]
     }
   ],
-  "version": "1.0.0"
+  "version": "3.0.0"
 }

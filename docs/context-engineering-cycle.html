@@ -187,6 +187,54 @@
       border-left: 3px solid; font-style: italic;
     }
 
+    /* === PHASE 7 SPECIAL CARD === */
+    .phase7-card {
+      grid-column: 1 / -1 !important;
+      border-color: rgba(239,68,68,0.25) !important;
+    }
+    .phase7-body {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .phase7-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check-item {
+      background: var(--surface-hover); border-radius: 8px; padding: 10px 12px;
+      border-left: 3px solid transparent;
+    }
+    .check-name { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .check-desc { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.4; }
+    .phase7-score { display: flex; flex-direction: column; gap: 6px; }
+    .score-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface-hover); border-radius: 6px; padding: 7px 10px;
+    }
+    .score-criterion { font-size: 0.76rem; color: var(--text-secondary); }
+    .score-pts { font-size: 0.85rem; font-weight: 800; color: #ef4444; }
+    .score-total {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; border-top: 1px solid var(--border); margin-top: 2px;
+    }
+    .score-total-label { font-size: 0.76rem; font-weight: 600; }
+    .phase7-rating { display: flex; flex-direction: column; gap: 6px; }
+    .rating-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface-hover); border-radius: 6px; padding: 8px 10px;
+    }
+    .rating-letter {
+      font-size: 1rem; font-weight: 800; width: 20px; text-align: center; flex-shrink: 0;
+    }
+    .rating-desc { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.3; }
+    .phase7-feedback {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+    }
+    .feedback-chip {
+      font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+      border: 1px solid; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+    }
+    @media (max-width: 768px) { .phase7-body { grid-template-columns: 1fr; } }
+
     /* === SCENARIO === */
     .scenario-section {
       max-width: 960px; margin: 48px auto 0; padding: 0 24px;
@@ -283,7 +331,7 @@
   <main id="main-content" role="main">
     <section class="page-header">
       <h1 class="animate">Context Engineering Cycle</h1>
-      <p class="animate delay-1">A repeatable 5-step workflow for developing complex services with AI tools</p>
+      <p class="animate delay-1">A 7-phase pipeline for systematically preparing context before giving it to an AI</p>
     </section>
 
     <section class="diagram-wrap animate delay-2" aria-label="Context Engineering cycle diagram">
@@ -299,16 +347,16 @@
         <span>Main flow</span>
       </div>
       <div class="legend-item">
-        <div class="legend-line dashed"></div>
-        <span>Spec update (Phase 4 → 3)</span>
+        <div class="legend-line dashed" style="background: repeating-linear-gradient(90deg, #ef4444 0, #ef4444 5px, transparent 5px, transparent 9px);"></div>
+        <span>G6 fail → Phase 7 (verify)</span>
       </div>
       <div class="legend-item">
         <div class="legend-line dashed" style="background: repeating-linear-gradient(90deg, #06b6d4 0, #06b6d4 4px, transparent 4px, transparent 9px);"></div>
-        <span>KB update (Phase 4 → 1)</span>
+        <span>Re-gather (Phase 7 → 1)</span>
       </div>
       <div class="legend-item">
         <div class="legend-line dashed" style="background: linear-gradient(90deg, #f59e0b 60%, transparent 60%); background-size: 10px 2px;"></div>
-        <span>Re-cycle (Readiness Gate unmet)</span>
+        <span>Re-build (Phase 7 → 4)</span>
       </div>
     </div>
 
@@ -323,27 +371,32 @@
     </section>
 
     <section class="scenario-section" data-reveal>
-      <h2>Phase 1 Scenario Branching</h2>
+      <h2>Phase 2 — Source Determination</h2>
       <div class="scenario-grid">
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#10b981;">A. Greenfield</div>
-          <div class="scenario-title">Nothing yet</div>
-          <div class="scenario-desc">Extract terms and constraints directly from Step 0 conversation. Proceed to Phase 2 with a minimal Knowledge Base.</div>
+          <div class="scenario-id" style="color:#3b82f6;">File / URL</div>
+          <div class="scenario-title">Document provided</div>
+          <div class="scenario-desc">Read file in full or fetch URL. Confirm section split for sources over 10,000 words.</div>
         </div>
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#3b82f6;">B. Spec docs</div>
-          <div class="scenario-title">--specs documents available</div>
-          <div class="scenario-desc">Explore documents with parallel Explore agents → write terms, constraints, and reference manifest.</div>
+          <div class="scenario-id" style="color:#8b5cf6;">Codebase</div>
+          <div class="scenario-title">Project or code mentioned</div>
+          <div class="scenario-desc">Scan directory structure, build files, and recent git log. Extract existing CLAUDE.md and spec if present.</div>
         </div>
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#f59e0b;">C. Existing code</div>
-          <div class="scenario-title">Codebase available</div>
-          <div class="scenario-desc">Code scan → extract existing patterns, terms, and constraints. Identify potential conflicts early.</div>
+          <div class="scenario-id" style="color:#f59e0b;">Store</div>
+          <div class="scenario-title">Save / remember request</div>
+          <div class="scenario-desc">Use the input text as-is. No external source scanning needed.</div>
         </div>
         <div class="scenario-card">
-          <div class="scenario-id" style="color:#8b5cf6;">D. Both</div>
-          <div class="scenario-title">Code + Spec</div>
-          <div class="scenario-desc">Run B + C in parallel. Richest Knowledge Base. Includes inconsistency detection.</div>
+          <div class="scenario-id" style="color:#10b981;">KB Query</div>
+          <div class="scenario-title">Question or task request</div>
+          <div class="scenario-desc">Scan KB index.md → keyword match → tag expansion → trace related entries by reliability.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-id" style="color:#ef4444;">Mixed</div>
+          <div class="scenario-title">Multiple signals</div>
+          <div class="scenario-desc">Combine sources above. Run parallel sub-agents for independent source types.</div>
         </div>
       </div>
     </section>
@@ -415,112 +468,134 @@
     var SUBSKILLS = [
       {
         cmd: '/context-engineering:gather',
-        covers: 'Step 0 · Phase 1 · Phase 2',
+        covers: 'Phase 1-3',
         color: '#6366f1',
-        desc: 'New project start or KB·CLAUDE.md rework/update. Requirements exploration → Knowledge Base → Policy (CLAUDE.md).'
+        desc: 'Define the problem, collect context candidates from sources, and select what to keep. Entry point for new tasks or when scope needs to be redefined.'
       },
       {
-        cmd: '/context-engineering:spec',
-        covers: 'Phase 3',
+        cmd: '/context-engineering:build',
+        covers: 'Phase 4-5',
         color: '#f59e0b',
-        desc: 'Write PRD (product requirements) + SPEC (technical spec). Auto-detects existing documents for update.'
+        desc: 'Structure selected context into Key Facts / Constraints / Decisions / Notes, then compress to token budget. Use when re-organizing existing context.'
       },
       {
-        cmd: '/context-engineering:valid',
-        covers: 'Readiness Gate',
-        color: '#8b5cf6',
-        desc: 'Checkpoint before entering Phase 4. AI summarizes current state → user decides pass/fail.'
-      },
-      {
-        cmd: '/context-engineering:impl',
-        covers: 'Phase 4',
+        cmd: '/context-engineering:compose',
+        covers: 'Phase 6',
         color: '#10b981',
-        desc: 'Implement in SPEC plan order. Verify done criteria + repeat feedback loop.'
+        desc: 'Generate the final output: execution instruction (A), KB entry (B), or project artifacts CLAUDE.md + spec.md (C). Auto-determines format from Phase 1 signals.'
+      },
+      {
+        cmd: '/context-engineering:verify',
+        covers: 'Phase 7',
+        color: '#ef4444',
+        desc: 'Check for omissions, conflicts, speculation, and format consistency. Scores H/M/L confidence and routes feedback to the correct phase. Add --consolidate for KB maintenance.'
       }
     ];
 
     var PHASES = [
       {
-        id: 'step0', label: 'Step 0', name: 'Context Gathering',
+        id: 'phase1', label: 'Phase 1', name: 'Problem Definition',
         angle: -90, color: '#6366f1',
         icon: 'gather',
         subskill: '/context-engineering:gather',
         confirmLabel: null,
         steps: [
-          'Requirements exploration — What·Why·Constraints (one question at a time, wait for answer)',
-          'Assign REQ-IDs when summary is confirmed (REQ-1·REQ-2·REQ-3…)',
-          'Requirements summary → user confirmation (HARD-GATE)',
-          'Auto-detect tech stack from code path (@arg) + build files'
+          'Ask 3 questions: purpose → constraints → success criteria (one at a time, wait for answer)',
+          'Auto-infer Role from the 3 answers — never ask directly',
+          'Scope reduction: decompose problem into minimum session scope',
+          'Classify expected sources: Must-have vs Nice-to-have'
         ],
-        branches: [
-          { label: 'Clear', desc: 'Write Phase 1~3 thoroughly, then enter Phase 4' },
-          { label: 'Unclear', desc: 'Discovery mode: generate empty drafts → go directly to Phase 4' }
-        ],
-        gate: null
+        branches: null,
+        gate: 'G1 auto-pass if: purpose concrete, constraints scoped, success criteria defined, Role inferable. Otherwise pause for user confirmation.'
       },
       {
-        id: 'phase1', label: 'Phase 1', name: 'Knowledge Base',
-        angle: -18, color: '#3b82f6',
+        id: 'phase2', label: 'Phase 2', name: 'Candidate Collection',
+        angle: -38.57, color: '#3b82f6',
         icon: 'book',
         subskill: '/context-engineering:gather',
-        confirmLabel: 'User confirmation',
-        steps: [
-          'Context Assessment — detect A/B/C/D scenario, user confirmation required',
-          'Source Scan — A: conversation / B: spec docs / C: code scan / D: B+C parallel',
-          'Write Domain Glossary (term table)',
-          'Write Constraint Registry (TC/BL/OC 5-column)',
-          'Write Reference Document Manifest',
-          'Self-Assessment — term sufficiency, constraint categories, source attribution (normal mode)'
-        ],
-        gate: 'Normal mode: output Self-Assessment table then user confirmation — review knowledge-base.md, proceed to Phase 2? / Discovery mode: skip Self-Assessment, proceed to Phase 2 without confirmation.'
-      },
-      {
-        id: 'phase2', label: 'Phase 2', name: 'Policy (CLAUDE.md)',
-        angle: 54, color: '#8b5cf6',
-        icon: 'shield',
-        subskill: '/context-engineering:gather',
-        confirmLabel: 'User confirmation',
-        steps: [
-          'Decide CLAUDE.md level (project/module)',
-          'Architecture — complex service: Hexagonal+DDD / simple project: describe freely',
-          'Set up Build & Test commands',
-          'Must include knowledge-base.md link in References section',
-          'Non-obvious Gotchas draft (updated via Phase 4 feedback loop)',
-          'Self-Assessment — build commands, High constraints reflected, KB link (normal mode)'
-        ],
-        gate: 'Normal mode: output Self-Assessment table then user confirmation — review CLAUDE.md, proceed to Phase 3? / Discovery mode: skip Self-Assessment, proceed to Phase 3 without confirmation.'
-      },
-      {
-        id: 'phase3', label: 'Phase 3', name: 'Spec',
-        angle: 126, color: '#f59e0b',
-        icon: 'file',
-        subskill: '/context-engineering:spec',
-        confirmLabel: 'Readiness Gate',
-        steps: [
-          'PRD — feature requirements + verifiable success criteria',
-          'SPEC — architecture decisions (alternatives/choice/rationale)',
-          'Finalize package/module structure',
-          'SPEC implementation plan — dependencies, parallelizable, done criteria (REQ column included)',
-          'Requirements traceability table — REQ-ID → PRD feature → SPEC implementation mapping',
-          'Self-Assessment then Readiness Gate — AI summarizes, user decides pass/fail (⑥ REQ mapping included)'
-        ],
-        gate: 'Normal mode: Self-Assessment then 6-item Gate check (⑥ REQ mapping included) — unmet → re-cycle to relevant phase. Discovery mode: user requests Gate directly → pass leads to Phase 4.'
-      },
-      {
-        id: 'phase4', label: 'Phase 4', name: 'Implementation',
-        angle: 198, color: '#10b981',
-        icon: 'code',
-        subskill: '/context-engineering:impl',
         confirmLabel: null,
         steps: [
-          'Implement in SPEC plan order',
-          'Verify build + tests pass',
-          'Verify SPEC architecture decisions are followed',
-          'Verify PRD per-feature success criteria achieved (separate from build success)',
-          'Update requirements traceability table REQ-ID status on each completion (not implemented → implemented)',
-          'Based on finding type → immediately update the relevant Phase 1/2/3 document',
-          'Output Implementation Retrospective when all done (requirements achieved · process · final document state)'
+          'Auto-determine sources from Phase 1 constraint signals',
+          'File/URL → read directly; codebase → scan structure + git log; KB → keyword → tag expansion → related entries',
+          'Sources over 10,000 words: confirm section split before loading',
+          'KB miss: notify user, proceed with general knowledge'
         ],
+        branches: null,
+        gate: 'G2 auto-pass if: all Phase 1 constraint-mentioned sources collected, no obvious omissions. Otherwise ask if a suspected missing source is needed.'
+      },
+      {
+        id: 'phase3', label: 'Phase 3', name: 'Context Selection',
+        angle: 12.86, color: '#8b5cf6',
+        icon: 'shield',
+        subskill: '/context-engineering:gather',
+        confirmLabel: null,
+        steps: [
+          'Evaluate each candidate on 3 criteria: Relevance / Recency / Reliability',
+          'Keep: all 3 criteria met',
+          'Skip: any criterion fails — document reason explicitly',
+          'Merge: 70%+ semantic overlap → retain higher-reliability version'
+        ],
+        branches: null,
+        gate: 'G3 auto-pass if: criteria applied consistently, all Skip items have stated reasons, Keep set sufficient for Phase 1 purpose.'
+      },
+      {
+        id: 'phase4', label: 'Phase 4', name: 'Structuring',
+        angle: 64.29, color: '#f59e0b',
+        icon: 'file',
+        subskill: '/context-engineering:build',
+        confirmLabel: null,
+        steps: [
+          'Organize Keep items into 4 sections: Key Facts / Constraints / Decisions / Notes',
+          'One item per fact, constraint, or decision — no compound entries',
+          'Empty sections omitted entirely',
+          'No duplication across sections'
+        ],
+        branches: null,
+        gate: 'G4 auto-pass if: no ambiguous items, no cross-section duplicates, Key Facts directly connected to Phase 1 purpose.'
+      },
+      {
+        id: 'phase5', label: 'Phase 5', name: 'Compression',
+        angle: 115.71, color: '#f97316',
+        icon: 'code',
+        subskill: '/context-engineering:build',
+        confirmLabel: null,
+        steps: [
+          'Measure token budget: small < 500w (no compression), medium 500-2000w (50%), large 2000+w (30%)',
+          'Compress in order: Notes first → Key Facts → Constraints last resort',
+          'Constraints and Decisions are never compressed — preserved verbatim',
+          'Large sources: scan headers/TOC first, then load purpose-relevant sections only'
+        ],
+        branches: null,
+        gate: 'G5 auto-pass if: Constraints and Decisions preserved verbatim, no over-compression of Key Facts, token budget target met.'
+      },
+      {
+        id: 'phase6', label: 'Phase 6', name: 'Output Generation',
+        angle: 167.14, color: '#10b981',
+        icon: 'gather',
+        subskill: '/context-engineering:compose',
+        confirmLabel: 'G6',
+        steps: [
+          'Auto-determine format from Phase 1 success criteria signals',
+          'Format A (Execution Instruction): Role + Task + Constraints + Output Format',
+          'Format B (KB Entry): frontmatter (title/type/reliability/tags) + Key Facts/Constraints/Decisions/Notes',
+          'Format C (Project Artifacts): CLAUDE.md + spec.md + implementation plan'
+        ],
+        branches: null,
+        gate: 'G6: success criteria reflected, no omissions, no conflicts, no speculation. Pass → deliver output. Fail → auto-invoke Phase 7.'
+      },
+      {
+        id: 'phase7', label: 'Phase 7', name: 'Verification',
+        angle: 218.57, color: '#ef4444',
+        icon: 'shield',
+        subskill: '/context-engineering:verify',
+        confirmLabel: null,
+        steps: [
+          '4 checks: Omission / Conflict / Speculation / Consistency',
+          'Score 0-100: purpose 30pt + source evidence 25pt + internal consistency 25pt + format fit 20pt',
+          'H: 80+ (3+ sources, no issues) / M: 50-79 / L: 49-',
+          'Feedback: Omission/Speculation → gather | Conflict → build | Format mismatch → compose'
+        ],
+        branches: null,
         gate: null
       }
     ];
@@ -712,10 +787,46 @@
         p.cx = c.x; p.cy = c.y;
       });
 
-      /* --- MAIN FLOW ARROWS --- */
-      for (var i = 0; i < PHASES.length; i++) {
+      /* --- SUB-SKILL ARC SEGMENTS (outer ring, grouped by command) --- */
+      (function() {
+        var ARC_R = ORBIT + 42;
+        var GROUPS = [
+          { label: ':gather',  color: '#6366f1', a1: -113, a2: 36  },  // Phase 1-3
+          { label: ':build',   color: '#f59e0b', a1: 40,   a2: 140 },  // Phase 4-5
+          { label: ':compose', color: '#10b981', a1: 144,  a2: 191 },  // Phase 6
+          { label: ':verify',  color: '#ef4444', a1: 195,  a2: 244 },  // Phase 7
+        ];
+        GROUPS.forEach(function(g) {
+          var a1r = rad(g.a1), a2r = rad(g.a2);
+          var x1 = CX + ARC_R * Math.cos(a1r), y1 = CY + ARC_R * Math.sin(a1r);
+          var x2 = CX + ARC_R * Math.cos(a2r), y2 = CY + ARC_R * Math.sin(a2r);
+          var span = g.a2 - g.a1;
+          var largeArc = span > 180 ? 1 : 0;
+          svg.appendChild(makeSVGEl('path', {
+            d: 'M '+x1+' '+y1+' A '+ARC_R+' '+ARC_R+' 0 '+largeArc+' 1 '+x2+' '+y2,
+            fill: 'none', stroke: g.color, 'stroke-width': '4',
+            'stroke-linecap': 'round', opacity: '0.55'
+          }));
+          // Label at arc midpoint
+          var midA = rad((g.a1 + g.a2) / 2);
+          var LABEL_R = ARC_R + 22;
+          var lx = CX + LABEL_R * Math.cos(midA), ly = CY + LABEL_R * Math.sin(midA);
+          var anchor = textAnchor((g.a1 + g.a2) / 2);
+          var lbl = makeSVGEl('text', {
+            x: lx, y: ly, 'text-anchor': anchor, 'dominant-baseline': 'middle',
+            fill: g.color, 'font-size': '11',
+            'font-family': 'Menlo, Monaco, Courier New, monospace', 'font-weight': '700',
+            opacity: '0.85'
+          });
+          lbl.textContent = g.label;
+          svg.appendChild(lbl);
+        });
+      })();
+
+      /* --- MAIN FLOW ARROWS (Phase 1→2→3→4→5→6 only — not full loop) --- */
+      for (var i = 0; i < PHASES.length - 1; i++) {
         var from = PHASES[i];
-        var to   = PHASES[(i + 1) % PHASES.length];
+        var to   = PHASES[i + 1];
 
         var dx = to.cx - from.cx, dy = to.cy - from.cy;
         var dist = Math.sqrt(dx*dx + dy*dy);
@@ -726,77 +837,97 @@
         var ex = to.cx   - nx * (NR + 12);
         var ey = to.cy   - ny * (NR + 12);
 
-        // Midpoint on outer circle (clockwise between from and to)
-        var midAngle;
-        if (i === PHASES.length - 1) {
-          // Phase 4 (198°) → Step 0 (270°): mid = 234°
-          midAngle = (198 + 270) / 2;
-        } else {
-          midAngle = (from.angle + to.angle) / 2;
-        }
+        var midAngle = (from.angle + to.angle) / 2;
         var mx = CX + ORBIT * Math.cos(rad(midAngle));
         var my = CY + ORBIT * Math.sin(rad(midAngle));
 
-        // QBezier control point that makes arc pass through (mx, my) at t=0.5
         var cp_x = 2*mx - 0.5*sx - 0.5*ex;
         var cp_y = 2*my - 0.5*sy - 0.5*ey;
 
-        var path = makeSVGEl('path', {
+        svg.appendChild(makeSVGEl('path', {
           d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
           fill: 'none', stroke: from.color, 'stroke-width': '2',
           'stroke-linecap': 'round', opacity: '0.85',
           'marker-end': 'url(#arr-'+from.id+')'
-        });
-        svg.appendChild(path);
+        }));
       }
 
-      /* --- FEEDBACK ARROW: Phase 4 → Phase 3 (inward, dashed) --- */
+      /* --- OUTPUT INDICATOR at Phase 6 (center-directed arrow) --- */
       (function() {
-        var f = PHASES[4], t = PHASES[3];
+        var p6 = PHASES[5]; // Phase 6
+        var dx = CX - p6.cx, dy = CY - p6.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+        var sx = p6.cx + nx*(NR+6), sy = p6.cy + ny*(NR+6);
+        var ex = p6.cx + nx*(NR+52), ey = p6.cy + ny*(NR+52);
+        // Output arrow marker
+        var mo = makeSVGEl('marker', {
+          id: 'arr-output', markerWidth: '9', markerHeight: '7',
+          refX: '8', refY: '3.5', orient: 'auto'
+        });
+        mo.appendChild(makeSVGEl('polygon', { points: '0 0, 9 3.5, 0 7', fill: '#10b981' }));
+        defs.appendChild(mo);
+        svg.appendChild(makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' L '+ex+' '+ey,
+          fill: 'none', stroke: '#10b981', 'stroke-width': '2.5',
+          'stroke-linecap': 'round', opacity: '0.9',
+          'marker-end': 'url(#arr-output)'
+        }));
+        var lx = (sx+ex)/2 + ny*18, ly = (sy+ey)/2 - nx*18;
+        var bg = makeSVGEl('rect', { x: lx-24, y: ly-9, width: '50', height: '18', rx: '5', fill: surfaceColor });
+        svg.appendChild(bg);
+        var lt = makeSVGEl('text', {
+          x: lx+1, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: '#10b981', 'font-size': '10', 'font-weight': '700',
+          'font-family': 'Inter, sans-serif'
+        });
+        lt.textContent = 'Output';
+        svg.appendChild(lt);
+      })();
+
+      /* --- G6-FAIL ARROW: Phase 6 → Phase 7 (dashed, error path) --- */
+      (function() {
+        var f = PHASES[5], t = PHASES[6]; // Phase 6 → Phase 7
         var dx = t.cx - f.cx, dy = t.cy - f.cy;
         var dist = Math.sqrt(dx*dx + dy*dy);
         var nx = dx/dist, ny = dy/dist;
-
         var sx = f.cx + nx*(NR+3), sy = f.cy + ny*(NR+3);
         var ex = t.cx - nx*(NR+12), ey = t.cy - ny*(NR+12);
-
-        // Push control point toward center (inward)
-        var mx = (sx+ex)/2, my = (sy+ey)/2;
-        var dcx = CX - mx, dcy = CY - my;
-        var dcd = Math.sqrt(dcx*dcx + dcy*dcy);
-        var cp_x = mx + (dcx/dcd)*110;
-        var cp_y = my + (dcy/dcd)*110;
-
-        var path = makeSVGEl('path', {
-          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
-          fill: 'none', stroke: fbColor, 'stroke-width': '1.5',
-          'stroke-dasharray': '6,4', 'stroke-linecap': 'round',
-          'marker-end': 'url(#arr-fb)'
+        var midAngle = (f.angle + t.angle) / 2;
+        var mx = CX + ORBIT * Math.cos(rad(midAngle));
+        var my = CY + ORBIT * Math.sin(rad(midAngle));
+        var cp_x = 2*mx - 0.5*sx - 0.5*ex;
+        var cp_y = 2*my - 0.5*sy - 0.5*ey;
+        // G6-fail marker
+        var mg = makeSVGEl('marker', {
+          id: 'arr-g6fail', markerWidth: '8', markerHeight: '6',
+          refX: '7', refY: '3', orient: 'auto'
         });
-        svg.appendChild(path);
-
-        // Label at bezier midpoint
+        mg.appendChild(makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: '#ef4444' }));
+        defs.appendChild(mg);
+        svg.appendChild(makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
+          fill: 'none', stroke: '#ef4444', 'stroke-width': '1.8',
+          'stroke-dasharray': '5,4', 'stroke-linecap': 'round', opacity: '0.8',
+          'marker-end': 'url(#arr-g6fail)'
+        }));
+        // "G6 fail" label
         var lx = 0.25*sx + 0.5*cp_x + 0.25*ex;
         var ly = 0.25*sy + 0.5*cp_y + 0.25*ey;
-
-        var bg = makeSVGEl('rect', {
-          x: lx-32, y: ly-10, width: '64', height: '20', rx: '6',
-          fill: surfaceColor, stroke: guideColor, 'stroke-width': '1'
-        });
+        var bg = makeSVGEl('rect', { x: lx-24, y: ly-9, width: '48', height: '18', rx: '5', fill: surfaceColor, stroke: '#ef4444', 'stroke-width': '0.8' });
         svg.appendChild(bg);
-
-        var lbl = makeSVGEl('text', {
+        var lt2 = makeSVGEl('text', {
           x: lx, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
-          fill: textColor, 'font-size': '11',
-          'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
+          fill: '#ef4444', 'font-size': '10', 'font-weight': '700',
+          'font-family': 'Inter, sans-serif'
         });
-        lbl.textContent = 'Spec update';
-        svg.appendChild(lbl);
+        lt2.textContent = 'G6 fail';
+        svg.appendChild(lt2);
       })();
 
-      /* --- REFINEMENT LOOP ARROW: Phase 3 → Phase 1 (inward, dashed, amber) --- */
+      /* --- FEEDBACK ARROW: Phase 7 → Phase 4 (conflict / re-build, inward, dashed, amber) --- */
       (function() {
-        var f = PHASES[3], t = PHASES[1]; // Phase 3 → Phase 1
+        var f = PHASES[6], t = PHASES[3]; // Phase 7 → Phase 4
         var dx = t.cx - f.cx, dy = t.cy - f.cy;
         var dist = Math.sqrt(dx*dx + dy*dy);
         var nx = dx/dist, ny = dy/dist;
@@ -834,13 +965,13 @@
           fill: refineColor, 'font-size': '11',
           'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
         });
-        lbl.textContent = 'Re-cycle';
+        lbl.textContent = 'Re-build';
         svg.appendChild(lbl);
       })();
 
-      /* --- FEEDBACK ARROW: Phase 4 → Phase 1 (KB/Policy update, dashed cyan) --- */
+      /* --- FEEDBACK ARROW: Phase 7 → Phase 1 (omission/speculation / re-gather, dashed cyan) --- */
       (function() {
-        var f = PHASES[4], t = PHASES[1]; // Phase 4 → Phase 1
+        var f = PHASES[6], t = PHASES[0]; // Phase 7 → Phase 1
         var dx = t.cx - f.cx, dy = t.cy - f.cy;
         var dist = Math.sqrt(dx*dx + dy*dy);
         var nx = dx/dist, ny = dy/dist;
@@ -878,7 +1009,7 @@
           fill: kbColor, 'font-size': '11',
           'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
         });
-        lbl.textContent = 'KB update';
+        lbl.textContent = 'Re-gather';
         svg.appendChild(lbl);
       })();
 
@@ -1087,6 +1218,134 @@
           sbadge.textContent = p.subskill;
           card.appendChild(sbadge);
         }
+
+        // === Phase 7 special layout ===
+        if (idx === 6) {
+          card.classList.add('phase7-card');
+
+          var body = document.createElement('div');
+          body.className = 'phase7-body';
+
+          // Column 1: 4 checks
+          var checksWrap = document.createElement('div');
+          var checksTitle = document.createElement('div');
+          checksTitle.style.cssText = 'font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:8px;';
+          checksTitle.textContent = '4 Verification Checks';
+          checksWrap.appendChild(checksTitle);
+          var checksGrid = document.createElement('div');
+          checksGrid.className = 'phase7-checks';
+          var CHECKS = [
+            { name: 'Omission',    desc: 'Purpose & constraints reflected in output?', color: '#6366f1', target: '→ :gather' },
+            { name: 'Conflict',    desc: 'No contradictions within the output?',        color: '#f59e0b', target: '→ :build' },
+            { name: 'Speculation', desc: 'Claims grounded in collected sources?',       color: '#6366f1', target: '→ :gather' },
+            { name: 'Consistency', desc: 'Format matches Phase 1 success criteria?',   color: '#10b981', target: '→ :compose' },
+          ];
+          CHECKS.forEach(function(c) {
+            var ci = document.createElement('div');
+            ci.className = 'check-item';
+            ci.style.borderLeftColor = c.color;
+            var cn = document.createElement('div');
+            cn.className = 'check-name';
+            cn.style.color = c.color;
+            cn.textContent = c.name;
+            var cd = document.createElement('div');
+            cd.className = 'check-desc';
+            cd.textContent = c.desc;
+            var ct = document.createElement('div');
+            ct.style.cssText = 'font-size:0.7rem;font-weight:700;color:'+c.color+';margin-top:5px;opacity:0.8;font-family:monospace;';
+            ct.textContent = c.target;
+            ci.appendChild(cn); ci.appendChild(cd); ci.appendChild(ct);
+            checksGrid.appendChild(ci);
+          });
+          checksWrap.appendChild(checksGrid);
+          body.appendChild(checksWrap);
+
+          // Column 2: Scoring
+          var scoreWrap = document.createElement('div');
+          var scoreTitle = document.createElement('div');
+          scoreTitle.style.cssText = 'font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:8px;';
+          scoreTitle.textContent = 'Self-Score (0–100)';
+          scoreWrap.appendChild(scoreTitle);
+          var scoreRows = document.createElement('div');
+          scoreRows.className = 'phase7-score';
+          var SCORES = [
+            { label: 'Purpose reflected', pts: 30 },
+            { label: 'Source evidence',   pts: 25 },
+            { label: 'Internal consistency', pts: 25 },
+            { label: 'Format fit',        pts: 20 },
+          ];
+          SCORES.forEach(function(s) {
+            var row = document.createElement('div');
+            row.className = 'score-row';
+            var lbl = document.createElement('span');
+            lbl.className = 'score-criterion';
+            lbl.textContent = s.label;
+            var pts = document.createElement('span');
+            pts.className = 'score-pts';
+            pts.textContent = s.pts + 'pt';
+            row.appendChild(lbl); row.appendChild(pts);
+            scoreRows.appendChild(row);
+          });
+          var total = document.createElement('div');
+          total.className = 'score-total';
+          var tl = document.createElement('span'); tl.className = 'score-total-label'; tl.textContent = 'Total';
+          var tv = document.createElement('span'); tv.style.cssText = 'font-size:0.85rem;font-weight:800;color:#ef4444;'; tv.textContent = '100pt';
+          total.appendChild(tl); total.appendChild(tv);
+          scoreRows.appendChild(total);
+          scoreWrap.appendChild(scoreRows);
+          body.appendChild(scoreWrap);
+
+          // Column 3: H/M/L rating
+          var ratingWrap = document.createElement('div');
+          var ratingTitle = document.createElement('div');
+          ratingTitle.style.cssText = 'font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:8px;';
+          ratingTitle.textContent = 'Confidence Rating';
+          ratingWrap.appendChild(ratingTitle);
+          var ratingList = document.createElement('div');
+          ratingList.className = 'phase7-rating';
+          var RATINGS = [
+            { letter: 'H', color: '#10b981', desc: '80+ pt · 3+ sources · no issues' },
+            { letter: 'M', color: '#f59e0b', desc: '50–79 pt · 1–2 sources or minor gaps' },
+            { letter: 'L', color: '#ef4444', desc: '49– pt · insufficient sources or conflicts' },
+          ];
+          RATINGS.forEach(function(r) {
+            var ri = document.createElement('div');
+            ri.className = 'rating-item';
+            var rl = document.createElement('div');
+            rl.className = 'rating-letter';
+            rl.style.color = r.color;
+            rl.textContent = r.letter;
+            var rd = document.createElement('div');
+            rd.className = 'rating-desc';
+            rd.textContent = r.desc;
+            ri.appendChild(rl); ri.appendChild(rd);
+            ratingList.appendChild(ri);
+          });
+          ratingWrap.appendChild(ratingList);
+          body.appendChild(ratingWrap);
+
+          card.appendChild(body);
+
+          // Feedback chips
+          var fb = document.createElement('div');
+          fb.className = 'phase7-feedback';
+          var CHIPS = [
+            { label: 'Omission / Speculation  →  :gather',  bg: '#6366f118', color: '#6366f1', border: '#6366f144' },
+            { label: 'Conflict  →  :build',                 bg: '#f59e0b18', color: '#f59e0b', border: '#f59e0b44' },
+            { label: 'Format mismatch  →  :compose',        bg: '#10b98118', color: '#10b981', border: '#10b98144' },
+          ];
+          CHIPS.forEach(function(c) {
+            var chip = document.createElement('div');
+            chip.className = 'feedback-chip';
+            chip.style.background = c.bg;
+            chip.style.color = c.color;
+            chip.style.borderColor = c.border;
+            chip.textContent = c.label;
+            fb.appendChild(chip);
+          });
+          card.appendChild(fb);
+        }
+        // === end Phase 7 ===
 
         card.addEventListener('click', function() { handleNodeClick(idx); });
         grid.appendChild(card);

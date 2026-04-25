@@ -1,36 +1,46 @@
 # context-engineering
 
-> [한국어](README.ko.md) | English
+> English | [한국어](README.ko.md)
 
-A Claude Code plugin that defines step-by-step **"what to know, how to behave, and what to build"** when developing complex services with AI tools.
-
-## Skills Overview
-
-This plugin provides two independent skill sets:
-
-| Skill | Command | Purpose |
-|-------|---------|---------|
-| **Knowledge Engine** | `/ke`, `/ke:ingest`, `/ke:query` | Accumulate knowledge from any domain, query it to produce any output |
-| **Service Development** | `/context-engineering`, sub-skills | 4-phase workflow for building complex services with AI |
+A Claude Code plugin that implements a 7-phase pipeline for systematically preparing context before giving it to an AI — what information to include, in what structure, at what level of compression.
 
 ## What is Context Engineering?
 
 Context Engineering is **the practice of designing what goes into an LLM's context window**. It goes beyond writing a single good prompt — it decides what information to give to AI, when, and in what structure. RAG, memory architecture, token budget management, and system prompt design all fall under this category.
 
-This plugin addresses one aspect of that — **persistent context preparation** — a workflow to systematically create and maintain `knowledge-base.md` and `CLAUDE.md` so AI starts each development session with the right domain knowledge and behavior rules.
+This plugin addresses **persistent context preparation** — a repeatable workflow to collect, select, structure, compress, and verify context so every AI session starts with exactly the right information.
 
-## Overview
+## Pipeline
 
-When developing complex services with AI, three questions must be answered:
+```
+Phase 1 --[G1]--> Phase 2 --[G2]--> Phase 3 --[G3]-->
+Phase 4 --[G4]--> Phase 5 --[G5]--> Phase 6 --[G6]--> [Output]
+                                                          |
+                                                     (G6 fail)
+                                                          v
+                                                       Phase 7
+```
 
-- **What to know** → Knowledge Base (domain knowledge, constraints)
-- **How to behave** → Policy (CLAUDE.md)
-- **What to build** → Spec (PRD + architecture decisions + implementation plan)
+| Sub-skill | Phases | Role |
+|-----------|--------|------|
+| `/context-engineering:gather`  | 1-3 | Problem definition → candidate collection → selection |
+| `/context-engineering:build`   | 4-5 | Structuring → compression |
+| `/context-engineering:compose` | 6   | Output generation |
+| `/context-engineering:verify`  | 7   | Final verification |
 
-This plugin can be used in two ways:
+Each gate auto-passes when criteria are clearly met. When ambiguous, the pipeline pauses and asks for user confirmation before continuing.
 
-- **`/context-engineering`** — Sequential flow from Step 0 to Phase 4 (full workflow)
-- **Sub-skills** — Direct entry to a specific phase (for rework or feedback loop)
+## Output Types
+
+Phase 6 auto-determines the output format from Phase 1 success criteria:
+
+| Format | Trigger signals | Output |
+|--------|----------------|--------|
+| **A — Execution Instruction** | "make a prompt", "how should I write", "give me instructions" | Role + Task + Constraints + Output Format |
+| **B — KB Entry** | "save this", "remember this", "take a note" | Markdown entry with frontmatter + Key Facts / Constraints / Decisions / Notes |
+| **C — Project Artifacts** | "start a project", "analyze codebase", "I want to build" | CLAUDE.md + spec.md + implementation plan |
+
+If the signal is ambiguous, Phase 6 asks the user to choose A, B, or C once.
 
 ## Installation
 
@@ -48,7 +58,7 @@ Verify installation:
 ```bash
 claude plugin list
 #   ❯ context-engineering@context-engineering
-#     Version: 2.0.0
+#     Version: 3.0.0
 #     Scope: user
 #     Status: ✔ enabled
 ```
@@ -58,108 +68,34 @@ To use directly from a local directory:
 claude --plugin-dir /path/to/context-engineering
 ```
 
-## Skills
+## Usage
 
-### `/context-engineering` — Full workflow
+### Full pipeline
 
-Runs sequentially from Step 0 through Phase 4.
-
-```
-/context-engineering @<code-path> [--output <output-path>] [--specs <spec-doc-path>]
-```
-
-**Examples:**
-```
-/context-engineering @/path/to/project
-/context-engineering @/path/to/project --specs docs/references/
-/context-engineering @/path/to/project --output /tmp/context-docs --specs docs/references/
-```
-
-### Sub-skills — Direct entry by phase
-
-Use when reworking a specific phase in an ongoing project, or returning to a phase via the feedback loop.
-
-| Command | Handles | When to use |
-|---------|---------|-------------|
-| `/context-engineering:gather` | Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md) | New project start, KB or CLAUDE.md rework/update |
-| `/context-engineering:spec` | Phase 3 — PRD + SPEC | Writing or updating requirements and technical spec |
-| `/context-engineering:impl` | Phase 4 — Implementation | Starting implementation, entering feedback loop |
-| `/context-engineering:valid` | Readiness Gate | Pre-Phase 4 validation, discovery mode exit check |
-
-Each sub-skill auto-detects existing artifacts (knowledge-base.md, CLAUDE.md, prd.md, spec.md) and offers rework or update options.
+Runs all 7 phases in sequence from Phase 1 through Phase 6 (Phase 7 triggered automatically if Phase 6 gate fails).
 
 ```
-/context-engineering:gather @/path/to/project
-/context-engineering:spec @/path/to/project
-/context-engineering:valid
-/context-engineering:impl @/path/to/project
+/context-engineering
 ```
 
-## Knowledge Engine (`/ke`)
+### Sub-skills — direct phase entry
 
-A universal 7-phase engine for accumulating knowledge and producing AI-powered output. Not tied to software development — works for any domain and any output type.
+Use when re-working a specific phase, returning via a feedback loop, or when prior phases are already complete.
 
-### Two modes
-
-- **Ingest** — store information systematically into a knowledge base
-- **Query** — use stored knowledge to answer questions or produce output (code, analysis, reports, documents)
-
-### Commands
-
-```
-/ke                    — auto-detect mode from your input
-/ke:ingest             — force ingest mode
-/ke:query              — force query mode
-/ke --kb /path/to/kb   — use a specific knowledge base location
-```
-
-### How it works
-
-Knowledge is stored as plain markdown files — works with any tool (Obsidian, VS Code, GitHub, etc.).
+| Command | Phases | When to use |
+|---------|--------|-------------|
+| `/context-engineering:gather`  | 1-3 | New problem, or re-defining scope / re-collecting sources |
+| `/context-engineering:build`   | 4-5 | Re-structuring or re-compressing existing context |
+| `/context-engineering:compose` | 6   | Re-generating output with updated context |
+| `/context-engineering:verify`  | 7   | Manual verification pass or `--consolidate` KB maintenance |
 
 ```
-~/knowledge/             ← default location
-  index.md               ← master index (all entries, searchable)
-  {domain}/
-    {entry-slug}.md      ← one concept per file
+/context-engineering:gather
+/context-engineering:build
+/context-engineering:compose
+/context-engineering:verify
+/context-engineering:verify --consolidate
 ```
-
-Each knowledge entry has frontmatter (title, domain, type, source, date, reliability, tags) and structured body sections (Key Facts, Constraints, Decisions, Notes).
-
-## Workflow
-
-> **[📊 Interactive Diagram](https://seokrae.github.io/context-engineering/context-engineering-cycle.html)** — Click each phase to see the step-by-step details.
-
-```
-Step 0 — Context Gathering
-  · Requirements exploration (What · Why · Constraints — one question at a time)
-  · Assign REQ-IDs when summary is confirmed (REQ-1 · REQ-2 · REQ-3…)
-  · Clear     → write Phase 1~3 thoroughly, then enter Phase 4
-  · Unclear   → discovery mode: generate empty drafts → go directly to Phase 4
-                 ↓
-Phase 1 — Knowledge Base           [Self-Assessment] [User confirmation]
-  · Context Assessment — A/B/C/D scenario detection
-  · Source Scan  A: conversation  B: spec docs  C: code  D: B+C
-  · knowledge-base.md (Glossary · Constraints · Manifest)
-                 ↓
-Phase 2 — Policy (CLAUDE.md)       [Self-Assessment] [User confirmation]
-  · knowledge-base.md link required
-  · Non-obvious Gotchas draft (updated via Phase 4 feedback)
-                 ↓
-Phase 3 — Spec              [Self-Assessment] [Readiness Gate ⑥REQ]
-  · PRD feature requirements + SPEC architecture decisions + package structure
-  · Requirements traceability (REQ-ID → PRD feature → SPEC → implementation plan)
-  · Gate: AI summarizes current state → user decides pass/fail
-  ↑──────────────────── re-cycle to relevant phase if unmet
-                 ↓  Gate passed
-Phase 4 — Implementation                          [Retrospective]
-  · Build + Test + PRD success criteria achieved
-  · Update REQ-ID status on each completion (not implemented → implemented)
-  · Feedback loop: findings → immediately update the relevant phase document
-  · Output Implementation Retrospective when all done (achievement · process · documents)
-```
-
-**Discovery mode**: When requirements are unclear, generate Phase 1~3 as empty drafts and go directly to Phase 4. Fill in while developing, then switch to the main track when the user requests the Readiness Gate.
 
 ## Reference Documents
 
@@ -167,11 +103,14 @@ Phase artifact templates are in `skills/context-engineering/references/`:
 
 | File | Purpose |
 |------|---------|
-| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | Per-project progress checklist |
-| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 artifact template |
+| [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | Per-project 7-phase progress checklist |
+| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | Phase 1 KB artifact template |
 | [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | Phase 2 CLAUDE.md template |
 | [`spec-template.md`](skills/context-engineering/references/spec-template.md) | Phase 3 SPEC template (architecture decisions + package structure) |
-| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD principles (for complex services, optional) |
+| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | Hexagonal + DDD principles (optional, for complex services) |
+| [`entry-template.md`](skills/context-engineering/references/entry-template.md) | KB entry format (frontmatter + body) |
+| [`index-template.md`](skills/context-engineering/references/index-template.md) | KB index format |
+| [`context-session-template.md`](skills/context-engineering/references/context-session-template.md) | Multi-step task context scratch file (deleted after use) |
 
 ## License
 

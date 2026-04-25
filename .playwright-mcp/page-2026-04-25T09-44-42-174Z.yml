@@ -1,0 +1,165 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "Menu" [ref=e4] [cursor=pointer]:
+    - img [ref=e5]
+  - main [ref=e6]:
+    - generic [ref=e7]:
+      - heading "Context Engineering Cycle" [level=1] [ref=e8]
+      - paragraph [ref=e9]: A 7-phase pipeline for systematically preparing context before giving it to an AI
+    - region "Context Engineering cycle diagram" [ref=e10]:
+      - img "Step 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → feedback loop cycle diagram" [ref=e11]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: Context
+          - generic [ref=e15]: Engineering
+        - generic [ref=e25]: Re-compose
+        - generic [ref=e28]: Re-build
+        - generic [ref=e31]: Re-gather
+        - generic [ref=e32] [cursor=pointer]:
+          - generic [ref=e38]: Phase 1
+          - generic [ref=e39]: Problem
+          - generic [ref=e40]: Definition
+        - generic [ref=e42] [cursor=pointer]:
+          - generic [ref=e49]: Phase 2
+          - generic [ref=e50]: Candidate
+          - generic [ref=e51]: Collection
+        - generic [ref=e53] [cursor=pointer]:
+          - generic [ref=e60]: Phase 3
+          - generic [ref=e61]: Context
+          - generic [ref=e62]: Selection
+        - generic [ref=e64] [cursor=pointer]:
+          - generic [ref=e71]: Phase 4
+          - generic [ref=e72]: Structuring
+        - generic [ref=e74] [cursor=pointer]:
+          - generic [ref=e81]: Phase 5
+          - generic [ref=e82]: Compression
+        - generic [ref=e84] [cursor=pointer]:
+          - generic [ref=e90]: Phase 6
+          - generic [ref=e91]: Output
+          - generic [ref=e92]: Generation
+          - generic [ref=e95]: ✓ Self-Assess
+        - generic [ref=e96] [cursor=pointer]:
+          - generic [ref=e103]: Phase 7
+          - generic [ref=e104]: Verification
+    - generic [ref=e106]:
+      - generic [ref=e109]: Main flow
+      - generic [ref=e112]: Re-compose (Phase 7 → 6, format mismatch)
+      - generic [ref=e115]: Re-gather (Phase 7 → 1, omission/speculation)
+      - generic [ref=e118]: Re-build (Phase 7 → 4, conflict)
+    - generic [ref=e119]:
+      - heading "Phase Details" [level=2] [ref=e120]
+      - generic [ref=e121]:
+        - generic [ref=e122] [cursor=pointer]:
+          - generic [ref=e123]: Phase 1
+          - generic [ref=e125]: Problem Definition
+          - list [ref=e126]:
+            - listitem [ref=e127]: "Ask 3 questions: purpose → constraints → success criteria (one at a time, wait for answer)"
+            - listitem [ref=e128]: Auto-infer Role from the 3 answers — never ask directly
+            - listitem [ref=e129]: "Scope reduction: decompose problem into minimum session scope"
+            - listitem [ref=e130]: "Classify expected sources: Must-have vs Nice-to-have"
+          - generic [ref=e131]: "G1 auto-pass if: purpose concrete, constraints scoped, success criteria defined, Role inferable. Otherwise pause for user confirmation."
+          - generic [ref=e132]: /context-engineering:gather
+        - generic [ref=e133] [cursor=pointer]:
+          - generic [ref=e134]: Phase 2
+          - generic [ref=e136]: Candidate Collection
+          - list [ref=e137]:
+            - listitem [ref=e138]: Auto-determine sources from Phase 1 constraint signals
+            - listitem [ref=e139]: File/URL → read directly; codebase → scan structure + git log; KB → keyword → tag expansion → related entries
+            - listitem [ref=e140]: "Sources over 10,000 words: confirm section split before loading"
+            - listitem [ref=e141]: "KB miss: notify user, proceed with general knowledge"
+          - generic [ref=e142]: "G2 auto-pass if: all Phase 1 constraint-mentioned sources collected, no obvious omissions. Otherwise ask if a suspected missing source is needed."
+          - generic [ref=e143]: /context-engineering:gather
+        - generic [ref=e144] [cursor=pointer]:
+          - generic [ref=e145]: Phase 3
+          - generic [ref=e147]: Context Selection
+          - list [ref=e148]:
+            - listitem [ref=e149]: "Evaluate each candidate on 3 criteria: Relevance / Recency / Reliability"
+            - listitem [ref=e150]: "Keep: all 3 criteria met"
+            - listitem [ref=e151]: "Skip: any criterion fails — document reason explicitly"
+            - listitem [ref=e152]: "Merge: 70%+ semantic overlap → retain higher-reliability version"
+          - generic [ref=e153]: "G3 auto-pass if: criteria applied consistently, all Skip items have stated reasons, Keep set sufficient for Phase 1 purpose."
+          - generic [ref=e154]: /context-engineering:gather
+        - generic [ref=e155] [cursor=pointer]:
+          - generic [ref=e156]: Phase 4
+          - generic [ref=e158]: Structuring
+          - list [ref=e159]:
+            - listitem [ref=e160]: "Organize Keep items into 4 sections: Key Facts / Constraints / Decisions / Notes"
+            - listitem [ref=e161]: One item per fact, constraint, or decision — no compound entries
+            - listitem [ref=e162]: Empty sections omitted entirely
+            - listitem [ref=e163]: No duplication across sections
+          - generic [ref=e164]: "G4 auto-pass if: no ambiguous items, no cross-section duplicates, Key Facts directly connected to Phase 1 purpose."
+          - generic [ref=e165]: /context-engineering:build
+        - generic [ref=e166] [cursor=pointer]:
+          - generic [ref=e167]: Phase 5
+          - generic [ref=e169]: Compression
+          - list [ref=e170]:
+            - listitem [ref=e171]: "Measure token budget: small < 500w (no compression), medium 500-2000w (50%), large 2000+w (30%)"
+            - listitem [ref=e172]: "Compress in order: Notes first → Key Facts → Constraints last resort"
+            - listitem [ref=e173]: Constraints and Decisions are never compressed — preserved verbatim
+            - listitem [ref=e174]: "Large sources: scan headers/TOC first, then load purpose-relevant sections only"
+          - generic [ref=e175]: "G5 auto-pass if: Constraints and Decisions preserved verbatim, no over-compression of Key Facts, token budget target met."
+          - generic [ref=e176]: /context-engineering:build
+        - generic [ref=e177] [cursor=pointer]:
+          - generic [ref=e178]: Phase 6
+          - generic [ref=e179]:
+            - generic [ref=e180]: Output Generation
+            - generic [ref=e181]: G6
+          - list [ref=e182]:
+            - listitem [ref=e183]: Auto-determine format from Phase 1 success criteria signals
+            - listitem [ref=e184]: "Format A (Execution Instruction): Role + Task + Constraints + Output Format"
+            - listitem [ref=e185]: "Format B (KB Entry): frontmatter (title/type/reliability/tags) + Key Facts/Constraints/Decisions/Notes"
+            - listitem [ref=e186]: "Format C (Project Artifacts): CLAUDE.md + spec.md + implementation plan"
+          - generic [ref=e187]: "G6: success criteria reflected, no omissions, no conflicts, no speculation. Pass → deliver output. Fail → auto-invoke Phase 7."
+          - generic [ref=e188]: /context-engineering:compose
+        - generic [ref=e189] [cursor=pointer]:
+          - generic [ref=e190]: Phase 7
+          - generic [ref=e192]: Verification
+          - list [ref=e193]:
+            - listitem [ref=e194]: "4 checks: Omission / Conflict / Speculation / Consistency"
+            - listitem [ref=e195]: "Score 0-100: purpose 30pt + source evidence 25pt + internal consistency 25pt + format fit 20pt"
+            - listitem [ref=e196]: "H: 80+ (3+ sources, no issues) / M: 50-79 / L: 49-"
+            - listitem [ref=e197]: "Feedback: Omission/Speculation → gather | Conflict → build | Format mismatch → compose"
+          - generic [ref=e198]: /context-engineering:verify
+    - generic [ref=e199]:
+      - heading "Sub-skills — Direct Phase Entry" [level=2] [ref=e200]
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - generic [ref=e203]: /context-engineering:gather
+          - generic [ref=e204]: Phase 1-3
+          - generic [ref=e205]: Define the problem, collect context candidates from sources, and select what to keep. Entry point for new tasks or when scope needs to be redefined.
+        - generic [ref=e206]:
+          - generic [ref=e207]: /context-engineering:build
+          - generic [ref=e208]: Phase 4-5
+          - generic [ref=e209]: Structure selected context into Key Facts / Constraints / Decisions / Notes, then compress to token budget. Use when re-organizing existing context.
+        - generic [ref=e210]:
+          - generic [ref=e211]: /context-engineering:compose
+          - generic [ref=e212]: Phase 6
+          - generic [ref=e213]: "Generate the final output: execution instruction (A), KB entry (B), or project artifacts CLAUDE.md + spec.md (C). Auto-determines format from Phase 1 signals."
+        - generic [ref=e214]:
+          - generic [ref=e215]: /context-engineering:verify
+          - generic [ref=e216]: Phase 7
+          - generic [ref=e217]: Check for omissions, conflicts, speculation, and format consistency. Scores H/M/L confidence and routes feedback to the correct phase. Add --consolidate for KB maintenance.
+    - generic [ref=e218]:
+      - heading "Phase 2 — Source Determination" [level=2] [ref=e219]
+      - generic [ref=e220]:
+        - generic [ref=e221]:
+          - generic [ref=e222]: File / URL
+          - generic [ref=e223]: Document provided
+          - generic [ref=e224]: Read file in full or fetch URL. Confirm section split for sources over 10,000 words.
+        - generic [ref=e225]:
+          - generic [ref=e226]: Codebase
+          - generic [ref=e227]: Project or code mentioned
+          - generic [ref=e228]: Scan directory structure, build files, and recent git log. Extract existing CLAUDE.md and spec if present.
+        - generic [ref=e229]:
+          - generic [ref=e230]: Store
+          - generic [ref=e231]: Save / remember request
+          - generic [ref=e232]: Use the input text as-is. No external source scanning needed.
+        - generic [ref=e233]:
+          - generic [ref=e234]: KB Query
+          - generic [ref=e235]: Question or task request
+          - generic [ref=e236]: Scan KB index.md → keyword match → tag expansion → trace related entries by reliability.
+        - generic [ref=e237]:
+          - generic [ref=e238]: Mixed
+          - generic [ref=e239]: Multiple signals
+          - generic [ref=e240]: Combine sources above. Run parallel sub-agents for independent source types.
+  - contentinfo [ref=e241]: © SeokRae — context-engineering plugin
