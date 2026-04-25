@@ -28,6 +28,20 @@ Phase 1 분석 결과 (purpose / constraints / success criteria / Role)
 
 ---
 
+## 출력 예산 가이드
+
+Phase 6 출력물의 목표 크기:
+
+| 출력 형식 | 목표 크기 | 초과 시 |
+|---------|---------|-------|
+| A. 실행 지시문 | 200-800단어 | Notes를 한 줄 요약으로 축약 → 그래도 초과 시 아티팩트 분할 |
+| B. KB 엔트리 | 20-80줄 | 엔트리 분할 (entry-template 가이드라인 참조) |
+| C. 프로젝트 산출물 | CLAUDE.md 100-150줄 | 150줄 초과 시 별도 docs/ 파일로 분리 |
+
+> **불변 규칙**: Constraints와 Decisions는 출력 예산 압박 하에서도 삭제·축약 금지. build Phase 5에서 이미 보존을 보장한 항목이다.
+
+---
+
 ## Phase 6. 실행 지시 생성
 
 **목적**: Phase 1 success criteria 신호에 맞는 출력 형식을 자동 결정하고 최종 출력물을 생성한다.
