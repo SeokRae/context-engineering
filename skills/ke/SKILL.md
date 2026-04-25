@@ -79,8 +79,10 @@ When mode is forced via `:ingest` or `:query`, skip detection entirely.
 | | Ingest | Query |
 |---|---|---|
 | **Action** | Classify the input: domain, knowledge type, importance | Rephrase the question precisely; identify relevant domains; determine output format |
-| **Output** | `[Domain: X] [Type: fact/decision/constraint/procedure/reference] [Importance: H/M/L]` | `[Query: rephrased text] [Domains: X, Y] [Format: prose/list/table/code/analysis/document]` |
+| **Output** | `[Domains: X] [Type: fact/decision/constraint/procedure/reference] [Importance: H/M/L]` | `[Query: rephrased text] [Domains: X, Y] [Format: prose/list/table/code/analysis/document]` |
 | **Decision** | If domain is genuinely unclear, ask: "Which domain fits best? e.g., finance, health, legal, project-X" | If output format is ambiguous, ask: "What format do you need? e.g., prose summary, comparison table, bullet list" |
+
+Note (Ingest): An entry belongs to one domain; use the most specific one. If cross-domain, choose primary.
 
 Type definitions:
 - `fact` — an observable or reported truth
@@ -111,6 +113,8 @@ Importance scale: H = must retain long-term, M = useful context, L = ephemeral o
 | **Output** | Internal — not shown unless complex | Ranked list of entries to use (internal) |
 | **Decision** | If Merge candidates are found: "Entry `domain/slug.md` already covers this. Update it or keep both?" | If all candidates are low-relevance: note the gap — "Available knowledge is tangential. Answer will rely more on general reasoning." |
 
+Merge heuristic: Two entries merge if they share >70% semantic overlap AND cover the same narrow concept. Related-but-distinct concepts (e.g., "Python async patterns" vs. "asyncio event loops") should remain separate entries.
+
 ---
 
 ### Phase 4: Structuring (구조화)
@@ -135,7 +139,7 @@ Entry format rules:
 |---|---|---|
 | **Action** | Remove redundant examples. Trim verbose prose to essential facts. Aim for 20–80 lines per entry. | Summarize tangential context to fit the context budget. Keep high-relevance excerpts verbatim. |
 | **Output** | Compressed entry draft (internal) | Compressed context (internal) |
-| **Decision** | If entry exceeds 80 lines after compression: "This entry is large. Split into `{title-part-a}` and `{title-part-b}`?" | None — proceed automatically |
+| **Decision** | If entry exceeds 80 lines after compression: "This entry is large. Split into `{title-part-a}` and `{title-part-b}`?" If the user declines the split: accept and proceed to Phase 6. Large entries (>100 lines) are harder to retrieve but user choice is final. | None — proceed automatically |
 
 ---
 
@@ -158,6 +162,13 @@ Supported query output formats (non-exhaustive): prose narrative, bullet list, c
 | **Action** | Scan existing entries for semantic conflicts with the new entry. Add `related` cross-references where appropriate. Verify `index.md` row count matches files on disk. | Check the answer for unsupported claims, internal contradictions, and gaps relative to stored knowledge. |
 | **Output** | Silent on success. Conflict: "Conflict with `domain/existing.md`: [description]. Keep new entry, update existing, or discard?" | Confidence footer appended to answer: `[Confidence: H/M/L] — based on N entries. Gaps: {gap description or "none"}` |
 | **Decision** | On conflict: ask user to resolve (keep new / update existing / discard) | None — gaps are reported in the confidence footer, not as a blocking question |
+
+Semantic conflict = new entry contradicts or supersedes a stored fact (e.g., different values for the same factual claim). Minor thematic overlap does NOT trigger a conflict.
+
+Confidence levels:
+- High (H): 3+ consistent recent entries; answer is well-grounded
+- Medium (M): 1–2 entries or dated entries; note gaps, answer is reasonable
+- Low (L): 0 relevant entries or contradictory entries; answer relies on general knowledge — always append a warning
 
 ---
 
@@ -205,6 +216,9 @@ type: fact | decision | constraint | procedure | reference
 source: user | document:filename | url:https://...
 date: {YYYY-MM-DD}
 reliability: high | medium | low
+  # high — direct user statement, official documentation, code in the repository
+  # medium — secondhand source, older but verified document
+  # low — inferred behavior, external claim not yet verified
 tags: [tag1, tag2]
 related: [domain/other-entry]
 ---
