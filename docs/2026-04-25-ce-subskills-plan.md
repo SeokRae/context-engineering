@@ -1,8 +1,8 @@
-# ce sub-skills Implementation Plan
+# context-engineering sub-skills Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** `ce` 플러그인 생성 — `/ce:gather`, `/ce:spec`, `/ce:impl`, `/ce:valid` 4개 sub-skill로 context-engineering 워크플로우의 특정 Phase에 직접 진입
+**Goal:** `context-engineering` 플러그인에 sub-skills 추가 — `/context-engineering:gather`, `/context-engineering:spec`, `/context-engineering:impl`, `/context-engineering:valid` 4개 sub-skill로 context-engineering 워크플로우의 특정 Phase에 직접 진입
 
 **Architecture:** 기존 `/context-engineering` 스킬과 완전히 독립된 새 플러그인. 각 SKILL.md는 자체 완결적으로 작성하며 공통 로직(Context Resolution)을 인라인으로 포함. 템플릿은 별도 references/ 없이 SKILL.md에 직접 기술.
 
@@ -31,37 +31,36 @@
 ### Task 1: 레포 초기화 + plugin.json
 
 **Files:**
-- Create: `/Users/sr/IdeaProjects/claude/ce/.claude-plugin/plugin.json`
-- Create: `/Users/sr/IdeaProjects/claude/ce/.gitignore`
+- Create: `<CE_ROOT>/.claude-plugin/plugin.json`
+- Create: `<CE_ROOT>/.gitignore`
 
 - [ ] **Step 1: 디렉토리 생성**
 
 ```bash
-mkdir -p /Users/sr/IdeaProjects/claude/ce/.claude-plugin
-mkdir -p /Users/sr/IdeaProjects/claude/ce/skills/gather
-mkdir -p /Users/sr/IdeaProjects/claude/ce/skills/spec
-mkdir -p /Users/sr/IdeaProjects/claude/ce/skills/impl
-mkdir -p /Users/sr/IdeaProjects/claude/ce/skills/valid
+mkdir -p <CE_ROOT>/.claude-plugin
+mkdir -p <CE_ROOT>/skills/gather
+mkdir -p <CE_ROOT>/skills/spec
+mkdir -p <CE_ROOT>/skills/impl
+mkdir -p <CE_ROOT>/skills/valid
 ```
 
 - [ ] **Step 2: plugin.json 작성**
 
-`/Users/sr/IdeaProjects/claude/ce/.claude-plugin/plugin.json`:
+`<CE_ROOT>/.claude-plugin/plugin.json`:
 ```json
 {
-  "name": "ce",
+  "name": "context-engineering",
   "version": "1.0.0",
-  "description": "context-engineering sub-skills — Phase별 직접 진입: /ce:gather, /ce:spec, /ce:impl, /ce:valid",
+  "description": "context-engineering sub-skills — Phase별 직접 진입: /context-engineering:gather, /context-engineering:spec, /context-engineering:impl, /context-engineering:valid",
   "author": {
-    "name": "SeokRae",
-    "email": "kslbsh@gmail.com"
+    "name": "<author>",
+    "email": "<email>"
   },
-  "homepage": "https://github.com/SeokRae/ce",
-  "repository": "https://github.com/SeokRae/ce",
+  "homepage": "https://github.com/<username>/context-engineering",
+  "repository": "https://github.com/<username>/context-engineering",
   "license": "MIT",
   "keywords": [
     "context-engineering",
-    "ce",
     "gather",
     "spec",
     "impl",
@@ -73,7 +72,7 @@ mkdir -p /Users/sr/IdeaProjects/claude/ce/skills/valid
 - [ ] **Step 3: git 초기화 + .gitignore**
 
 ```bash
-cd /Users/sr/IdeaProjects/claude/ce
+cd <CE_ROOT>
 git init
 echo ".DS_Store" > .gitignore
 ```
@@ -81,27 +80,27 @@ echo ".DS_Store" > .gitignore
 - [ ] **Step 4: GitHub 레포 생성 + 초기 커밋**
 
 ```bash
-gh repo create SeokRae/ce --public --description "context-engineering Phase별 직접 진입 sub-skills"
+gh repo create <username>/context-engineering --public --description "context-engineering Phase별 직접 진입 sub-skills"
 git add .
-git commit -m "chore: init ce plugin"
+git commit -m "chore: init context-engineering plugin"
 git branch -M main
-git remote add origin https://github.com/SeokRae/ce.git
+git remote add origin https://github.com/<username>/context-engineering.git
 git push -u origin main
 ```
 
 ---
 
-### Task 2: /ce:gather SKILL.md
+### Task 2: /context-engineering:gather SKILL.md
 
 **Files:**
-- Create: `/Users/sr/IdeaProjects/claude/ce/skills/gather/SKILL.md`
+- Create: `<CE_ROOT>/skills/gather/SKILL.md`
 
 - [ ] **Step 1: Issue 생성**
 
 ```bash
-cd /Users/sr/IdeaProjects/claude/ce
+cd <CE_ROOT>
 gh issue create \
-  --title "feat: /ce:gather — Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md)" \
+  --title "feat: /context-engineering:gather — Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md)" \
   --body "Step 0 요구사항 탐색부터 knowledge-base.md, CLAUDE.md 작성까지 진행하는 sub-skill"
 ```
 
@@ -113,7 +112,7 @@ git checkout -b feature/{issue-번호}-gather
 
 - [ ] **Step 3: SKILL.md 작성**
 
-`/Users/sr/IdeaProjects/claude/ce/skills/gather/SKILL.md`:
+`<CE_ROOT>/skills/gather/SKILL.md`:
 ```markdown
 ---
 name: gather
@@ -124,14 +123,14 @@ description: >
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 ---
 
-# ce:gather
+# context-engineering:gather
 
 프로젝트 컨텍스트 수집(Step 0) → Knowledge Base(Phase 1) → CLAUDE.md(Phase 2)를 진행한다.
 
 ## 사용법
 
 ```
-/ce:gather [@<code-path>] [--output <output-path>]
+/context-engineering:gather [@<code-path>] [--output <output-path>]
 ```
 
 ## Context Resolution
@@ -268,38 +267,38 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 **산출물**: `{CODE_PATH}/CLAUDE.md`
 
-> **완료**: "gather 완료 — `/ce:spec`으로 PRD·SPEC을 작성하거나 `/ce:valid`로 Readiness Gate를 체크할 수 있습니다."
+> **완료**: "gather 완료 — `/context-engineering:spec`으로 PRD·SPEC을 작성하거나 `/context-engineering:valid`로 Readiness Gate를 체크할 수 있습니다."
 ```
 
 - [ ] **Step 4: 커밋 + PR**
 
 ```bash
 git add skills/gather/SKILL.md
-git commit -m "feat: /ce:gather — Step 0 + Phase 1 + Phase 2 (#이슈번호)"
+git commit -m "feat: /context-engineering:gather — Step 0 + Phase 1 + Phase 2 (#이슈번호)"
 git push origin feature/{이슈번호}-gather
-gh pr create --title "feat: /ce:gather" --body "Closes #{이슈번호}"
+gh pr create --title "feat: /context-engineering:gather" --body "Closes #{이슈번호}"
 gh pr merge {PR번호} --merge --delete-branch
 git checkout main && git pull origin main
 ```
 
 ---
 
-### Task 3: /ce:spec SKILL.md
+### Task 3: /context-engineering:spec SKILL.md
 
 **Files:**
-- Create: `/Users/sr/IdeaProjects/claude/ce/skills/spec/SKILL.md`
+- Create: `<CE_ROOT>/skills/spec/SKILL.md`
 
 - [ ] **Step 1: Issue 생성 + 브랜치**
 
 ```bash
-gh issue create --title "feat: /ce:spec — Phase 3 PRD + SPEC" \
+gh issue create --title "feat: /context-engineering:spec — Phase 3 PRD + SPEC" \
   --body "PRD와 SPEC을 작성하는 sub-skill. knowledge-base.md 있으면 로드해서 컨텍스트 활용."
 git checkout -b feature/{이슈번호}-spec
 ```
 
 - [ ] **Step 2: SKILL.md 작성**
 
-`/Users/sr/IdeaProjects/claude/ce/skills/spec/SKILL.md`:
+`<CE_ROOT>/skills/spec/SKILL.md`:
 ```markdown
 ---
 name: spec
@@ -310,14 +309,14 @@ description: >
 allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
-# ce:spec
+# context-engineering:spec
 
 PRD(제품 요구사항)와 SPEC(기술 명세)를 작성한다.
 
 ## 사용법
 
 ```
-/ce:spec [@<code-path>] [--output <output-path>]
+/context-engineering:spec [@<code-path>] [--output <output-path>]
 ```
 
 ## Context Resolution
@@ -400,38 +399,38 @@ PRD(제품 요구사항)와 SPEC(기술 명세)를 작성한다.
 
 **산출물**: `{OUTPUT_PATH}/spec.md`
 
-> **완료**: "`prd.md`·`spec.md` 저장했습니다. `/ce:valid`로 Readiness Gate를 체크하거나 `/ce:impl`로 구현을 시작할 수 있습니다."
+> **완료**: "`prd.md`·`spec.md` 저장했습니다. `/context-engineering:valid`로 Readiness Gate를 체크하거나 `/context-engineering:impl`로 구현을 시작할 수 있습니다."
 ```
 
 - [ ] **Step 3: 커밋 + PR**
 
 ```bash
 git add skills/spec/SKILL.md
-git commit -m "feat: /ce:spec — Phase 3 PRD + SPEC (#이슈번호)"
+git commit -m "feat: /context-engineering:spec — Phase 3 PRD + SPEC (#이슈번호)"
 git push origin feature/{이슈번호}-spec
-gh pr create --title "feat: /ce:spec" --body "Closes #{이슈번호}"
+gh pr create --title "feat: /context-engineering:spec" --body "Closes #{이슈번호}"
 gh pr merge {PR번호} --merge --delete-branch
 git checkout main && git pull origin main
 ```
 
 ---
 
-### Task 4: /ce:impl SKILL.md
+### Task 4: /context-engineering:impl SKILL.md
 
 **Files:**
-- Create: `/Users/sr/IdeaProjects/claude/ce/skills/impl/SKILL.md`
+- Create: `<CE_ROOT>/skills/impl/SKILL.md`
 
 - [ ] **Step 1: Issue 생성 + 브랜치**
 
 ```bash
-gh issue create --title "feat: /ce:impl — Phase 4 구현" \
+gh issue create --title "feat: /context-engineering:impl — Phase 4 구현" \
   --body "SPEC 구현 계획 기반 단계별 구현 + 피드백 루프 sub-skill"
 git checkout -b feature/{이슈번호}-impl
 ```
 
 - [ ] **Step 2: SKILL.md 작성**
 
-`/Users/sr/IdeaProjects/claude/ce/skills/impl/SKILL.md`:
+`<CE_ROOT>/skills/impl/SKILL.md`:
 ```markdown
 ---
 name: impl
@@ -442,14 +441,14 @@ description: >
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
-# ce:impl
+# context-engineering:impl
 
 SPEC 구현 계획을 기반으로 단계별 구현을 진행한다.
 
 ## 사용법
 
 ```
-/ce:impl [@<code-path>] [--output <output-path>]
+/context-engineering:impl [@<code-path>] [--output <output-path>]
 ```
 
 ## Context Resolution
@@ -492,10 +491,10 @@ SPEC 구현 계획을 기반으로 단계별 구현을 진행한다.
 
 | 발견 내용 | 갱신 대상 | 명령 |
 |---------|---------|------|
-| 도메인 용어 오류, 새 제약 발견 | `knowledge-base.md` | `/ce:gather` |
-| 새 gotcha 발견, AI 행동 규칙 변경 | `CLAUDE.md` | `/ce:gather` |
-| 기능 요구사항 변경 | `prd.md` | `/ce:spec` |
-| 아키텍처 결정 번복, 패키지 구조 변경 | `spec.md` | `/ce:spec` |
+| 도메인 용어 오류, 새 제약 발견 | `knowledge-base.md` | `/context-engineering:gather` |
+| 새 gotcha 발견, AI 행동 규칙 변경 | `CLAUDE.md` | `/context-engineering:gather` |
+| 기능 요구사항 변경 | `prd.md` | `/context-engineering:spec` |
+| 아키텍처 결정 번복, 패키지 구조 변경 | `spec.md` | `/context-engineering:spec` |
 
 > **원칙**: 구현을 문서에 맞추지 말고, 문서를 현실에 맞춰 갱신한다.
 ```
@@ -504,31 +503,31 @@ SPEC 구현 계획을 기반으로 단계별 구현을 진행한다.
 
 ```bash
 git add skills/impl/SKILL.md
-git commit -m "feat: /ce:impl — Phase 4 구현 + 피드백 루프 (#이슈번호)"
+git commit -m "feat: /context-engineering:impl — Phase 4 구현 + 피드백 루프 (#이슈번호)"
 git push origin feature/{이슈번호}-impl
-gh pr create --title "feat: /ce:impl" --body "Closes #{이슈번호}"
+gh pr create --title "feat: /context-engineering:impl" --body "Closes #{이슈번호}"
 gh pr merge {PR번호} --merge --delete-branch
 git checkout main && git pull origin main
 ```
 
 ---
 
-### Task 5: /ce:valid SKILL.md
+### Task 5: /context-engineering:valid SKILL.md
 
 **Files:**
-- Create: `/Users/sr/IdeaProjects/claude/ce/skills/valid/SKILL.md`
+- Create: `<CE_ROOT>/skills/valid/SKILL.md`
 
 - [ ] **Step 1: Issue 생성 + 브랜치**
 
 ```bash
-gh issue create --title "feat: /ce:valid — Readiness Gate 체크" \
+gh issue create --title "feat: /context-engineering:valid — Readiness Gate 체크" \
   --body "PRD·SPEC·KB·CLAUDE.md 상태를 점검하고 사용자가 Phase 4 진입 여부를 결정하는 sub-skill"
 git checkout -b feature/{이슈번호}-valid
 ```
 
 - [ ] **Step 2: SKILL.md 작성**
 
-`/Users/sr/IdeaProjects/claude/ce/skills/valid/SKILL.md`:
+`<CE_ROOT>/skills/valid/SKILL.md`:
 ```markdown
 ---
 name: valid
@@ -540,14 +539,14 @@ description: >
 allowed-tools: Read, Bash, Glob
 ---
 
-# ce:valid
+# context-engineering:valid
 
 현재 프로젝트 artifacts 상태를 점검하고 Readiness Gate 결과를 사용자에게 제시한다.
 
 ## 사용법
 
 ```
-/ce:valid [@<code-path>] [--output <output-path>]
+/context-engineering:valid [@<code-path>] [--output <output-path>]
 ```
 
 ## Context Resolution
@@ -586,25 +585,25 @@ allowed-tools: Read, Bash, Glob
    → {첫 항목명 + 의존 관계}
 
 미충족 항목이 있다면 해당 명령을 사용해 주세요.
-모두 통과라면 "Phase 4 진행" 또는 "/ce:impl" 이라고 알려 주세요.
+모두 통과라면 "Phase 4 진행" 또는 "/context-engineering:impl" 이라고 알려 주세요.
 ```
 
 | 기준 | 미충족 시 |
 |------|---------|
-| ① PRD 성공 기준 누락 | `/ce:spec` 으로 PRD 보완 |
-| ② SPEC 근거 누락 | `/ce:spec` 으로 SPEC 보완 |
-| ③ 도메인 용어 미확정 | `/ce:gather` 로 KB 보완 |
-| ④ CLAUDE.md 제약 미반영 | `/ce:gather` 로 CLAUDE.md 보완 |
-| ⑤ 구현 계획 착수 불가 | `/ce:spec` 으로 SPEC 보완 |
+| ① PRD 성공 기준 누락 | `/context-engineering:spec` 으로 PRD 보완 |
+| ② SPEC 근거 누락 | `/context-engineering:spec` 으로 SPEC 보완 |
+| ③ 도메인 용어 미확정 | `/context-engineering:gather` 로 KB 보완 |
+| ④ CLAUDE.md 제약 미반영 | `/context-engineering:gather` 로 CLAUDE.md 보완 |
+| ⑤ 구현 계획 착수 불가 | `/context-engineering:spec` 으로 SPEC 보완 |
 ```
 
 - [ ] **Step 3: 커밋 + PR**
 
 ```bash
 git add skills/valid/SKILL.md
-git commit -m "feat: /ce:valid — Readiness Gate 체크 (#이슈번호)"
+git commit -m "feat: /context-engineering:valid — Readiness Gate 체크 (#이슈번호)"
 git push origin feature/{이슈번호}-valid
-gh pr create --title "feat: /ce:valid" --body "Closes #{이슈번호}"
+gh pr create --title "feat: /context-engineering:valid" --body "Closes #{이슈번호}"
 gh pr merge {PR번호} --merge --delete-branch
 git checkout main && git pull origin main
 ```
@@ -614,7 +613,7 @@ git checkout main && git pull origin main
 ### Task 6: README.md
 
 **Files:**
-- Create: `/Users/sr/IdeaProjects/claude/ce/README.md`
+- Create: `<CE_ROOT>/README.md`
 
 - [ ] **Step 1: Issue 생성 + 브랜치**
 
@@ -625,9 +624,9 @@ git checkout -b feature/{이슈번호}-readme
 
 - [ ] **Step 2: README 작성**
 
-`/Users/sr/IdeaProjects/claude/ce/README.md`:
+`<CE_ROOT>/README.md`:
 ```markdown
-# ce
+# context-engineering
 
 context-engineering 워크플로우의 특정 Phase에 직접 진입하는 Claude Code 플러그인.
 
@@ -635,44 +634,44 @@ context-engineering 워크플로우의 특정 Phase에 직접 진입하는 Claud
 
 | 명령 | 담당 | 사용 시점 |
 |------|------|---------|
-| `/ce:gather` | Step 0 + KB + CLAUDE.md | 새 프로젝트 시작, KB·CLAUDE.md 재작업 |
-| `/ce:spec` | PRD + SPEC | 요구사항·기술 명세 작성·갱신 |
-| `/ce:impl` | Phase 4 구현 | 구현 시작, 피드백 루프 진입 |
-| `/ce:valid` | Readiness Gate | Phase 4 진입 전 검증, 탐색 모드 종료 체크 |
+| `/context-engineering:gather` | Step 0 + KB + CLAUDE.md | 새 프로젝트 시작, KB·CLAUDE.md 재작업 |
+| `/context-engineering:spec` | PRD + SPEC | 요구사항·기술 명세 작성·갱신 |
+| `/context-engineering:impl` | Phase 4 구현 | 구현 시작, 피드백 루프 진입 |
+| `/context-engineering:valid` | Readiness Gate | Phase 4 진입 전 검증, 탐색 모드 종료 체크 |
 
 ## 설치
 
 ```bash
-claude plugin marketplace add https://github.com/SeokRae/ce.git
-claude plugin install ce
+claude plugin marketplace add https://github.com/<username>/context-engineering.git
+claude plugin install context-engineering
 ```
 
 로컬에서 바로 사용:
 
 ```bash
-claude --plugin-dir /path/to/ce
+claude --plugin-dir <CE_ROOT>
 ```
 
 ## 사용법
 
 ```bash
 # 새 프로젝트 시작 — 경로 직접 지정
-/ce:gather @/path/to/project
+/context-engineering:gather @/path/to/project
 
 # 현재 디렉토리에서 자동 탐색
-/ce:spec
+/context-engineering:spec
 
 # Readiness Gate 체크
-/ce:valid @/path/to/project
+/context-engineering:valid @/path/to/project
 
 # 구현 시작
-/ce:impl @/path/to/project
+/context-engineering:impl @/path/to/project
 ```
 
 ## 기존 스킬과의 관계
 
 `/context-engineering` — 전체 워크플로우를 Step 0부터 Phase 4까지 순차 진행.  
-`/ce:*` — 특정 Phase에 직접 진입. 이미 진행 중인 프로젝트의 재작업·피드백 루프에 사용.
+`/context-engineering:*` — 특정 Phase에 직접 진입. 이미 진행 중인 프로젝트의 재작업·피드백 루프에 사용.
 
 ## License
 
@@ -697,25 +696,25 @@ git checkout main && git pull origin main
 - [ ] **Step 1: 로컬 플러그인 등록**
 
 ```bash
-claude plugin marketplace add /Users/sr/IdeaProjects/claude/ce
-claude plugin install ce
+claude plugin marketplace add <CE_ROOT>
+claude plugin install context-engineering
 ```
 
 - [ ] **Step 2: 스킬 목록 확인**
 
 Claude Code를 재시작 후 available skills 목록에 아래 4개가 나타나는지 확인:
 ```
-ce:gather
-ce:spec
-ce:impl
-ce:valid
+context-engineering:gather
+context-engineering:spec
+context-engineering:impl
+context-engineering:valid
 ```
 
 - [ ] **Step 3: 동작 확인**
 
 테스트 프로젝트로 각 스킬 기본 진입 확인:
 ```
-/ce:gather                     → "프로젝트 경로를 알려주세요" 프롬프트 출력 확인
-/ce:gather @/tmp/test-project  → Step 0 질문 1번 출력 확인
-/ce:valid @/tmp/test-project   → Readiness Gate 출력 확인 (artifacts 없음 상태)
+/context-engineering:gather                     → "프로젝트 경로를 알려주세요" 프롬프트 출력 확인
+/context-engineering:gather @/tmp/test-project  → Step 0 질문 1번 출력 확인
+/context-engineering:valid @/tmp/test-project   → Readiness Gate 출력 확인 (artifacts 없음 상태)
 ```
