@@ -1,5 +1,7 @@
 # context-engineering
 
+> [한국어](README.ko.md) | English
+
 A Claude Code plugin that defines step-by-step **"what to know, how to behave, and what to build"** when developing complex services with AI tools.
 
 ## What is Context Engineering?
