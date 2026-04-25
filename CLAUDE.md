@@ -44,11 +44,6 @@ Phase 6은 Phase 1 success criteria 신호에 따라 출력 형식을 자동 결
 4. **게이트 동작**: 기준 명확히 충족 → 자동 통과, 모호한 경우 → 사용자 확인 요청
 5. **Compaction Survival**: 각 SKILL.md의 핵심 행동 계약을 **첫 5,000 토큰** 내에 배치. 보조 정보는 그 뒤에 둘 것 — 컨텍스트 압축 시 뒷부분이 잘림
 
-## Known Drift
-
-`marketplace.json`(v1.0.0, 4-phase)과 `README.md`(구 아키텍처: gather/spec/impl/valid + KE 분리)가
-현재 `plugin.json`(v3.0.0, 7-phase 통합)과 불일치. 업데이트 필요.
-
 ## Verification
 
 스킬 수정 후 실제 프로젝트에서 `/context-engineering @<path>` 실행하여 Phase 1 질의가 올바르게 시작되는지 확인.
