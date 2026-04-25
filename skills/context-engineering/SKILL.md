@@ -107,6 +107,8 @@ Phase 1 success criteria에 따라 자동 결정:
 
 ---
 
+> 파이프라인 실패 시나리오 + 복구 프로토콜 → [Failure Cases & Recovery](references/failure-cases.md)
+
 ## 스킬 수정 가이드라인
 
 1. **Phase 일관성**: gather → build → compose → verify 흐름을 유지할 것

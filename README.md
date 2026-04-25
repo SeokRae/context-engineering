@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-3.0.0-blue)
+![Version](https://img.shields.io/badge/version-3.1.0-blue)
 ![License](https://img.shields.io/github/license/SeokRae/context-engineering)
 ![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-Plugin-blueviolet)
 
@@ -7,6 +7,41 @@
 > [한국어](README.ko.md)
 
 A Claude Code plugin that systematically prepares AI context through a 7-phase pipeline — deciding what information to include, in what structure, at what level of compression.
+
+## When / How / How Much
+
+| Question | Answer |
+|----------|--------|
+| **When** | Information comes from 2+ sources, or a simple copy-paste would cause the AI to miss context |
+| **How** | Run `/context-engineering` → answer 3 questions → the 7-phase pipeline handles the rest. Jump directly to a sub-skill if prior phases are already done |
+| **How Much** | Compression scales with input size — see [Phase 5 token budget](skills/build/SKILL.md) for exact thresholds |
+
+## Decision Table
+
+### Level 1: Do I need Context Engineering?
+
+| Situation | Use CE? | Reason |
+|-----------|---------|--------|
+| Single question, no extra context needed | No | A plain prompt is enough |
+| Editing one file with a clear scope | No | Direct instruction is faster |
+| Combining information from 2+ sources | **Yes** | AI will miss context without it |
+| Need to reference previous decisions | **Yes** | KB retrieval keeps things consistent |
+| Starting a project (CLAUDE.md + spec) | **Yes** | Format C generates all project artifacts |
+| Writing the same type of prompt repeatedly | **Yes** | Format A produces a reusable instruction |
+| Accumulating domain knowledge | **Yes** | Format B saves a KB entry |
+
+### Level 2: Where do I enter?
+
+| Scenario | Entry point | Prerequisite |
+|----------|------------|-------------|
+| Starting from scratch | `/context-engineering` | — |
+| Re-running gather only | `:gather` | — |
+| Phase 1/3 artifacts already exist | `:build` | gather output required |
+| Compressed context block exists | `:compose` | build output required |
+| Re-validating existing output | `:verify` | compose output required |
+| KB housekeeping | `:verify --consolidate` | Maintenance mode (independent of pipeline) |
+
+> Each sub-skill checks for its prerequisite artifacts and exits with guidance if they are missing.
 
 ## Highlights
 
@@ -123,6 +158,8 @@ Phase artifact templates are in `skills/context-engineering/references/`:
 | [`entry-template.md`](skills/context-engineering/references/entry-template.md) | 6-B | KB entry format (frontmatter + body) |
 | [`index-template.md`](skills/context-engineering/references/index-template.md) | 6-B | KB index format |
 | [`context-session-template.md`](skills/context-engineering/references/context-session-template.md) | 6-A | Multi-step task scratch file (deleted after use) |
+| [`context-source-strategy.md`](skills/context-engineering/references/context-source-strategy.md) | 2 | RAG / Memory / Tool Result strategy classification |
+| [`failure-cases.md`](skills/context-engineering/references/failure-cases.md) | All | Pipeline failure scenarios + recovery protocols |
 
 ## Project Structure
 

@@ -7,9 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Nature
 
 소스 코드 없음. **순수 마크다운** Claude Code 플러그인:
-- `.claude-plugin/plugin.json` — 플러그인 메타데이터 (v3.0.0)
+- `.claude-plugin/plugin.json` — 플러그인 메타데이터 (v3.1.0)
 - `skills/context-engineering/SKILL.md` — 오케스트레이터 (전체 7-Phase 파이프라인)
-- `skills/context-engineering/references/` — 8개 템플릿 및 참조 문서
+- `skills/context-engineering/references/` — 10개 템플릿 및 참조 문서
 - `skills/gather/SKILL.md` — Phase 1-3 (문제 정의 → 수집 → 선택)
 - `skills/build/SKILL.md` — Phase 4-5 (구조화 → 압축)
 - `skills/compose/SKILL.md` — Phase 6 (실행 지시 생성)
@@ -39,7 +39,7 @@ Phase 6은 Phase 1 success criteria 신호에 따라 출력 형식을 자동 결
 ## Skill Modification Guidelines
 
 1. **Phase 일관성**: gather → build → compose → verify 흐름 유지
-2. **템플릿 동기화**: `references/` 템플릿 8개와 SKILL.md 인라인 구조를 항상 일치시킬 것
+2. **템플릿 동기화**: `references/` 파일 10개와 SKILL.md 인라인 구조를 항상 일치시킬 것
 3. **게이트 형식**: `"Phase N 결과: {요약}\n 미충족 항목: {내용}\n 수정하거나 승인 후 진행해주세요."` 준수
 4. **게이트 동작**: 기준 명확히 충족 → 자동 통과, 모호한 경우 → 사용자 확인 요청
 5. **Compaction Survival**: 각 SKILL.md의 핵심 행동 계약을 **첫 5,000 토큰** 내에 배치. 보조 정보는 그 뒤에 둘 것 — 컨텍스트 압축 시 뒷부분이 잘림

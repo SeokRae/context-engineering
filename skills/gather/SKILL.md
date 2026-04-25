@@ -100,6 +100,8 @@ Phase 1의 constraints 답변 신호에서 소스를 결정한다:
 | 질문 / 태스크 요청 | KB `index.md` 스캔 → 매칭 엔트리 읽기 |
 | 복합 (여러 신호 혼재) | 위 소스 조합 — 서브 에이전트 병렬 실행 |
 
+> 전략 분류 (RAG / Memory / Tool Result) → [Context Source Strategy](../context-engineering/references/context-source-strategy.md)
+
 ### KB 검색 강화
 
 KB `index.md`에서 후보를 찾을 때 다음 순서로 검색한다:
