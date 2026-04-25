@@ -123,7 +123,7 @@ If the user declines the split: accept and proceed to Phase 6. Large entries (>1
 
 Write each entry file to `{KNOWLEDGE_PATH}/{domain}/{slug}.md`.
 
-Update `index.md`: add a new row to the correct domain table (or create the table if the domain is new).
+Update `index.md`: add a new row to the correct domain table. If the domain doesn't yet exist in index.md, create a new `## {domain}` section in alphabetical order among domains. Use the standard table header: `| Entry | Type | Date | Reliability | Tags | Summary |`
 
 Output: `Stored: {domain}/{slug}.md` (one line per entry written)
 
@@ -168,7 +168,7 @@ related: [domain/other-entry]
 **Reliability scale**:
 - `high` — direct user statement, official documentation, code in the repository
 - `medium` — secondhand source, older but verified document
-- `low` — inferred behavior, external claim not yet verified
+- `low` — speculative, experimental, or user-reported without verification
 
 Storage path: `{KNOWLEDGE_PATH}/{domain}/{slugified-title}.md`
 
@@ -197,7 +197,7 @@ Index update rules:
 - Update the row when an entry is modified
 - Remove the row when an entry is deleted
 - Regenerate the header counts (`Total entries`, `Domains`) on every update
-- Sort entries within a domain by date descending (newest first)
+- Sort entries within a domain by date descending (newest first). Re-sort the domain table on every update.
 
 ---
 
@@ -205,9 +205,10 @@ Index update rules:
 
 For simple inputs, multiple phases execute in a single step without visible output:
 
-| Scenario | Behavior |
-|----------|----------|
-| Short simple ingest (1–2 sentences, clear domain) | Phases 1–5 execute silently; user sees only Phase 6 confirmation |
-| Large document ingest (1000+ words) | All phases shown with progress markers |
+| Threshold | Behavior |
+|-----------|----------|
+| ≤100 words (or ≤3 sentences) AND single clear domain | Phases 1–5 execute silently; user sees only Phase 6 confirmation |
+| 100–1000 words OR ambiguous domain | Show Phase 1 classification, then Phase 6 confirmation |
+| 1000+ words | Show all phase transitions with progress markers |
 
 Rule: show phase transitions when the input is complex. For simple inputs, phases execute silently and the user sees only the final output.
