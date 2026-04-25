@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>컨텍스트 엔지니어링 사이클</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { interpolate-size: allow-keywords; }
+
+    html.theme-dark {
+      --bg: #0A0A0A; --surface: #141414; --surface-hover: #1C1C1C;
+      --border: rgba(255,255,255,0.06); --border-strong: rgba(255,255,255,0.14);
+      --text: #EDEDED; --text-secondary: #777;
+      --accent: #3b82f6; --accent-secondary: #8b5cf6;
+      --positive: #10b981; --negative: #f43f5e; --warning: #f59e0b;
+    }
+    html.theme-light {
+      --bg: #FAFAF9; --surface: #FFFFFF; --surface-hover: #F5F5F4;
+      --border: rgba(0,0,0,0.07); --border-strong: rgba(0,0,0,0.15);
+      --text: #0f172a; --text-secondary: #64748b;
+      --accent: #2563eb; --accent-secondary: #7c3aed;
+      --positive: #059669; --negative: #e11d48; --warning: #d97706;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', 'Inter', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em; transition: background 0.3s, color 0.3s;
+    }
+    h1,h2,h3 { letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; color: var(--text); }
+    h1 { font-size: 2.5rem; font-weight: 800; }
+    h2 { font-size: 1.25rem; font-weight: 600; }
+    h3 { font-size: 1rem; font-weight: 600; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes nodePulse {
+      0%, 100% { opacity: 0.12; }
+      50%       { opacity: 0.22; }
+    }
+    .animate { animation: fadeInUp 0.65s ease-out both; }
+    .animate.delay-1 { animation-delay: 0.1s; }
+    .animate.delay-2 { animation-delay: 0.2s; }
+    .animate.delay-3 { animation-delay: 0.35s; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+    @media print {
+      body { background: white !important; color: black !important; }
+      .viz-menu { display: none; }
+    }
+    @page { margin: 1in; }
+
+    /* === MENU === */
+    .viz-menu { position: fixed; top: 16px; right: 16px; z-index: 9999; }
+    .viz-menu-toggle {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(12px); transition: all 0.2s;
+    }
+    .viz-menu-toggle:hover { background: var(--surface-hover); }
+    .viz-menu-dropdown {
+      position: absolute; top: 52px; right: 0; min-width: 200px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 8px;
+      opacity: 0; visibility: hidden; transform: translateY(-8px);
+      transition: all 0.2s; backdrop-filter: blur(16px);
+    }
+    .viz-menu-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .viz-menu-dropdown button {
+      width: 100%; padding: 10px 14px; border: none; border-radius: 8px;
+      background: transparent; color: var(--text); font-size: 14px;
+      font-family: inherit; cursor: pointer; text-align: left;
+      display: flex; align-items: center; gap: 10px; transition: background 0.15s;
+    }
+    .viz-menu-dropdown button:hover { background: var(--surface-hover); }
+
+    /* === LAYOUT === */
+    .page-header {
+      text-align: center; padding: 64px 24px 0;
+    }
+    .page-header p {
+      color: var(--text-secondary); font-size: 1rem;
+      max-width: 560px; margin: 12px auto 0;
+    }
+    .diagram-wrap {
+      display: flex; justify-content: center;
+      padding: 48px 24px 0;
+    }
+    #cycle-svg { width: 100%; max-width: 680px; }
+
+    /* === LEGEND === */
+    .legend {
+      display: flex; justify-content: center; gap: 28px;
+      padding: 16px 24px 0; flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--text-secondary);
+    }
+    .legend-line {
+      width: 28px; height: 2px;
+    }
+    .legend-line.solid { background: var(--text-secondary); }
+    .legend-line.dashed {
+      background: repeating-linear-gradient(
+        90deg, var(--text-secondary) 0, var(--text-secondary) 5px,
+        transparent 5px, transparent 9px
+      );
+    }
+
+    /* === PHASE CARDS === */
+    .cards-section {
+      max-width: 960px; margin: 56px auto 0; padding: 0 24px;
+    }
+    .cards-section > h2 { margin-bottom: 24px; color: var(--text-secondary); font-weight: 500; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid transparent;
+      border-radius: 12px; padding: 20px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .phase-card:hover { border-color: var(--border-strong); box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
+    .phase-card.active { box-shadow: 0 0 0 2px; }
+    .phase-badge {
+      display: inline-block;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 3px 10px; border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .phase-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .phase-card-title { font-size: 0.95rem; font-weight: 600; margin: 0; }
+    .confirm-badge {
+      font-size: 0.68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+      border: 1px solid transparent; white-space: nowrap; flex-shrink: 0;
+    }
+    .branch-section {
+      margin-top: 10px; padding: 10px 12px;
+      background: var(--surface-hover); border-radius: 8px;
+      font-size: 0.79rem;
+    }
+    .branch-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 2px 0; color: var(--text-secondary);
+    }
+    .branch-label {
+      font-weight: 700; white-space: nowrap; flex-shrink: 0;
+    }
+    .phase-steps { list-style: none; font-size: 0.82rem; color: var(--text-secondary); }
+    .phase-steps li {
+      padding: 3px 0; display: flex; align-items: flex-start; gap: 8px;
+    }
+    .phase-steps li::before {
+      content: ''; width: 4px; height: 4px; border-radius: 50%;
+      background: currentColor; margin-top: 8px; flex-shrink: 0;
+    }
+    .gate-msg {
+      margin-top: 14px; padding: 8px 12px;
+      background: var(--surface-hover); border-radius: 8px;
+      font-size: 0.76rem; color: var(--text-secondary);
+      border-left: 3px solid; font-style: italic;
+    }
+
+    /* === PHASE 7 SPECIAL CARD === */
+    .phase7-card {
+      grid-column: 1 / -1 !important;
+      border-color: rgba(239,68,68,0.25) !important;
+    }
+    .phase7-body {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .phase7-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check-item {
+      background: var(--surface-hover); border-radius: 8px; padding: 10px 12px;
+      border-left: 3px solid transparent;
+    }
+    .check-name { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .check-desc { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.4; }
+    .phase7-score { display: flex; flex-direction: column; gap: 6px; }
+    .score-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface-hover); border-radius: 6px; padding: 7px 10px;
+    }
+    .score-criterion { font-size: 0.76rem; color: var(--text-secondary); }
+    .score-pts { font-size: 0.85rem; font-weight: 800; color: #ef4444; }
+    .score-total {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; border-top: 1px solid var(--border); margin-top: 2px;
+    }
+    .score-total-label { font-size: 0.76rem; font-weight: 600; }
+    .phase7-rating { display: flex; flex-direction: column; gap: 6px; }
+    .rating-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface-hover); border-radius: 6px; padding: 8px 10px;
+    }
+    .rating-letter {
+      font-size: 1rem; font-weight: 800; width: 20px; text-align: center; flex-shrink: 0;
+    }
+    .rating-desc { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.3; }
+    .phase7-feedback {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+    }
+    .feedback-chip {
+      font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+      border: 1px solid; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+    }
+    @media (max-width: 768px) { .phase7-body { grid-template-columns: 1fr; } }
+
+    /* === SCENARIO === */
+    .scenario-section {
+      max-width: 960px; margin: 48px auto 0; padding: 0 24px;
+    }
+    .scenario-section > h2 { margin-bottom: 20px; color: var(--text-secondary); font-weight: 500; }
+    .scenario-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .scenario-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px;
+    }
+    .scenario-id {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px;
+    }
+    .scenario-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+    .scenario-desc { font-size: 0.78rem; color: var(--text-secondary); }
+
+    /* === SUB-SKILLS === */
+    .subskill-section {
+      max-width: 960px; margin: 48px auto 0; padding: 0 24px;
+    }
+    .subskill-section > h2 { margin-bottom: 20px; color: var(--text-secondary); font-weight: 500; }
+    .subskill-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .subskill-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      border-radius: 10px; padding: 16px;
+      transition: box-shadow 0.2s;
+    }
+    .subskill-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
+    .subskill-cmd {
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: 0.78rem; font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .subskill-covers {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      opacity: 0.7; margin-bottom: 6px;
+    }
+    .subskill-desc { font-size: 0.78rem; color: var(--text-secondary); }
+
+    /* Sub-skill badge on phase cards */
+    .subskill-badge {
+      display: inline-block;
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: 0.69rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 6px;
+      margin-top: 12px; margin-bottom: 2px;
+      border: 1px solid transparent;
+    }
+
+    /* SVG node hover */
+    .svg-node { cursor: pointer; }
+    .svg-node .glow-ring { animation: nodePulse 3s ease-in-out infinite; }
+    .svg-node:hover .node-ring { filter: brightness(1.3); }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .scenario-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 375px) {
+      body { overflow-x: hidden; }
+      h1 { font-size: 1.6rem; }
+      .scenario-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" style="position:absolute;left:-9999px;" onfocus="this.style.cssText='position:fixed;left:16px;top:16px;z-index:10000;padding:8px 16px;background:var(--accent);color:white;border-radius:4px;text-decoration:none;font-family:Inter,sans-serif;'" onblur="this.style.cssText='position:absolute;left:-9999px;'">Skip to content</a>
+
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/>
+        <line x1="3" y1="10" x2="17" y2="10"/>
+        <line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()"><span id="themeIcon">🌙</span><span id="themeLabel">다크</span></button>
+      <button onclick="downloadImage()"><span>📥</span><span>PNG 다운로드</span></button>
+      <button onclick="window.print()"><span>🖨️</span><span>인쇄 / PDF</span></button>
+    </div>
+  </div>
+
+  <main id="main-content" role="main">
+    <section class="page-header">
+      <h1 class="animate">컨텍스트 엔지니어링 사이클</h1>
+      <p class="animate delay-1">AI에게 컨텍스트를 전달하기 전에 체계적으로 준비하는 7-Phase 파이프라인</p>
+    </section>
+
+    <section class="diagram-wrap animate delay-2" aria-label="Context Engineering cycle diagram">
+      <svg id="cycle-svg" viewBox="0 0 980 820" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Step 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → feedback loop cycle diagram">
+        <!-- drawn by JS -->
+      </svg>
+    </section>
+
+    <div class="legend animate delay-3">
+      <div class="legend-item">
+        <div class="legend-line solid"></div>
+        <span>메인 플로우</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line dashed" style="background: repeating-linear-gradient(90deg, #ef4444 0, #ef4444 5px, transparent 5px, transparent 9px);"></div>
+        <span>G6 실패 → Phase 7 (검증)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line dashed" style="background: repeating-linear-gradient(90deg, #06b6d4 0, #06b6d4 4px, transparent 4px, transparent 9px);"></div>
+        <span>재수집 (Phase 7 → 1)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line dashed" style="background: linear-gradient(90deg, #f59e0b 60%, transparent 60%); background-size: 10px 2px;"></div>
+        <span>재구조화 (Phase 7 → 4)</span>
+      </div>
+    </div>
+
+    <section class="cards-section" data-reveal>
+      <h2>Phase 상세</h2>
+      <div class="cards-grid" id="phaseCardsGrid"></div>
+    </section>
+
+    <section class="subskill-section" data-reveal>
+      <h2>서브스킬 — 특정 Phase 직접 진입</h2>
+      <div class="subskill-grid" id="subskillGrid"></div>
+    </section>
+
+    <section class="scenario-section" data-reveal>
+      <h2>Phase 2 — 소스 결정</h2>
+      <div class="scenario-grid">
+        <div class="scenario-card">
+          <div class="scenario-id" style="color:#3b82f6;">File / URL</div>
+          <div class="scenario-title">문서 제공됨</div>
+          <div class="scenario-desc">파일 전체 읽기 또는 URL 가져오기. 10,000단어 초과 소스는 섹션 분할 확인.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-id" style="color:#8b5cf6;">Codebase</div>
+          <div class="scenario-title">프로젝트 또는 코드 언급</div>
+          <div class="scenario-desc">디렉토리 구조, 빌드 파일, 최근 git log 스캔. 기존 CLAUDE.md 및 spec 추출.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-id" style="color:#f59e0b;">Store</div>
+          <div class="scenario-title">저장 / 기억 요청</div>
+          <div class="scenario-desc">입력 텍스트를 그대로 사용. 외부 소스 스캔 불필요.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-id" style="color:#10b981;">KB Query</div>
+          <div class="scenario-title">질문 또는 작업 요청</div>
+          <div class="scenario-desc">KB index.md 스캔 → 키워드 매칭 → 태그 확장 → 신뢰도별 연관 항목 추적.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-id" style="color:#ef4444;">Mixed</div>
+          <div class="scenario-title">복합 신호</div>
+          <div class="scenario-desc">위 소스들 조합. 독립적인 소스 유형에는 병렬 서브에이전트 실행.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="margin-top:60px; padding:20px 0; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--text-secondary);">
+    © SeokRae — context-engineering plugin
+  </footer>
+
+  <script>
+    /* === MENU === */
+    function toggleMenu() {
+      var d = document.getElementById('vizMenuDropdown');
+      if (d) d.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.viz-menu')) {
+        var d = document.getElementById('vizMenuDropdown');
+        if (d) d.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var d = document.getElementById('vizMenuDropdown');
+        if (d) d.classList.remove('open');
+      }
+    });
+
+    /* === THEME === */
+    var savedTheme = localStorage.getItem('viz-theme');
+    var currentTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    function applyTheme(t) {
+      document.documentElement.className = 'theme-' + t;
+      document.getElementById('themeIcon').textContent = t === 'dark' ? '🌙' : '☀️';
+      document.getElementById('themeLabel').textContent = t === 'dark' ? '다크' : '라이트';
+      localStorage.setItem('viz-theme', t);
+      currentTheme = t;
+      if (typeof onThemeChange === 'function') onThemeChange();
+    }
+    function cycleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+
+    /* === SCROLL REVEAL === */
+    document.querySelectorAll('[data-reveal]').forEach(function(el) { el.classList.add('reveal'); });
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+    /* === DOWNLOAD === */
+    async function downloadImage() {
+      var menu = document.querySelector('.viz-menu');
+      menu.style.display = 'none';
+      try {
+        var url = await htmlToImage.toPng(document.body, { quality: 1, pixelRatio: 2 });
+        var a = document.createElement('a');
+        a.href = url; a.download = 'context-engineering-cycle-ko.png'; a.click();
+      } catch(e) { console.error(e); }
+      menu.style.display = '';
+    }
+
+    /* ===========================
+       DIAGRAM DATA
+    =========================== */
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var CX = 490, CY = 410, ORBIT = 255, NR = 58;
+
+    var SUBSKILLS = [
+      {
+        cmd: '/context-engineering:gather',
+        covers: 'Phase 1-3',
+        color: '#6366f1',
+        desc: '문제를 정의하고, 소스에서 컨텍스트 후보를 수집하고, 유지할 항목을 선택합니다. 새 작업 시작점 또는 스코프 재정의 필요 시 사용.'
+      },
+      {
+        cmd: '/context-engineering:build',
+        covers: 'Phase 4-5',
+        color: '#f59e0b',
+        desc: '선택된 컨텍스트를 핵심 사실 / 제약사항 / 결정사항 / 노트로 구조화하고 토큰 예산에 맞게 압축합니다. 기존 컨텍스트 재구성 시 사용.'
+      },
+      {
+        cmd: '/context-engineering:compose',
+        covers: 'Phase 6',
+        color: '#10b981',
+        desc: '최종 출력 생성: 실행 지시 (A), KB 엔트리 (B), 또는 프로젝트 산출물 CLAUDE.md + spec.md (C). Phase 1 신호에서 형식 자동 결정.'
+      },
+      {
+        cmd: '/context-engineering:verify',
+        covers: 'Phase 7',
+        color: '#ef4444',
+        desc: '누락, 충돌, 추측, 형식 일관성을 검사합니다. H/M/L 신뢰도 점수를 매기고 피드백을 올바른 Phase로 전달합니다. KB 유지보수에는 --consolidate 추가.'
+      }
+    ];
+
+    var PHASES = [
+      {
+        id: 'phase1', label: 'Phase 1', name: '문제 정의',
+        angle: -90, color: '#6366f1',
+        icon: 'gather',
+        subskill: '/context-engineering:gather',
+        confirmLabel: null,
+        steps: [
+          '3가지 질문: 목적 → 제약사항 → 성공 기준 (한 번에 하나씩, 답변 대기)',
+          '3가지 답변에서 Role 자동 추론 — 직접 묻지 않음',
+          '스코프 축소: 문제를 최소 세션 범위로 분해',
+          '예상 소스 분류: 필수 vs 선택'
+        ],
+        branches: null,
+        gate: 'G1 자동 통과 조건: 목적 구체적, 제약사항 범위 지정, 성공 기준 정의, Role 추론 가능. 그렇지 않으면 사용자 확인 대기.'
+      },
+      {
+        id: 'phase2', label: 'Phase 2', name: '후보 수집',
+        angle: -38.57, color: '#3b82f6',
+        icon: 'book',
+        subskill: '/context-engineering:gather',
+        confirmLabel: null,
+        steps: [
+          'Phase 1 제약 신호에서 소스 자동 결정',
+          '파일/URL → 직접 읽기; 코드베이스 → 구조 스캔 + git log; KB → 키워드 → 태그 확장 → 연관 항목',
+          '10,000단어 초과 소스: 로드 전 섹션 분할 확인',
+          'KB 미스: 사용자 알림, 일반 지식으로 진행'
+        ],
+        branches: null,
+        gate: 'G2 자동 통과 조건: Phase 1 제약에서 언급된 모든 소스 수집, 명백한 누락 없음. 그렇지 않으면 누락 의심 소스 필요 여부 질문.'
+      },
+      {
+        id: 'phase3', label: 'Phase 3', name: '컨텍스트 선택',
+        angle: 12.86, color: '#8b5cf6',
+        icon: 'shield',
+        subskill: '/context-engineering:gather',
+        confirmLabel: null,
+        steps: [
+          '각 후보를 3가지 기준으로 평가: 관련성 / 최신성 / 신뢰도',
+          'Keep: 3가지 기준 모두 충족',
+          'Skip: 기준 하나라도 실패 — 이유 명시적 기록',
+          'Merge: 70% 이상 의미 중복 → 신뢰도 높은 버전 유지'
+        ],
+        branches: null,
+        gate: 'G3 자동 통과 조건: 기준 일관 적용, 모든 Skip 항목에 이유 명시, Keep 세트가 Phase 1 목적에 충분.'
+      },
+      {
+        id: 'phase4', label: 'Phase 4', name: '구조화',
+        angle: 64.29, color: '#f59e0b',
+        icon: 'file',
+        subskill: '/context-engineering:build',
+        confirmLabel: null,
+        steps: [
+          'Keep 항목을 4개 섹션으로 구성: 핵심 사실 / 제약사항 / 결정사항 / 노트',
+          '사실, 제약, 결정당 하나의 항목 — 복합 항목 금지',
+          '빈 섹션은 완전히 생략',
+          '섹션 간 중복 없음'
+        ],
+        branches: null,
+        gate: 'G4 자동 통과 조건: 모호한 항목 없음, 섹션 간 중복 없음, 핵심 사실이 Phase 1 목적과 직접 연결.'
+      },
+      {
+        id: 'phase5', label: 'Phase 5', name: '압축',
+        angle: 115.71, color: '#f97316',
+        icon: 'code',
+        subskill: '/context-engineering:build',
+        confirmLabel: null,
+        steps: [
+          '토큰 예산 측정: 소형 < 500단어 (압축 없음), 중형 500-2000단어 (50%), 대형 2000+단어 (30%)',
+          '순서대로 압축: 노트 먼저 → 핵심 사실 → 제약사항 최후 수단',
+          '제약사항과 결정사항은 절대 압축하지 않음 — 원문 그대로 보존',
+          '대형 소스: 먼저 헤더/목차 스캔, 목적과 관련된 섹션만 로드'
+        ],
+        branches: null,
+        gate: 'G5 자동 통과 조건: 제약사항과 결정사항 원문 보존, 핵심 사실 과압축 없음, 토큰 예산 목표 달성.'
+      },
+      {
+        id: 'phase6', label: 'Phase 6', name: '출력 생성',
+        angle: 167.14, color: '#10b981',
+        icon: 'gather',
+        subskill: '/context-engineering:compose',
+        confirmLabel: 'G6',
+        steps: [
+          'Phase 1 성공 기준 신호에서 형식 자동 결정',
+          '형식 A (실행 지시): Role + 작업 + 제약사항 + 출력 형식',
+          '형식 B (KB 엔트리): frontmatter (제목/유형/신뢰도/태그) + 핵심 사실/제약사항/결정사항/노트',
+          '형식 C (프로젝트 산출물): CLAUDE.md + spec.md + 구현 계획'
+        ],
+        branches: null,
+        gate: 'G6: 성공 기준 반영, 누락 없음, 충돌 없음, 추측 없음. 통과 → 출력 전달. 실패 → Phase 7 자동 실행.'
+      },
+      {
+        id: 'phase7', label: 'Phase 7', name: '검증',
+        angle: 218.57, color: '#ef4444',
+        icon: 'shield',
+        subskill: '/context-engineering:verify',
+        confirmLabel: null,
+        steps: [
+          '4가지 검증: 누락 / 충돌 / 추측 / 일관성',
+          '점수 0-100: 목적 30점 + 소스 근거 25점 + 내부 일관성 25점 + 형식 적합 20점',
+          'H: 80+ (소스 3개 이상, 문제 없음) / M: 50-79 / L: 49 이하',
+          '피드백: 누락/추측 → gather | 충돌 → build | 형식 불일치 → compose'
+        ],
+        branches: null,
+        gate: null
+      }
+    ];
+
+    /* === ICON PATHS (24x24 viewBox, Lucide-style) === */
+    var ICON_PATHS = {
+      gather: function(g, color) {
+        // Funnel
+        var path = makeSVGEl('path', {
+          d: 'M22 3H2l8 9.46V19l4 2v-8.54L22 3z',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+          fill: color, 'fill-opacity': '0.15'
+        });
+        g.appendChild(path);
+      },
+      book: function(g, color) {
+        var p1 = makeSVGEl('path', {
+          d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', fill: 'none'
+        });
+        var p2 = makeSVGEl('path', {
+          d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', fill: 'none'
+        });
+        var p3 = makeSVGEl('line', { x1: '8', y1: '7', x2: '15', y2: '7', stroke: color, 'stroke-width': '1.5', 'stroke-linecap': 'round' });
+        var p4 = makeSVGEl('line', { x1: '8', y1: '11', x2: '15', y2: '11', stroke: color, 'stroke-width': '1.5', 'stroke-linecap': 'round' });
+        g.appendChild(p1); g.appendChild(p2); g.appendChild(p3); g.appendChild(p4);
+      },
+      shield: function(g, color) {
+        var p1 = makeSVGEl('path', {
+          d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+          fill: color, 'fill-opacity': '0.12'
+        });
+        var p2 = makeSVGEl('polyline', {
+          points: '9,12 11,14 15,10',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none'
+        });
+        g.appendChild(p1); g.appendChild(p2);
+      },
+      file: function(g, color) {
+        var p1 = makeSVGEl('path', {
+          d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none'
+        });
+        var p2 = makeSVGEl('polyline', {
+          points: '14,2 14,8 20,8',
+          stroke: color, 'stroke-width': '1.5',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none'
+        });
+        var l1 = makeSVGEl('line', { x1: '9', y1: '13', x2: '16', y2: '13', stroke: color, 'stroke-width': '1.3', 'stroke-linecap': 'round' });
+        var l2 = makeSVGEl('line', { x1: '9', y1: '17', x2: '14', y2: '17', stroke: color, 'stroke-width': '1.3', 'stroke-linecap': 'round' });
+        g.appendChild(p1); g.appendChild(p2); g.appendChild(l1); g.appendChild(l2);
+      },
+      code: function(g, color) {
+        var p1 = makeSVGEl('polyline', {
+          points: '16,18 22,12 16,6',
+          stroke: color, 'stroke-width': '1.8',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none'
+        });
+        var p2 = makeSVGEl('polyline', {
+          points: '8,6 2,12 8,18',
+          stroke: color, 'stroke-width': '1.8',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none'
+        });
+        g.appendChild(p1); g.appendChild(p2);
+      }
+    };
+
+    /* === SVG HELPERS === */
+    function makeSVGEl(tag, attrs) {
+      var el = document.createElementNS(SVG_NS, tag);
+      Object.keys(attrs).forEach(function(k) { el.setAttribute(k, attrs[k]); });
+      return el;
+    }
+
+    function rad(deg) { return deg * Math.PI / 180; }
+
+    function nodeCenter(phase) {
+      return {
+        x: CX + ORBIT * Math.cos(rad(phase.angle)),
+        y: CY + ORBIT * Math.sin(rad(phase.angle))
+      };
+    }
+
+    function textAnchor(angle) {
+      var ca = Math.cos(rad(angle));
+      if (ca > 0.25) return 'start';
+      if (ca < -0.25) return 'end';
+      return 'middle';
+    }
+
+    /* ===========================
+       BUILD DIAGRAM
+    =========================== */
+    function buildDiagram() {
+      var svg = document.getElementById('cycle-svg');
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      var isDark = document.documentElement.classList.contains('theme-dark');
+      var textColor   = isDark ? '#EDEDED' : '#0f172a';
+      var textSec     = isDark ? '#666'    : '#888';
+      var surfaceColor = isDark ? '#141414' : '#FFFFFF';
+      var guideColor  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+      var fbColor     = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.22)';
+      var refineColor = isDark ? '#f59e0b' : '#d97706';
+      var kbColor     = isDark ? '#06b6d4' : '#0891b2';
+
+      /* --- DEFS --- */
+      var defs = makeSVGEl('defs', {});
+
+      // Arrow markers per phase
+      PHASES.forEach(function(p) {
+        var m = makeSVGEl('marker', {
+          id: 'arr-' + p.id, markerWidth: '9', markerHeight: '7',
+          refX: '8', refY: '3.5', orient: 'auto'
+        });
+        var poly = makeSVGEl('polygon', { points: '0 0, 9 3.5, 0 7', fill: p.color });
+        m.appendChild(poly); defs.appendChild(m);
+      });
+
+      // Feedback arrow marker
+      var mfb = makeSVGEl('marker', {
+        id: 'arr-fb', markerWidth: '8', markerHeight: '6',
+        refX: '7', refY: '3', orient: 'auto'
+      });
+      var pfb = makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: fbColor });
+      mfb.appendChild(pfb); defs.appendChild(mfb);
+
+      // Refinement loop arrow marker
+      var mref = makeSVGEl('marker', {
+        id: 'arr-refine', markerWidth: '8', markerHeight: '6',
+        refX: '7', refY: '3', orient: 'auto'
+      });
+      var pref = makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: refineColor });
+      mref.appendChild(pref); defs.appendChild(mref);
+
+      // KB/Policy feedback arrow marker (cyan)
+      var mkb = makeSVGEl('marker', {
+        id: 'arr-kb', markerWidth: '8', markerHeight: '6',
+        refX: '7', refY: '3', orient: 'auto'
+      });
+      var pkb = makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: kbColor });
+      mkb.appendChild(pkb); defs.appendChild(mkb);
+
+      // Glow filters
+      PHASES.forEach(function(p) {
+        var f = makeSVGEl('filter', { id: 'glow-' + p.id, x: '-60%', y: '-60%', width: '220%', height: '220%' });
+        var blur = makeSVGEl('feGaussianBlur', { in: 'SourceGraphic', stdDeviation: '6', result: 'b' });
+        var merge = makeSVGEl('feMerge', {});
+        merge.appendChild(makeSVGEl('feMergeNode', { in: 'b' }));
+        merge.appendChild(makeSVGEl('feMergeNode', { in: 'SourceGraphic' }));
+        f.appendChild(blur); f.appendChild(merge); defs.appendChild(f);
+      });
+
+      svg.appendChild(defs);
+
+      /* --- BACKGROUND GUIDE CIRCLE --- */
+      svg.appendChild(makeSVGEl('circle', {
+        cx: CX, cy: CY, r: ORBIT,
+        fill: 'none', stroke: guideColor,
+        'stroke-width': '1', 'stroke-dasharray': '3,7'
+      }));
+
+      /* --- CENTER LABEL --- */
+      var cg = makeSVGEl('g', {});
+      ['Context', 'Engineering'].forEach(function(word, i) {
+        var t = makeSVGEl('text', {
+          x: CX, y: CY + (i - 0.5) * 20,
+          'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: textSec, 'font-size': '15',
+          'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600',
+          'letter-spacing': '0.03em'
+        });
+        t.textContent = word;
+        cg.appendChild(t);
+      });
+      svg.appendChild(cg);
+
+      /* --- COMPUTE NODE CENTERS --- */
+      PHASES.forEach(function(p) {
+        var c = nodeCenter(p);
+        p.cx = c.x; p.cy = c.y;
+      });
+
+      /* --- SUB-SKILL ARC SEGMENTS (outer ring, grouped by command) --- */
+      (function() {
+        var ARC_R = ORBIT + 42;
+        var GROUPS = [
+          { label: ':gather',  color: '#6366f1', a1: -113, a2: 36  },  // Phase 1-3
+          { label: ':build',   color: '#f59e0b', a1: 40,   a2: 140 },  // Phase 4-5
+          { label: ':compose', color: '#10b981', a1: 144,  a2: 191 },  // Phase 6
+          { label: ':verify',  color: '#ef4444', a1: 195,  a2: 244 },  // Phase 7
+        ];
+        GROUPS.forEach(function(g) {
+          var a1r = rad(g.a1), a2r = rad(g.a2);
+          var x1 = CX + ARC_R * Math.cos(a1r), y1 = CY + ARC_R * Math.sin(a1r);
+          var x2 = CX + ARC_R * Math.cos(a2r), y2 = CY + ARC_R * Math.sin(a2r);
+          var span = g.a2 - g.a1;
+          var largeArc = span > 180 ? 1 : 0;
+          svg.appendChild(makeSVGEl('path', {
+            d: 'M '+x1+' '+y1+' A '+ARC_R+' '+ARC_R+' 0 '+largeArc+' 1 '+x2+' '+y2,
+            fill: 'none', stroke: g.color, 'stroke-width': '4',
+            'stroke-linecap': 'round', opacity: '0.55'
+          }));
+          // Label at arc midpoint
+          var midA = rad((g.a1 + g.a2) / 2);
+          var LABEL_R = ARC_R + 22;
+          var lx = CX + LABEL_R * Math.cos(midA), ly = CY + LABEL_R * Math.sin(midA);
+          var anchor = textAnchor((g.a1 + g.a2) / 2);
+          var lbl = makeSVGEl('text', {
+            x: lx, y: ly, 'text-anchor': anchor, 'dominant-baseline': 'middle',
+            fill: g.color, 'font-size': '11',
+            'font-family': 'Menlo, Monaco, Courier New, monospace', 'font-weight': '700',
+            opacity: '0.85'
+          });
+          lbl.textContent = g.label;
+          svg.appendChild(lbl);
+        });
+      })();
+
+      /* --- MAIN FLOW ARROWS (Phase 1→2→3→4→5→6 only — not full loop) --- */
+      for (var i = 0; i < PHASES.length - 1; i++) {
+        var from = PHASES[i];
+        var to   = PHASES[i + 1];
+
+        var dx = to.cx - from.cx, dy = to.cy - from.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+
+        var sx = from.cx + nx * (NR + 3);
+        var sy = from.cy + ny * (NR + 3);
+        var ex = to.cx   - nx * (NR + 12);
+        var ey = to.cy   - ny * (NR + 12);
+
+        var midAngle = (from.angle + to.angle) / 2;
+        var mx = CX + ORBIT * Math.cos(rad(midAngle));
+        var my = CY + ORBIT * Math.sin(rad(midAngle));
+
+        var cp_x = 2*mx - 0.5*sx - 0.5*ex;
+        var cp_y = 2*my - 0.5*sy - 0.5*ey;
+
+        svg.appendChild(makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
+          fill: 'none', stroke: from.color, 'stroke-width': '2',
+          'stroke-linecap': 'round', opacity: '0.85',
+          'marker-end': 'url(#arr-'+from.id+')'
+        }));
+      }
+
+      /* --- OUTPUT INDICATOR at Phase 6 (center-directed arrow) --- */
+      (function() {
+        var p6 = PHASES[5]; // Phase 6
+        var dx = CX - p6.cx, dy = CY - p6.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+        var sx = p6.cx + nx*(NR+6), sy = p6.cy + ny*(NR+6);
+        var ex = p6.cx + nx*(NR+52), ey = p6.cy + ny*(NR+52);
+        // Output arrow marker
+        var mo = makeSVGEl('marker', {
+          id: 'arr-output', markerWidth: '9', markerHeight: '7',
+          refX: '8', refY: '3.5', orient: 'auto'
+        });
+        mo.appendChild(makeSVGEl('polygon', { points: '0 0, 9 3.5, 0 7', fill: '#10b981' }));
+        defs.appendChild(mo);
+        svg.appendChild(makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' L '+ex+' '+ey,
+          fill: 'none', stroke: '#10b981', 'stroke-width': '2.5',
+          'stroke-linecap': 'round', opacity: '0.9',
+          'marker-end': 'url(#arr-output)'
+        }));
+        var lx = (sx+ex)/2 + ny*18, ly = (sy+ey)/2 - nx*18;
+        var bg = makeSVGEl('rect', { x: lx-24, y: ly-9, width: '50', height: '18', rx: '5', fill: surfaceColor });
+        svg.appendChild(bg);
+        var lt = makeSVGEl('text', {
+          x: lx+1, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: '#10b981', 'font-size': '10', 'font-weight': '700',
+          'font-family': 'Inter, sans-serif'
+        });
+        lt.textContent = '출력';
+        svg.appendChild(lt);
+      })();
+
+      /* --- G6-FAIL ARROW: Phase 6 → Phase 7 (dashed, error path) --- */
+      (function() {
+        var f = PHASES[5], t = PHASES[6]; // Phase 6 → Phase 7
+        var dx = t.cx - f.cx, dy = t.cy - f.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+        var sx = f.cx + nx*(NR+3), sy = f.cy + ny*(NR+3);
+        var ex = t.cx - nx*(NR+12), ey = t.cy - ny*(NR+12);
+        var midAngle = (f.angle + t.angle) / 2;
+        var mx = CX + ORBIT * Math.cos(rad(midAngle));
+        var my = CY + ORBIT * Math.sin(rad(midAngle));
+        var cp_x = 2*mx - 0.5*sx - 0.5*ex;
+        var cp_y = 2*my - 0.5*sy - 0.5*ey;
+        // G6-fail marker
+        var mg = makeSVGEl('marker', {
+          id: 'arr-g6fail', markerWidth: '8', markerHeight: '6',
+          refX: '7', refY: '3', orient: 'auto'
+        });
+        mg.appendChild(makeSVGEl('polygon', { points: '0 0, 8 3, 0 6', fill: '#ef4444' }));
+        defs.appendChild(mg);
+        svg.appendChild(makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
+          fill: 'none', stroke: '#ef4444', 'stroke-width': '1.8',
+          'stroke-dasharray': '5,4', 'stroke-linecap': 'round', opacity: '0.8',
+          'marker-end': 'url(#arr-g6fail)'
+        }));
+        // "G6 실패" label
+        var lx = 0.25*sx + 0.5*cp_x + 0.25*ex;
+        var ly = 0.25*sy + 0.5*cp_y + 0.25*ey;
+        var bg = makeSVGEl('rect', { x: lx-24, y: ly-9, width: '48', height: '18', rx: '5', fill: surfaceColor, stroke: '#ef4444', 'stroke-width': '0.8' });
+        svg.appendChild(bg);
+        var lt2 = makeSVGEl('text', {
+          x: lx, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: '#ef4444', 'font-size': '10', 'font-weight': '700',
+          'font-family': 'Inter, sans-serif'
+        });
+        lt2.textContent = 'G6 실패';
+        svg.appendChild(lt2);
+      })();
+
+      /* --- FEEDBACK ARROW: Phase 7 → Phase 4 (conflict / re-build, inward, dashed, amber) --- */
+      (function() {
+        var f = PHASES[6], t = PHASES[3]; // Phase 7 → Phase 4
+        var dx = t.cx - f.cx, dy = t.cy - f.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+
+        var sx = f.cx + nx*(NR+3), sy = f.cy + ny*(NR+3);
+        var ex = t.cx - nx*(NR+12), ey = t.cy - ny*(NR+12);
+
+        // Push control point toward center (inward)
+        var mx = (sx+ex)/2, my = (sy+ey)/2;
+        var dcx = CX - mx, dcy = CY - my;
+        var dcd = Math.sqrt(dcx*dcx + dcy*dcy);
+        var cp_x = mx + (dcx/dcd)*130;
+        var cp_y = my + (dcy/dcd)*130;
+
+        var path = makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
+          fill: 'none', stroke: refineColor, 'stroke-width': '1.5',
+          'stroke-dasharray': '5,4', 'stroke-linecap': 'round',
+          'marker-end': 'url(#arr-refine)'
+        });
+        svg.appendChild(path);
+
+        // Label at t=0.2 (Phase 3 side) — avoid overlap with center text
+        var lx = 0.64*sx + 0.32*cp_x + 0.04*ex;
+        var ly = 0.64*sy + 0.32*cp_y + 0.04*ey;
+
+        var bg = makeSVGEl('rect', {
+          x: lx-32, y: ly-10, width: '64', height: '20', rx: '6',
+          fill: surfaceColor, stroke: refineColor, 'stroke-width': '1'
+        });
+        svg.appendChild(bg);
+
+        var lbl = makeSVGEl('text', {
+          x: lx, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: refineColor, 'font-size': '11',
+          'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
+        });
+        lbl.textContent = '재구조화';
+        svg.appendChild(lbl);
+      })();
+
+      /* --- FEEDBACK ARROW: Phase 7 → Phase 1 (omission/speculation / re-gather, dashed cyan) --- */
+      (function() {
+        var f = PHASES[6], t = PHASES[0]; // Phase 7 → Phase 1
+        var dx = t.cx - f.cx, dy = t.cy - f.cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var nx = dx/dist, ny = dy/dist;
+
+        var sx = f.cx + nx*(NR+3), sy = f.cy + ny*(NR+3);
+        var ex = t.cx - nx*(NR+12), ey = t.cy - ny*(NR+12);
+
+        // Phase 4 and Phase 1 are at the same y — push control point toward center
+        var mx = (sx+ex)/2, my = (sy+ey)/2;
+        var dcx = CX - mx, dcy = CY - my;
+        var dcd = Math.sqrt(dcx*dcx + dcy*dcy);
+        var cp_x = mx + (dcx/dcd)*90;
+        var cp_y = my + (dcy/dcd)*90;
+
+        var path = makeSVGEl('path', {
+          d: 'M '+sx+' '+sy+' Q '+cp_x+' '+cp_y+' '+ex+' '+ey,
+          fill: 'none', stroke: kbColor, 'stroke-width': '1.5',
+          'stroke-dasharray': '4,5', 'stroke-linecap': 'round',
+          'marker-end': 'url(#arr-kb)'
+        });
+        svg.appendChild(path);
+
+        // Label near midpoint, shifted up slightly to avoid center text
+        var lx = 0.25*sx + 0.5*cp_x + 0.25*ex;
+        var ly = (0.25*sy + 0.5*cp_y + 0.25*ey) - 14;
+
+        var bg = makeSVGEl('rect', {
+          x: lx-30, y: ly-10, width: '60', height: '20', rx: '6',
+          fill: surfaceColor, stroke: kbColor, 'stroke-width': '1'
+        });
+        svg.appendChild(bg);
+
+        var lbl = makeSVGEl('text', {
+          x: lx, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+          fill: kbColor, 'font-size': '11',
+          'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '600'
+        });
+        lbl.textContent = '재수집';
+        svg.appendChild(lbl);
+      })();
+
+      /* --- NODES --- */
+      PHASES.forEach(function(p, idx) {
+        var g = makeSVGEl('g', { class: 'svg-node', 'data-idx': idx });
+
+        // Glow ring (pulsing)
+        g.appendChild(makeSVGEl('circle', {
+          cx: p.cx, cy: p.cy, r: NR + 22,
+          fill: p.color, class: 'glow-ring',
+          style: 'animation-delay:' + (idx * 0.6) + 's',
+          opacity: '0.12'
+        }));
+
+        // Outer ring
+        g.appendChild(makeSVGEl('circle', {
+          cx: p.cx, cy: p.cy, r: NR + 4,
+          fill: 'none', stroke: p.color,
+          'stroke-width': '1', opacity: '0.25',
+          class: 'node-ring'
+        }));
+
+        // Main circle
+        g.appendChild(makeSVGEl('circle', {
+          cx: p.cx, cy: p.cy, r: NR,
+          fill: surfaceColor, stroke: p.color,
+          'stroke-width': '2.5',
+          'filter': 'url(#glow-' + p.id + ')'
+        }));
+
+        // Icon (centered at node)
+        var iconG = makeSVGEl('g', {
+          transform: 'translate(' + (p.cx - 12) + ',' + (p.cy - 12) + ')'
+        });
+        if (ICON_PATHS[p.icon]) {
+          ICON_PATHS[p.icon](iconG, p.color);
+        }
+        g.appendChild(iconG);
+
+        // Label outside: phase label + name (must clear glow ring = NR+22)
+        var labelDist = NR + 72;
+        var lx = p.cx + Math.cos(rad(p.angle)) * labelDist;
+        var ly = p.cy + Math.sin(rad(p.angle)) * labelDist;
+        var anchor = textAnchor(p.angle);
+
+        // Phase label (e.g., "Step 0")
+        var lt = makeSVGEl('text', {
+          x: lx, y: ly,
+          'text-anchor': anchor, 'dominant-baseline': 'middle',
+          fill: p.color, 'font-size': '14',
+          'font-family': 'Noto Sans KR, Inter, sans-serif',
+          'font-weight': '800', 'letter-spacing': '0.02em'
+        });
+        lt.textContent = p.label;
+        g.appendChild(lt);
+
+        // Phase name (below label)
+        var ly2 = ly + 18;
+        var nameParts = p.name.split(' ');
+        var nameLines = [];
+        var line = '';
+        nameParts.forEach(function(word) {
+          if (line.length + word.length > 12 && line.length > 0) {
+            nameLines.push(line.trim());
+            line = word + ' ';
+          } else {
+            line += word + ' ';
+          }
+        });
+        if (line.trim()) nameLines.push(line.trim());
+
+        nameLines.forEach(function(nl, ni) {
+          var nt = makeSVGEl('text', {
+            x: lx, y: ly2 + ni*16,
+            'text-anchor': anchor, 'dominant-baseline': 'middle',
+            fill: textColor, 'font-size': '12',
+            'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '500'
+          });
+          nt.textContent = nl;
+          g.appendChild(nt);
+        });
+
+        // Invisible clickable overlay
+        var overlay = makeSVGEl('circle', {
+          cx: p.cx, cy: p.cy, r: NR + 8,
+          fill: 'transparent', cursor: 'pointer'
+        });
+        overlay.addEventListener('click', function() { handleNodeClick(idx); });
+        g.appendChild(overlay);
+
+        // Gate badge: Phase 1/2/3 Self-Assessment indicator (directly above each node)
+        if (p.confirmLabel) {
+          var bx = p.cx;
+          var by = p.cy - NR - 16;
+          var bw = 44, bh = 14;
+          var brect = makeSVGEl('rect', {
+            x: bx - bw/2, y: by - bh/2, width: bw, height: bh, rx: '7',
+            fill: p.color + '22', stroke: p.color, 'stroke-width': '0.8',
+            opacity: '0.95'
+          });
+          g.appendChild(brect);
+          var btxt = makeSVGEl('text', {
+            x: bx, y: by, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+            fill: p.color, 'font-size': '8.5',
+            'font-family': 'Noto Sans KR, Inter, sans-serif', 'font-weight': '700'
+          });
+          btxt.textContent = '✓ 자체 평가';
+          g.appendChild(btxt);
+        }
+
+        svg.appendChild(g);
+      });
+    }
+
+    /* ===========================
+       PHASE CARDS
+    =========================== */
+    function buildPhaseCards() {
+      var grid = document.getElementById('phaseCardsGrid');
+      grid.innerHTML = '';
+      PHASES.forEach(function(p, idx) {
+        var card = document.createElement('div');
+        card.className = 'phase-card';
+        card.style.borderTopColor = p.color;
+        card.setAttribute('data-idx', idx);
+
+        var badge = document.createElement('div');
+        badge.className = 'phase-badge';
+        badge.style.background = p.color + '22';
+        badge.style.color = p.color;
+        badge.textContent = p.label;
+        card.appendChild(badge);
+
+        var header = document.createElement('div');
+        header.className = 'phase-card-header';
+
+        var title = document.createElement('div');
+        title.className = 'phase-card-title';
+        title.textContent = p.name;
+        header.appendChild(title);
+
+        if (p.confirmLabel) {
+          var cbadge = document.createElement('div');
+          cbadge.className = 'confirm-badge';
+          cbadge.style.background = p.color + '18';
+          cbadge.style.color = p.color;
+          cbadge.style.borderColor = p.color + '55';
+          cbadge.textContent = p.confirmLabel;
+          header.appendChild(cbadge);
+        }
+
+        card.appendChild(header);
+
+        var ul = document.createElement('ul');
+        ul.className = 'phase-steps';
+        p.steps.forEach(function(s) {
+          var li = document.createElement('li');
+          li.textContent = s;
+          ul.appendChild(li);
+        });
+        card.appendChild(ul);
+
+        if (p.branches) {
+          var bsec = document.createElement('div');
+          bsec.className = 'branch-section';
+          p.branches.forEach(function(b) {
+            var row = document.createElement('div');
+            row.className = 'branch-row';
+
+            var lbl = document.createElement('span');
+            lbl.className = 'branch-label';
+            lbl.style.color = p.color;
+            lbl.textContent = b.label;
+            row.appendChild(lbl);
+
+            var arrow = document.createElement('span');
+            arrow.style.color = p.color;
+            arrow.style.flexShrink = '0';
+            arrow.textContent = '→';
+            row.appendChild(arrow);
+
+            var desc = document.createElement('span');
+            desc.textContent = b.desc;
+            row.appendChild(desc);
+
+            bsec.appendChild(row);
+          });
+          card.appendChild(bsec);
+        }
+
+        if (p.gate) {
+          var gate = document.createElement('div');
+          gate.className = 'gate-msg';
+          gate.style.borderLeftColor = p.color;
+          gate.textContent = p.gate;
+          card.appendChild(gate);
+        }
+
+        if (p.subskill) {
+          var sbadge = document.createElement('div');
+          sbadge.className = 'subskill-badge';
+          sbadge.style.background = p.color + '18';
+          sbadge.style.color = p.color;
+          sbadge.style.borderColor = p.color + '44';
+          sbadge.textContent = p.subskill;
+          card.appendChild(sbadge);
+        }
+
+        // === Phase 7 special layout ===
+        if (idx === 6) {
+          card.classList.add('phase7-card');
+
+          var body = document.createElement('div');
+          body.className = 'phase7-body';
+
+          // Column 1: 4 checks
+          var checksWrap = document.createElement('div');
+          var checksTitle = document.createElement('div');
+          checksTitle.style.cssText = 'font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:8px;';
+          checksTitle.textContent = '4가지 검증 항목';
+          checksWrap.appendChild(checksTitle);
+          var checksGrid = document.createElement('div');
+          checksGrid.className = 'phase7-checks';
+          var CHECKS = [
+            { name: 'Omission',    desc: '목적 및 제약사항이 출력에 반영되었는가?', color: '#6366f1', target: '→ :gather' },
+            { name: 'Conflict',    desc: '출력 내 모순이 없는가?',                  color: '#f59e0b', target: '→ :build' },
+            { name: 'Speculation', desc: '주장이 수집된 소스에 근거하는가?',         color: '#6366f1', target: '→ :gather' },
+            { name: 'Consistency', desc: '형식이 Phase 1 성공 기준과 일치하는가?',  color: '#10b981', target: '→ :compose' },
+          ];
+          CHECKS.forEach(function(c) {
+            var ci = document.createElement('div');
+            ci.className = 'check-item';
+            ci.style.borderLeftColor = c.color;
+            var cn = document.createElement('div');
+            cn.className = 'check-name';
+            cn.style.color = c.color;
+            cn.textContent = c.name;
+            var cd = document.createElement('div');
+            cd.className = 'check-desc';
+            cd.textContent = c.desc;
+            var ct = document.createElement('div');
+            ct.style.cssText = 'font-size:0.7rem;font-weight:700;color:'+c.color+';margin-top:5px;opacity:0.8;font-family:monospace;';
+            ct.textContent = c.target;
+            ci.appendChild(cn); ci.appendChild(cd); ci.appendChild(ct);
+            checksGrid.appendChild(ci);
+          });
+          checksWrap.appendChild(checksGrid);
+          body.appendChild(checksWrap);
+
+          // Column 2: Scoring
+          var scoreWrap = document.createElement('div');
+          var scoreTitle = document.createElement('div');
+          scoreTitle.style.cssText = 'font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:8px;';
+          scoreTitle.textContent = '자체 점수 (0–100)';
+          scoreWrap.appendChild(scoreTitle);
+          var scoreRows = document.createElement('div');
+          scoreRows.className = 'phase7-score';
+          var SCORES = [
+            { label: '목적 반영',    pts: 30 },
+            { label: '소스 근거',    pts: 25 },
+            { label: '내부 일관성',  pts: 25 },
+            { label: '형식 적합',    pts: 20 },
+          ];
+          SCORES.forEach(function(s) {
+            var row = document.createElement('div');
+            row.className = 'score-row';
+            var lbl = document.createElement('span');
+            lbl.className = 'score-criterion';
+            lbl.textContent = s.label;
+            var pts = document.createElement('span');
+            pts.className = 'score-pts';
+            pts.textContent = s.pts + 'pt';
+            row.appendChild(lbl); row.appendChild(pts);
+            scoreRows.appendChild(row);
+          });
+          var total = document.createElement('div');
+          total.className = 'score-total';
+          var tl = document.createElement('span'); tl.className = 'score-total-label'; tl.textContent = '합계';
+          var tv = document.createElement('span'); tv.style.cssText = 'font-size:0.85rem;font-weight:800;color:#ef4444;'; tv.textContent = '100pt';
+          total.appendChild(tl); total.appendChild(tv);
+          scoreRows.appendChild(total);
+          scoreWrap.appendChild(scoreRows);
+          body.appendChild(scoreWrap);
+
+          // Column 3: H/M/L rating
+          var ratingWrap = document.createElement('div');
+          var ratingTitle = document.createElement('div');
+          ratingTitle.style.cssText = 'font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary);margin-bottom:8px;';
+          ratingTitle.textContent = '신뢰도 등급';
+          ratingWrap.appendChild(ratingTitle);
+          var ratingList = document.createElement('div');
+          ratingList.className = 'phase7-rating';
+          var RATINGS = [
+            { letter: 'H', color: '#10b981', desc: '80+ pt · 소스 3개 이상 · 문제 없음' },
+            { letter: 'M', color: '#f59e0b', desc: '50–79 pt · 소스 1-2개 또는 경미한 갭' },
+            { letter: 'L', color: '#ef4444', desc: '49– pt · 소스 부족 또는 충돌' },
+          ];
+          RATINGS.forEach(function(r) {
+            var ri = document.createElement('div');
+            ri.className = 'rating-item';
+            var rl = document.createElement('div');
+            rl.className = 'rating-letter';
+            rl.style.color = r.color;
+            rl.textContent = r.letter;
+            var rd = document.createElement('div');
+            rd.className = 'rating-desc';
+            rd.textContent = r.desc;
+            ri.appendChild(rl); ri.appendChild(rd);
+            ratingList.appendChild(ri);
+          });
+          ratingWrap.appendChild(ratingList);
+          body.appendChild(ratingWrap);
+
+          card.appendChild(body);
+
+          // Feedback chips
+          var fb = document.createElement('div');
+          fb.className = 'phase7-feedback';
+          var CHIPS = [
+            { label: '누락 / 추측  →  :gather',  bg: '#6366f118', color: '#6366f1', border: '#6366f144' },
+            { label: '충돌  →  :build',           bg: '#f59e0b18', color: '#f59e0b', border: '#f59e0b44' },
+            { label: '형식 불일치  →  :compose',  bg: '#10b98118', color: '#10b981', border: '#10b98144' },
+          ];
+          CHIPS.forEach(function(c) {
+            var chip = document.createElement('div');
+            chip.className = 'feedback-chip';
+            chip.style.background = c.bg;
+            chip.style.color = c.color;
+            chip.style.borderColor = c.border;
+            chip.textContent = c.label;
+            fb.appendChild(chip);
+          });
+          card.appendChild(fb);
+        }
+        // === end Phase 7 ===
+
+        card.addEventListener('click', function() { handleNodeClick(idx); });
+        grid.appendChild(card);
+      });
+    }
+
+    /* ===========================
+       INTERACTION
+    =========================== */
+    var activeIdx = -1;
+
+    function handleNodeClick(idx) {
+      activeIdx = (activeIdx === idx) ? -1 : idx;
+
+      // Update cards
+      document.querySelectorAll('.phase-card').forEach(function(c, i) {
+        c.classList.toggle('active', i === activeIdx);
+        if (i === activeIdx) {
+          c.style.boxShadow = '0 0 0 2px ' + PHASES[i].color;
+        } else {
+          c.style.boxShadow = '';
+        }
+      });
+
+      // Scroll to active card
+      if (activeIdx >= 0) {
+        var card = document.querySelector('.phase-card[data-idx="' + activeIdx + '"]');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Highlight node in SVG
+      document.querySelectorAll('.svg-node').forEach(function(n, i) {
+        n.style.opacity = (activeIdx < 0 || i === activeIdx) ? '1' : '0.35';
+      });
+    }
+
+    /* ===========================
+       SUB-SKILL CARDS
+    =========================== */
+    function buildSubskillCards() {
+      var grid = document.getElementById('subskillGrid');
+      grid.innerHTML = '';
+      SUBSKILLS.forEach(function(s) {
+        var card = document.createElement('div');
+        card.className = 'subskill-card';
+        card.style.borderLeftColor = s.color;
+
+        var cmd = document.createElement('div');
+        cmd.className = 'subskill-cmd';
+        cmd.style.color = s.color;
+        cmd.textContent = s.cmd;
+        card.appendChild(cmd);
+
+        var covers = document.createElement('div');
+        covers.className = 'subskill-covers';
+        covers.style.color = s.color;
+        covers.textContent = s.covers;
+        card.appendChild(covers);
+
+        var desc = document.createElement('div');
+        desc.className = 'subskill-desc';
+        desc.textContent = s.desc;
+        card.appendChild(desc);
+
+        grid.appendChild(card);
+      });
+    }
+
+    function onThemeChange() { buildDiagram(); }
+
+    /* === INIT (script is at end of body — DOM is ready) === */
+    applyTheme(currentTheme);
+    buildPhaseCards();
+    buildSubskillCards();
+  </script>
+</body>
+</html>
