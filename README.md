@@ -14,7 +14,7 @@ A Claude Code plugin that systematically prepares AI context through a 7-phase p
 |----------|--------|
 | **When** | Information comes from 2+ sources, or a simple copy-paste would cause the AI to miss context |
 | **How** | Run `/context-engineering` → answer 3 questions → the 7-phase pipeline handles the rest. Jump directly to a sub-skill if prior phases are already done |
-| **How Much** | Compression scales with input size — see [Phase 5 token budget](skills/build/SKILL.md) for exact thresholds |
+| **How Much** | Compression scales with input size — see the Token Budget table below |
 
 ## Decision Table
 
@@ -42,6 +42,36 @@ A Claude Code plugin that systematically prepares AI context through a 7-phase p
 | KB housekeeping | `:verify --consolidate` | Maintenance mode (independent of pipeline) |
 
 > Each sub-skill checks for its prerequisite artifacts and exits with guidance if they are missing.
+
+### Level 3: What context to prioritize?
+
+Once you know which sub-skill to enter, decide what context sources take priority for your task type:
+
+| Task type | Priority context | De-prioritize | Output |
+|-----------|-----------------|---------------|--------|
+| Q&A / factual answer | Retrieval-heavy: KB entries, source evidence, authoritative docs | Conversation history, speculative notes | — (direct answer) |
+| Project setup | Architecture principles, CLAUDE.md policy, spec template, implementation plan | Unrelated KB entries | C |
+| Knowledge base entry | Consolidation check, duplicate detection, stale entry check | Raw source text (already distilled) | B |
+| Execution instruction | Role, task, constraints, output format | Verbose background (compress in Phase 5) | A |
+
+> This table guides Phase 2 source selection and Phase 5 compression priorities. See [context-source-strategy.md](skills/context-engineering/references/context-source-strategy.md) for the underlying RAG / Memory / Tool Result classification.
+
+## Token Budget Allocation
+
+Phase 5 compresses collected context to fit within a target token budget. Compression tier is determined by input size:
+
+| Scale | Word count | Target compression | Strategy |
+|-------|-----------|-------------------|----------|
+| Small (single file / question) | < 500 words | None needed | Pass through as-is |
+| Medium (module / feature) | 500–2,000 words | ≤ 50% | Summarize Notes → remove duplicates |
+| Large (full project) | 2,000+ words | ≤ 30% | Remove Notes → condense Key Facts |
+
+**Compression order** (what gets cut first):
+1. Notes section — summarized or removed
+2. Key Facts — condensed where purpose allows
+3. Constraints / Decisions — **never compressed** (preserved verbatim regardless of budget pressure)
+
+> For large sources (2,000+ words), Phase 5 uses progressive loading: scan headers first, then read only the sections relevant to Phase 1 purpose.
 
 ## Highlights
 
@@ -151,9 +181,9 @@ Phase artifact templates are in `skills/context-engineering/references/`:
 | File | Phase | Purpose |
 |------|-------|---------|
 | [`phase-checklist.md`](skills/context-engineering/references/phase-checklist.md) | All | 7-phase progress checklist |
-| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | 1 | KB artifact template |
-| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | 2 | CLAUDE.md template |
-| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | 3 | Architecture decisions + package structure |
+| [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | 6-C | KB artifact template (Format C output) |
+| [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | 6-C | CLAUDE.md template (Format C output) |
+| [`spec-template.md`](skills/context-engineering/references/spec-template.md) | 6-C | Architecture decisions + package structure (Format C output) |
 | [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | — | Hexagonal + DDD principles (optional, for complex services) |
 | [`entry-template.md`](skills/context-engineering/references/entry-template.md) | 6-B | KB entry format (frontmatter + body) |
 | [`index-template.md`](skills/context-engineering/references/index-template.md) | 6-B | KB index format |
