@@ -1,180 +1,150 @@
 ---
 name: gather
 description: >
-  context-engineering Step 0 + Phase 1 (Knowledge Base) + Phase 2 (CLAUDE.md).
-  Use to start a new project or rework/update existing KB and CLAUDE.md.
-  Keywords: context gathering, knowledge base, CLAUDE.md, requirements exploration, domain knowledge, gather
+  Phase 1-3: 문제를 정의하고, 컨텍스트 후보를 수집하고, 필요한 것만 선택한다.
+  7-Phase Context Engineering 파이프라인의 첫 단계.
+  Keywords: problem definition, context collection, selection, relevance, recency, reliability
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 ---
 
-# context-engineering:gather
+# Gather (Phase 1-3)
 
-Run context gathering (Step 0) → Knowledge Base (Phase 1) → CLAUDE.md (Phase 2).
+컨텍스트 엔지니어링의 출발점. 사용자 의도를 명확히 하고, 관련 소스에서 후보를 수집하고, 필요한 것만 선택한다.
 
-## Usage
+---
 
+## Phase 1. 문제 정의
+
+**목적**: 사용자가 AI에게 원하는 것을 명확히 한다. 이후 모든 Phase의 기준이 된다.
+
+### 질의 방식
+
+**purpose → constraints → success criteria** 순서로, 하나씩, 가능하면 객관식으로 질문한다.
+
+**질문 1** (purpose — Task 확정):
+> "지금 해결하려는 문제가 무엇인가요?"
+
+**질문 2** (constraints — Phase 2 소스 + Constraints 확정):
+> "AI가 이 작업을 잘 하려면 어떤 배경 정보가 필요할 것 같나요? (예: 기존 코드, 문서, 이전 결정사항)"
+
+**질문 3** (success criteria — Output Format 확정):
+> "결과물이 어떤 형태여야 하나요? (예: 실행 지시문, 저장용 노트, 프로젝트 문서)"
+
+**추가 질문**: 3개로 해소되지 않는 모호함이 남아있을 때만 1회 허용. 총 4개 이상 질문 금지.
+
+### Role 자동 추론
+
+세 답변에서 AI가 담당해야 할 역할을 자동 추론한다. 사용자에게 역할을 직접 묻지 않는다.
+
+### G1 게이트
+
+다음 기준을 AI가 자동 평가:
+
+| 기준 | 평가 |
+|------|------|
+| purpose 명확 | 해결하려는 문제가 구체적으로 정의됐는가 |
+| constraints 명확 | 필요한 배경 정보의 범위가 파악됐는가 |
+| success criteria 명확 | 결과물의 형태가 확정됐는가 |
+| Role 추론 가능 | 세 답변에서 AI 역할을 추론할 수 있는가 |
+
+**자동 통과**: 기준 명확히 충족 → Phase 2로 진행
+
+**사용자 확인** (모호하거나 미충족 시):
 ```
-/context-engineering:gather [@<code-path>] [--output <output-path>]
-```
-
-## Context Resolution
-
-Resolve paths in this order:
-
-1. `@<code-path>` provided → `{CODE_PATH}` = that path
-2. Not provided → search current directory for `docs/knowledge-base.md`
-3. Not found → ask "Please provide the project path (e.g. `@/path/to/project`)"
-
-`{OUTPUT_PATH}` = `--output` value if specified, otherwise `{CODE_PATH}/docs/`
-
-## Existing Artifacts Check
-
-If `{OUTPUT_PATH}/knowledge-base.md` or `{CODE_PATH}/CLAUDE.md` exist:
-
-```
-[Current State]
-- knowledge-base.md: {N terms, N constraints if exists / "not found"}
-- CLAUDE.md: {exists / not found}
-
-Rework (start over) or update (keep existing, modify parts)?
-```
-
-- **Rework** → start from Step 0
-- **Update** → load files and proceed only with the parts to modify
-
-## Step 0: Context Gathering
-
-Ask one question at a time. Wait for the user's answer before the next question.
-
-1. "Describe what you're building in one sentence."
-2. "Why does this need to be built? What problem does it solve or what goal does it achieve?"
-3. "Are there any known constraints? (fixed tech stack, deadlines, integrated systems, performance requirements, etc.)"
-
-After all three answers, output a summary and ask for confirmation:
-
-```
-[Requirements Summary]
-- REQ-1 What: {summary}
-- REQ-2 Why: {summary}
-- REQ-3 Constraints: {summary or "none"}
-{If additional requirements emerge from the conversation, add REQ-4, REQ-5...}
-
-Does this look correct?
+Phase 1 결과:
+  미충족 항목: {항목명} — {이유}
+  수정하거나 승인 후 진행해주세요.
 ```
 
-If `@<code-path>` is provided, auto-detect tech stack from build files:
-`build.gradle` / `pom.xml` / `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod`
+---
 
-## Phase 1: Knowledge Base
+## Phase 2. 컨텍스트 후보 수집
 
-### Scenario Detection
+**목적**: Phase 1 답변을 바탕으로 소스를 결정하고 후보 컨텍스트를 수집한다.
 
-| Scenario | Condition | Description |
-|----------|-----------|-------------|
-| A. Greenfield | no spec + no code | brand new project |
-| B. Spec-first | spec exists + no code | documents only |
-| C. Code-first | no spec + code exists | existing code, no docs |
-| D. Full context | spec exists + code exists | both available |
+### 소스 자동 결정
 
-For mixed states (outdated spec, partial docs, etc.), select the closest scenario, note uncertainties, and ask for confirmation:
+Phase 1의 constraints 답변 신호에서 소스를 결정한다:
 
+| Phase 1 신호 | 수집 소스 |
+|-------------|----------|
+| 문서 / 파일 / URL 제공 | 해당 파일 전문 읽기 / URL 페치 |
+| 프로젝트 / 코드베이스 언급 | 코드베이스 탐색, 기존 spec, CLAUDE.md |
+| "저장해줘" / 데이터 입력 | 입력 텍스트 전문 |
+| 질문 / 태스크 요청 | KB `index.md` 스캔 → 매칭 엔트리 읽기 |
+| 복합 (여러 신호 혼재) | 위 소스 조합 — 서브 에이전트 병렬 실행 |
+
+### 수집 시 주의
+
+- 소스가 10,000단어 이상이면 섹션 분할 여부 확인
+- KB에서 후보가 0건이면 즉시 알림: "저장된 지식에서 관련 항목을 찾지 못했습니다. 일반 지식으로 진행합니다."
+
+### G2 게이트
+
+다음 기준을 AI가 자동 평가:
+
+| 기준 | 평가 |
+|------|------|
+| 소스 완전성 | Phase 1 purpose 달성에 필요한 소스가 모두 수집됐는가 |
+| 명백한 누락 없음 | constraints 답변에서 언급된 자료가 모두 포함됐는가 |
+
+**자동 통과**: 기준 명확히 충족 → Phase 3으로 진행
+
+**사용자 확인** (누락이 의심될 때):
 ```
-[Context Assessment] Scenario {A/B/C/D} ({name}) — {one-line rationale}
-Uncertainties: {list if any}
-
-Is this assessment correct?
-```
-
-### Knowledge Base Writing
-
-Collect domain terms, constraints, and reference documents to write `{OUTPUT_PATH}/knowledge-base.md`.
-
-**Domain Glossary**:
-```
-| Term | Definition | Source |
-|------|-----------|--------|
-| {term} | {one-line definition} | {document name or "conversation"} |
-```
-
-**Constraint Registry**:
-```
-| ID | Category | Description | Impact | Priority |
-|----|----------|-------------|--------|----------|
-| TC-1 | Technical | {constraint} | {impact} | High |
-| BL-1 | Business | {rule} | {impact} | Medium |
-| OC-1 | Organizational | {schedule/access limit} | {impact} | Low |
+Phase 2 결과:
+  수집된 소스: {소스 목록}
+  의심 누락: {항목} — 이 소스도 필요한가요?
 ```
 
-Categories: `TC` technical constraint, `BL` business rule, `OC` organizational constraint
+---
 
-**Output**: `{OUTPUT_PATH}/knowledge-base.md`
+## Phase 3. 컨텍스트 선택
 
-> **Gate**: Normal mode — after saving, run self-assessment and output in this format:
->
-> ```
-> [Phase 1 Self-Assessment]
-> | Item | Status | Action |
-> |------|--------|--------|
-> | Term sufficiency (5+) | OK / {N terms, key ones missing} | — / supplement Source Scan |
-> | Constraint categories (2+) | OK / {uncategorized} | — / expand constraint registry |
-> | Source attribution | OK / {items without source} | — / add sources |
->
-> Phase 1 complete — `knowledge-base.md` saved. Review and proceed to Phase 2?
-> ```
->
-> Discovery mode — skip self-assessment. Proceed to Phase 2 without confirmation.
+**목적**: 수집된 후보에서 Phase 1 purpose에 실제로 필요한 것만 남긴다.
 
-## Phase 2: CLAUDE.md
+### 3개 기준으로 평가
 
-> **Architecture section**: Complex domain services → Hexagonal + DDD. Simple scripts/pipelines → describe module structure only.
+| 기준 | 설명 |
+|------|------|
+| **관련성** | Phase 1 purpose와 직접 연결되는가 |
+| **최신성** | 더 최근의 정보가 있다면 오래된 것을 대체 |
+| **신뢰성** | 소스의 품질 (직접 진술 > 공식 문서 > 간접 참조) |
 
-```markdown
-# {PROJECT_NAME}
+### 분류
 
-This file provides guidance to Claude Code when working with code in this repository.
+각 후보 항목을 분류한다:
 
-> {one-line description}
+- **Keep**: 관련성·최신성·신뢰성 기준 충족 → 다음 단계로 전달
+- **Skip**: 기준 미충족 — 이유 명시
+- **Merge**: 기존 Keep 항목과 70% 이상 의미 중복 → 더 신뢰도 높은 항목으로 통합
 
-## Architecture
+### G3 게이트
 
-{3~5 core patterns — include WHY / simple projects: module structure only}
+다음 기준을 AI가 자동 평가:
 
-## Build & Test
+| 기준 | 평가 |
+|------|------|
+| 기준 일관 적용 | 관련성·최신성·신뢰성이 모든 항목에 동일하게 적용됐는가 |
+| Skip 이유 명확 | Skip된 항목마다 이유가 있는가 |
+| Keep 항목 충분 | Phase 1 purpose 달성에 필요한 정보가 Keep에 포함됐는가 |
 
-\`\`\`bash
-{BUILD_CMD}
-{TEST_CMD}
-\`\`\`
+**자동 통과**: 기준 명확히 충족 → build로 전달
 
-## Core Constraints
-
-{TC/BL items from Phase 1 that directly affect development — max 5}
-
-## Non-obvious Gotchas
-
-{To be discovered during implementation — update in Phase 4 feedback loop}
-
-## References
-
-- [Knowledge Base]({OUTPUT_PATH}/knowledge-base.md): Phase 1 domain knowledge base
+**사용자 확인** (모호하거나 미충족 시):
+```
+Phase 3 결과:
+  Keep: {N}개  Skip: {N}개  Merge: {N}개
+  미충족 항목: {항목명} — {이유}
+  수정하거나 승인 후 진행해주세요.
 ```
 
-> **Required**: Always include the `knowledge-base.md` link in the References section. Without this link, AI won't find the KB in future sessions.
-> **Draft nature**: Non-obvious Gotchas can only be known after implementation — update in Phase 4.
+---
 
-**Output**: `{CODE_PATH}/CLAUDE.md`
+## 완료 후
 
-> **Completion**: Normal mode — after saving, run self-assessment and output in this format:
->
-> ```
-> [Phase 2 Self-Assessment]
-> | Item | Status | Action |
-> |------|--------|--------|
-> | Build command verified | OK / {unverified} | — / re-check build files |
-> | High constraints reflected | OK / {missing constraints} | — / add to Core Constraints |
-> | KB link exists | OK / missing | — / add to References section |
->
-> gather complete — use `/context-engineering:spec` to write PRD·SPEC or `/context-engineering:valid` to check the Readiness Gate.
-> ```
->
-> Discovery mode — skip self-assessment. Output completion message only.
+gather 산출물 (Phase 1 분석 + 선택된 컨텍스트 세트)을 가지고 다음 단계로:
+
+```
+/context-engineering:build   — Phase 4-5 구조화·압축
+```

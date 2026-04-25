@@ -1,468 +1,116 @@
 ---
 name: context-engineering
 description: >
-  4-phase Context Engineering workflow for developing complex services with AI tools.
-  Defines what to know, how to behave, and what to build at each stage:
-  domain knowledge collection → Policy (CLAUDE.md) → implementation Spec → step-by-step implementation.
-  Use for new projects, large feature development, or building services with external API integrations.
-  Keywords: context engineering, AI development, domain knowledge, CLAUDE.md, service development,
-  knowledge base, policy, spec, implementation, new project, service dev
-allowed-tools: Read, Write, Bash, Grep, Glob, Agent
+  7-Phase Context Engineering 파이프라인 — AI에게 보낼 컨텍스트를 잘 만든다.
+  문제 정의 → 후보 수집 → 선택 → 구조화 → 압축 → 실행 지시 생성 → 검증.
+  Keywords: context engineering, ai context, prompt, knowledge base, CLAUDE.md, spec, 7-phase
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 ---
 
-# context-engineering
+# Context Engineering
 
-A 4-phase workflow for developing complex services with AI tools, defining **what to know, how to behave, and what to build** at each stage.
+AI에게 보낼 컨텍스트를 체계적으로 만드는 7-Phase 파이프라인. 단일 흐름으로 지식 축적, 프롬프트 조립, 프로젝트 문서 생성을 모두 처리한다.
+
+---
+
+## 전체 흐름
 
 ```
-Step 0: Context Gathering  ←  requirements exploration + parameter collection
+[입력]
   ↓
-  ├─ Requirements clear  ─────────────────────────────────────────────┐
-  │                                                                   │
-  └─ Requirements unclear (discovery mode) ─ empty drafts ───────────┤
-                                                                      ↓
-┌───────────────────────────────────────────────────────────────────────┐
-│  Phase 1: Knowledge Base  (discovery: empty draft, fill while coding) │
-│    ↓                                                                  │
-│  Phase 2: Policy (CLAUDE.md)  (discovery: minimal version)           │
-│    ↓                                                                  │
-│  Phase 3: Spec  →  [Readiness Gate]                                  │
-│    ↑______________________________↓ re-cycle if unmet                │
-└───────────────────────────────────────────────────────────────────────┘
-  ↓  [Readiness Gate passed — spiral exit]
-Phase 4: Implementation (main track)
-```
-
-## Usage
-
-```
-/context-engineering @<code-path> [--output <output-path>] [--specs <spec-doc-path>]
-```
-
-**Examples:**
-```
-/context-engineering @/path/to/project
-/context-engineering @/path/to/project --specs docs/references/
-/context-engineering @/path/to/project --output /tmp/context-docs --specs docs/references/
+Phase 1 →[G1]→ Phase 2 →[G2]→ Phase 3 →[G3]
+                                          ↓
+                         Phase 4 →[G4]→ Phase 5 →[G5]
+                                                   ↓
+                                         Phase 6 →[G6]→ [출력]
+                                                          ↓ (G6 실패)
+                                                        Phase 7
 ```
 
 ---
 
-## Step 0: Context Gathering
+## 게이트 동작 방식
 
-At skill start, perform these two steps in order: ① requirements exploration conversation, ② technical parameter collection.
-
-### Step 0-1. Requirements Exploration (HARD-GATE)
-
-**Ask one question at a time.** Wait for the user's answer before moving to the next.
-
-Confirm at least 3 things:
-
-1. **What are you building?**
-   > "Describe what you're building in one sentence."
-
-2. **Why build it? (purpose/motivation)**
-   > "Why does this need to be built? What problem does it solve or what goal does it achieve?"
-
-3. **Are there known constraints?**
-   > "Are there any known constraints? (fixed tech stack, deadlines, integrated systems, performance requirements, etc.)"
-
-After all three answers, output a summary and ask for confirmation:
+각 Phase 완료 후 AI가 기준을 자동 평가:
 
 ```
-[Requirements Summary]
-- REQ-1 What: {summary}
-- REQ-2 Why: {summary}
-- REQ-3 Constraints: {summary or "none"}
-{If additional requirements emerge from conversation, add REQ-4, REQ-5...}
-
-Does this look correct? Confirmed — will collect technical parameters and start Phase 1.
-```
-
-> **HARD-GATE**: After confirmation, choose one of two paths:
-> - **Requirements clear** → follow normal flow: write Phase 1~3 thoroughly, then enter Phase 4.
-> - **Requirements unclear** → enter discovery mode. Generate Phase 1~3 as empty drafts and proceed directly to Phase 4. Fill in via feedback loop as you develop.
-
-### Step 0-2. Technical Parameter Collection
-
-After requirements confirmation, if `@<code-path>` is provided, auto-detect from build files.
-
-| Parameter | Description | Auto-detect |
-|-----------|-------------|-------------|
-| `{PROJECT_NAME}` | Project name | — (user input or directory name) |
-| `{CODE_PATH}` | Absolute path to code repo | `@` argument |
-| `{TECH_STACK}` | Tech stack | `build.gradle` / `pom.xml` / `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` |
-| `{BUILD_CMD}` | Build command | inferred from build files |
-| `{TEST_CMD}` | Test command | inferred from build files |
-| `{SPEC_PATHS}` | External spec document paths | `--specs` argument |
-| `{OUTPUT_PATH}` | Output artifact path | `--output` if specified, otherwise `{CODE_PATH}/docs/` |
-
-After collection, output final summary and ask for user confirmation.
-
----
-
-## Discovery Mode (when requirements are unclear)
-
-Enter when Step 0 HARD-GATE determines requirements are unclear.
-
-**Full flow**:
-
-```
-Phase 1 empty draft → Phase 2 minimal → Phase 3 empty draft → enter Phase 4 immediately
-       ↑____________________↑_________________↑  fill via feedback loop
-                                                          ↓
-                                    [user requests Readiness Gate when ready]
-                                                          ↓
-                                            switch to main-track implementation
-```
-
-**Per-phase discovery artifacts**:
-
-| Phase | Initial state | Fill while coding |
-|-------|--------------|-------------------|
-| Phase 1 | Glossary/constraint table with empty rows + `> 🔍 Discovering` | discovered domain terms, new constraints |
-| Phase 2 | Project name + build commands only + `> 🔍 Discovering` | non-obvious gotchas, coding conventions |
-| Phase 3 | SPEC title only + `> 🔍 Discovering` | architecture decisions |
-
-**Readiness Gate transition**: User directly requests Readiness Gate when they feel sufficiently explored. If gate passes, switch to main-track implementation.
-
-**Feedback loop**: Findings during Phase 4 are immediately reflected in the relevant phase document based on their nature (see Phase 4 feedback loop table).
-
----
-
-## Phase 1: Knowledge Base
-
-**Purpose**: Build a knowledge base for AI to understand this project's domain.
-
-### Step 1-1. Context Assessment (Scenario Detection)
-
-Analyze the project state and select one of 4 scenarios:
-
-| Scenario | Condition | Description |
-|----------|-----------|-------------|
-| **A. Greenfield** | no spec + no code | brand new project |
-| **B. Spec-first** | spec exists + no code | docs exist, not yet implemented |
-| **C. Code-first** | no spec + code exists | existing code, no docs |
-| **D. Full context** | spec exists + code exists | both available |
-
-Detection criteria:
-- Presence of `{SPEC_PATHS}` → spec documents exist
-- Source files in `{CODE_PATH}` → code exists
-
-**Mixed state handling**: For intermediate states ('spec is outdated', 'code only partially documented'), select the closest scenario and note uncertainties in the rationale. Wrong scenario selection affects the entire downstream flow — user confirmation is required.
-
-Output detection result and get user confirmation before proceeding to Source Scan:
-
-```
-[Context Assessment] Scenario {A/B/C/D} ({name}) — {one-line rationale}
-Uncertainties: {list if any, omit if none}
-
-Is this assessment correct? Confirmed — will start Source Scan.
-```
-
-### Step 1-2. Source Scan (conditional)
-
-Collect knowledge differently depending on scenario:
-
-**Scenario A (Greenfield)**:
-- Extract domain concepts, constraints, purpose from Step 0 conversation
-- Write draft based on conversation without external references
-- Mark artifact as "Draft (verification needed)"
-
-**Scenario B (Spec-first)**:
-- Explore `{SPEC_PATHS}` documents in parallel with Explore sub-agent
-- Collect protocol specs, API guides, vendor docs
-- Compress each document to a one-line summary
-
-**Scenario C (Code-first)**:
-- Scan `{CODE_PATH}` codebase
-- Package structure, key class/module patterns
-- Existing design patterns, existing test strategy
-
-**Scenario D (Full context)**:
-- Run Scenario B + C in parallel (spec exploration and code scan simultaneously)
-
-### Step 1-3. Knowledge Base Assembly
-
-Always execute regardless of scenario. Organize collected information into the following structure.
-
-**Domain Glossary**:
-
-```markdown
-| Term | Definition | Source |
-|------|-----------|--------|
-| {term} | {one-line definition} | {document name or "conversation"} |
-```
-
-**Constraint Registry** (same 5-column format as `knowledge-base-template.md`):
-
-```markdown
-| ID | Category | Description | Impact | Priority |
-|----|----------|-------------|--------|----------|
-| TC-1 | Technical | {constraint description} | {impact} | High |
-| BL-1 | Business | {rule description} | {impact} | Medium |
-| OC-1 | Organizational | {schedule/access limit} | {impact} | Low |
-```
-
-Categories: `TC` technical constraint, `BL` business rule, `OC` organizational constraint (schedule/external dependencies)
-
-**Reference Document Manifest** (omit for Scenario A):
-
-```markdown
-| Path | Type | Summary | Updated |
-|------|------|---------|---------|
-| {path} | spec/code/api | {one line} | {date} |
-```
-
-**Output**: `{OUTPUT_PATH}/knowledge-base.md`
-- Scenario A: add `> ⚠️ Draft — based on Step 0 conversation, verify during implementation` at top
-- Discovery mode: create tables with empty rows + `> 🔍 Discovering — fill in as you develop.`
-
-> **Usage path**: This file is linked in Phase 2 CLAUDE.md references section. Without the link, AI won't find this file in future sessions.
-
-> **Gate**: Normal mode — after saving, run self-assessment and output:
->
-> ```
-> [Phase 1 Self-Assessment]
-> | Item | Status | Action |
-> |------|--------|--------|
-> | Term sufficiency (5+) | OK / {N terms, key ones missing} | — / supplement Source Scan |
-> | Constraint categories (2+) | OK / {uncategorized} | — / expand constraint registry |
-> | Source attribution | OK / {items without source} | — / add sources |
->
-> Phase 1 complete — `knowledge-base.md` draft saved. Review and proceed to Phase 2?
-> ```
->
-> Discovery mode — skip self-assessment. Proceed to Phase 2 without confirmation.
-
----
-
-## Phase 2: Policy (CLAUDE.md)
-
-**Purpose**: Define policy for how AI should behave in this project.
-
-### Step 2-1. CLAUDE.md Level Decision
-
-| Level | Location | Line limit | Purpose |
-|-------|----------|-----------|---------|
-| Project | `{CODE_PATH}/CLAUDE.md` | 100~150 lines | project-wide common |
-| Module | `{CODE_PATH}/{module}/CLAUDE.md` | 60~100 lines | module-specific |
-
-### Step 2-2. CLAUDE.md Writing
-
-WHAT/WHY/HOW 3-section structure:
-
-> **Architecture section guide**: Complex domain services → Hexagonal + DDD (see `references/architecture-principles.md`). Simple scripts/pipelines → describe module structure freely.
-
-```markdown
-# {PROJECT_NAME}
-
-> {one-line description}
-
-## Architecture
-
-{3~5 core patterns — include WHY / simple projects: module structure only}
-
-## Build & Test
-
-\`\`\`bash
-{BUILD_CMD}
-{TEST_CMD}
-\`\`\`
-
-## Ports / Endpoints
-
-| Port | Purpose |
-|------|---------|
-
-## Core Constraints
-
-{Phase 1 constraints that directly affect development}
-
-## Non-obvious Gotchas
-
-- {gotcha 1}
-- {gotcha 2}
-
-## References
-
-- [Knowledge Base]({OUTPUT_PATH}/knowledge-base.md): Phase 1 domain knowledge base
-```
-
-> **Required**: Always include `knowledge-base.md` link in the References section. Without this link, AI won't find the KB in future sessions.
-
-Items exceeding 150 lines → split to separate document and link.
-Discovery mode: fill project name, tech stack, build commands only + `> 🔍 Discovering`. Add the rest while developing.
-
-**Output**: `{CODE_PATH}/CLAUDE.md` (+ per-module CLAUDE.md)
-
-> **Draft nature**: Phase 2 CLAUDE.md is a draft. Non-obvious Gotchas and coding conventions can only be known after implementation — update in Phase 4 feedback loop. Fill only what's knowable now.
-
-> **Gate**: Normal mode — after saving, run self-assessment and output:
->
-> ```
-> [Phase 2 Self-Assessment]
-> | Item | Status | Action |
-> |------|--------|--------|
-> | Build command verified | OK / {unverified} | — / re-check build files |
-> | High constraints reflected | OK / {missing constraints} | — / add to Core Constraints |
-> | KB link exists | OK / missing | — / add to References section |
->
-> Phase 2 complete — `CLAUDE.md` draft saved. Review and proceed to Phase 3?
-> ```
->
-> Discovery mode — skip self-assessment. Proceed to Phase 3 without confirmation.
-
----
-
-## Phase 3: SPEC
-
-**Purpose**: Document architecture decisions for how to build it.
-
-### Step 3-1. SPEC (Technical Specification)
-
-```markdown
-# SPEC — {PROJECT_NAME}
-
-## Architecture Decisions
-| Decision | Alternatives | Choice | Rationale |
-|----------|-------------|--------|-----------|
-
-## Package Structure
-Dependency direction: `entry → application → domain ← infrastructure` (reverse forbidden)
-→ [references/architecture-principles.md](references/architecture-principles.md)
-
-## Implementation Plan
-| # | Item | REQ | Depends | Done Criteria |
-|---|------|-----|---------|--------------|
-| 1 | {unit} | REQ-1 | — | {verifiable criterion} |
-
-## Requirements Traceability
-| REQ-ID | Requirement | PRD Feature | Implementation Item | Status |
-|--------|-------------|-------------|---------------------|--------|
-| REQ-1 | {what} | {feature} | Plan #1 | not implemented |
-| REQ-2 | {why} | {feature} | Plan #N | not implemented |
-| REQ-3 | {constraint} | {non-func/feature} | Plan #N | not implemented |
-```
-
-Discovery mode: generate SPEC as empty draft + `> 🔍 Discovering`. Requirements traceability also `> 🔍 Discovering — fill in as requirements are confirmed.` Fill in while developing.
-
-**Output**: `{OUTPUT_PATH}/spec.md`
-
-### Step 3-2. Readiness Gate (decide whether to iterate)
-
-**HARD-GATE (user confirmation required)**: AI summarizes the current state of each criterion. User makes the pass/fail decision. AI must not declare "passed" unilaterally.
-
-Run Phase 3 self-assessment first, then output the gate:
-
-```
-[Phase 3 Self-Assessment]
-| Item | Status | Action |
-|------|--------|--------|
-| Decision rationale completeness | OK / {N decisions without rationale} | — / improve those items |
-| Implementation order dependencies | OK / {items missing dependency} | — / update plan |
-| REQ coverage | OK / {unmapped REQ-IDs} | — / update traceability table |
-
-[Readiness Gate]
-① Do all SPEC architecture decisions include alternatives and rationale?
-   → {current state: N decisions, M with rationale / missing: ...}
-② Are there no unresolved domain terms?
-   → {current state: N unresolved — list names}
-③ Does CLAUDE.md reflect actual constraints?
-   → {current state: N Phase 1 constraints, M reflected in CLAUDE.md}
-④ Do all PRD features have verifiable success criteria?
-   → {current state: N features, M with success criteria}
-⑤ Can the first implementation plan item start immediately?
-   → {current state: ready / blockers: ...}
-⑥ Are all REQ-IDs mapped to implementation plan items?
-   → {current state: N REQs, M mapped / unmapped: REQ-X, REQ-Y}
-
-If any criterion is unmet, specify which phase to return to.
-If all pass, say "Proceed to Phase 4".
-```
-
-| Criterion | Phase to return to if unmet |
-|-----------|----------------------------|
-| ① SPEC architecture decisions lack rationale | Phase 3 |
-| ② Unresolved domain terms | Phase 1 |
-| ③ CLAUDE.md missing constraints | Phase 2 |
-
-If any is unmet, return to the corresponding phase, reinforce, then re-cycle back to Phase 3.
-
-In discovery mode, this gate becomes the **spiral exit checkpoint**. The user decides when to check — when they feel sufficiently explored, they request the Readiness Gate. AI presents the current state; user makes the final transition decision.
-
----
-
-## Phase 4: Implementation
-
-**Purpose**: Implement based on the plan (or exploration) and verify at each step.
-
-### Per Implementation Unit
-
-**Entry criteria**:
-- Normal mode: SPEC confirmed
-- Discovery mode: SPEC empty draft generated (entry allowed even if empty)
-
-**Done criteria**: all checklist items must pass before moving to the next unit
-
-- [ ] `{BUILD_CMD}` succeeds
-- [ ] `{TEST_CMD}` passes (new + no regression)
-- [ ] SPEC architecture decisions followed — skip in discovery mode if SPEC is empty
-- [ ] Findings reflected in the relevant phase document
-- [ ] Requirements traceability table updated — mark completed REQ-IDs as "implemented"
-
-### Feedback Loop — return to the relevant phase when findings arise
-
-When implementation reveals mismatches, update the appropriate phase document based on the nature of the finding.
-
-| Finding | Update target |
-|---------|--------------|
-| Domain concept error, term mismatch, new constraint | Phase 1 `knowledge-base.md` |
-| AI behavior rule change needed, new gotcha | Phase 2 `CLAUDE.md` |
-| Architecture decision reversal, package structure change | Phase 3 `spec.md` |
-
-Update procedure:
-1. Record the finding and reason in one line
-2. Update the item in the relevant phase document
-3. Continue implementation after updating
-
-> **Principle**: Don't fit implementation to documents — update documents to match reality. Findings can be reflected in any earlier phase.
-
-### Post-Phase 4: Implementation Retrospective
-
-After all implementation units pass their done criteria, output the following retrospective.
-
-Discovery mode: use abbreviated "discovery retrospective" (discovered knowledge summary + empty item count + priority improvement areas).
-
-```
-[Implementation Retrospective]
-
-## Requirements Achievement
-| REQ-ID | Requirement | Achieved | Notes |
-|--------|-------------|:--------:|-------|
-| REQ-1 | {what} | ✅/❌ | {one line} |
-| REQ-2 | {why} | ✅/❌ | {one line} |
-| REQ-3 | {constraint} | ✅/❌ | {one line} |
-
-## Process Retrospective
-- What worked well: {effective decisions/approaches across Phase 1~4}
-- Discovered late: {items fed back to Phase 1/2/3 during implementation}
-- Improvements: {workflow points to improve in next project}
-
-## Final Document State
-| Document | Last update summary | Feedback loop updates |
-|----------|--------------------:|:--------------------:|
-| knowledge-base.md | {summary} | {N} |
-| CLAUDE.md | {summary} | {N} |
-| spec.md | {summary} | {N} |
+[자동 통과]  기준 명확히 충족 → 사용자 표시 없이 다음 Phase 진행
+
+[사용자 확인] 모호하거나 기준 미충족 →
+  "Phase N 결과: {요약}
+   미충족 항목: {내용}
+   수정하거나 승인 후 진행해주세요."
 ```
 
 ---
 
-## References
+## 서브 스킬 진입점
 
-- [4-Phase Checklist](references/phase-checklist.md)
-- [Knowledge Base Template](references/knowledge-base-template.md)
-- [CLAUDE.md Policy Template](references/claude-md-policy-template.md)
-- [SPEC Template](references/spec-template.md)
-- [Architecture Principles](references/architecture-principles.md)
+각 단계를 개별적으로 실행할 수 있다:
+
+| 명령 | 담당 Phase | 용도 |
+|------|-----------|------|
+| `/context-engineering:gather` | Phase 1-3 | 문제 정의 → 후보 수집 → 선택 |
+| `/context-engineering:build` | Phase 4-5 | 구조화 → 압축 |
+| `/context-engineering:compose` | Phase 6 | 실행 지시 생성 |
+| `/context-engineering:verify` | Phase 7 | 최종 검증 (재실행 가능) |
+
+**중간 진입 조건**: 이전 서브 스킬 산출물이 존재할 때만 허용.
+산출물 없으면 먼저 실행할 서브 스킬을 안내한다.
+
+---
+
+## 전체 실행 (`/context-engineering`)
+
+서브 스킬을 순서대로 호출한다:
+
+### 1단계: gather 실행
+`/context-engineering:gather` — Phase 1-3 + G1-G3
+
+완료 기준:
+- Phase 1 분석 결과 (purpose / constraints / success criteria / Role)
+- Phase 3 선택 결과 (Keep 항목 목록)
+
+### 2단계: build 실행
+`/context-engineering:build` — Phase 4-5 + G4-G5
+
+완료 기준:
+- 구조화·압축된 컨텍스트 블록 (Key Facts / Constraints / Decisions / Notes)
+
+### 3단계: compose 실행
+`/context-engineering:compose` — Phase 6 + G6
+
+완료 기준:
+- G6 통과: 최종 출력물 (지시문 / KB 엔트리 / 프로젝트 산출물)
+- G6 실패: Phase 7로 자동 이동
+
+### 4단계: verify 실행 (G6 실패 시)
+`/context-engineering:verify` — Phase 7
+
+완료 기준:
+- 신뢰도 표시 (H/M/L)
+- 문제 유형별 피드백 루프 안내
+
+---
+
+## 출력물 유형
+
+Phase 1 success criteria에 따라 자동 결정:
+
+| 목적 | 출력물 |
+|------|--------|
+| 실행 지시문 | Role + Task + Constraints + Output Format |
+| 지식 저장 | KB 엔트리 + index.md 업데이트 |
+| 프로젝트 개발 | CLAUDE.md + spec.md + 구현 계획 |
+
+---
+
+## 스킬 수정 가이드라인
+
+1. **Phase 일관성**: gather → build → compose → verify 흐름을 유지할 것
+2. **게이트 형식**: `"Phase N 결과: {요약}\n 미충족 항목: {내용}\n 수정하거나 승인 후 진행해주세요."` 형식 준수
+3. **템플릿 동기화**: `references/` 템플릿과 SKILL.md 인라인 구조를 항상 일치시킬 것
+
+## 검증
+
+스킬 수정 후 실제 프로젝트에서 `/context-engineering @<path>` 실행하여 Phase 1 질의가 올바르게 시작되는지 확인.

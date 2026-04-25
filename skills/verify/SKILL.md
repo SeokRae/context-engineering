@@ -1,0 +1,77 @@
+---
+name: verify
+description: >
+  Phase 7: 최종 holistic 검증. G6 실패 시 자동 호출되거나 수동으로 실행한다.
+  누락·충돌·추측·일관성을 점검하고 신뢰도를 표시한다. 읽기 전용 — 파일을 수정하지 않는다.
+  Keywords: verification, holistic check, confidence, feedback loop, omission, conflict, speculation
+allowed-tools: Read, Bash, Glob
+---
+
+# Verify (Phase 7)
+
+최종 검증 단계. compose 출력물이 Phase 1의 기준을 실제로 충족하는지 점검한다. 파일을 수정하지 않고 결과만 보고한다.
+
+---
+
+## 트리거
+
+- **자동**: G6 미충족 시 compose가 자동 호출
+- **수동**: `/context-engineering:verify` 직접 실행 (기존 산출물 재검증)
+
+---
+
+## Phase 7. 최종 검증
+
+**목적**: 4가지 기준으로 출력물을 점검하고 신뢰도를 표시한다.
+
+### 4가지 점검
+
+| 점검 항목 | 기준 |
+|---------|------|
+| **누락** | Phase 1 purpose/constraints가 출력물에 모두 반영됐는가? |
+| **충돌** | 출력물 내 모순이 없는가? |
+| **추측** | 수집된 소스에 근거하지 않은 주장이 없는가? |
+| **일관성** | 출력 형식이 Phase 1 success criteria와 일치하는가? |
+
+### 점검 출력 형식
+
+```
+[Phase 7 검증 결과]
+
+누락: {반영된 항목 N개 / 미반영: {항목명} — {설명}}
+충돌: {없음 / {항목A} ↔ {항목B} — {설명}}
+추측: {없음 / {항목명} — 근거 소스 없음}
+일관성: {일치 / {불일치 내용} — Phase 1 success criteria: {원문}}
+
+[신뢰도: H/M/L]
+{신뢰도 설명}
+```
+
+### 신뢰도 기준
+
+| 등급 | 조건 | 의미 |
+|------|------|------|
+| **H** (High) | 3개 이상 소스, 충돌 없음, 추측 없음 | 출력물이 충분한 근거에 기반함 |
+| **M** (Medium) | 1-2개 소스 또는 경미한 갭 존재 | 합리적이나 추가 정보로 개선 가능 |
+| **L** (Low) | 소스 부족 또는 충돌 존재 | 일반 지식에 의존 — 검토 필요 |
+
+M 등급: "더 많은 정보를 gather하면 정확도를 높일 수 있습니다."
+L 등급: "⚠ 소스가 부족합니다. gather를 다시 실행하거나 추가 정보를 제공해주세요."
+
+---
+
+## 피드백 루프
+
+문제 유형에 따라 해당 Phase로 복귀를 안내한다:
+
+| 문제 유형 | 복귀 Phase | 명령 |
+|---------|-----------|------|
+| 누락 — purpose/constraints 미반영 | Phase 1-2 | `/context-engineering:gather` |
+| 충돌 — 컨텍스트 내 모순 | Phase 3-4 | `/context-engineering:build` 재실행 |
+| 추측 — 근거 소스 부족 | Phase 2 | `/context-engineering:gather` (소스 추가) |
+| 일관성 — 출력 형식 불일치 | Phase 6 | `/context-engineering:compose` 재실행 |
+
+모든 기준 충족 시:
+```
+검증 완료. [신뢰도: H] 출력물을 사용할 준비가 됐습니다.
+```

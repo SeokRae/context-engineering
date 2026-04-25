@@ -2,45 +2,43 @@
 
 This file provides guidance to Claude Code when working with code in this repository.
 
-> 4-phase Context Engineering workflow Claude Code plugin for developing complex services with AI tools
+> 7-Phase Context Engineering 파이프라인 — AI에게 보낼 컨텍스트를 잘 만드는 Claude Code 플러그인
 
 ## Project Nature
 
-No source code. **Pure markdown** Claude Code plugin:
-- `plugin.json` — plugin metadata
-- `skills/context-engineering/SKILL.md` — full workflow skill (Step 0 → Phase 4)
-- `skills/context-engineering/references/` — phase artifact templates
-- `skills/gather/SKILL.md` — sub-skill: Step 0 + Phase 1 (KB) + Phase 2 (CLAUDE.md)
-- `skills/spec/SKILL.md` — sub-skill: Phase 3 (PRD + SPEC)
-- `skills/valid/SKILL.md` — sub-skill: Readiness Gate validation
-- `skills/impl/SKILL.md` — sub-skill: Phase 4 (implementation)
+소스 코드 없음. **순수 마크다운** Claude Code 플러그인:
+- `.claude-plugin/plugin.json` — 플러그인 메타데이터
+- `skills/context-engineering/SKILL.md` — 오케스트레이터 (전체 7-Phase 파이프라인)
+- `skills/context-engineering/references/` — 템플릿 및 참조 문서
+- `skills/gather/SKILL.md` — Phase 1-3 (문제 정의 → 수집 → 선택)
+- `skills/build/SKILL.md` — Phase 4-5 (구조화 → 압축)
+- `skills/compose/SKILL.md` — Phase 6 (실행 지시 생성)
+- `skills/verify/SKILL.md` — Phase 7 (최종 검증)
 
-## ke Skill Structure
+## Skill Structure
 
-New in v2.0. Universal knowledge engine, domain-agnostic:
-- `skills/ke/SKILL.md` — main 7-phase engine + auto mode detection (`/ke`)
-- `skills/ke/references/entry-template.md` — knowledge entry format template
-- `skills/ke/references/index-template.md` — index.md format template
-- `skills/ingest/SKILL.md` — direct ingest entry (`/ke:ingest`)
-- `skills/query/SKILL.md` — direct query entry (`/ke:query`)
+단일 7-Phase 파이프라인:
+
+```
+Phase 1 →[G1]→ Phase 2 →[G2]→ Phase 3 →[G3]→
+Phase 4 →[G4]→ Phase 5 →[G5]→ Phase 6 →[G6]→ [출력]
+                                                  ↓ (G6 실패)
+                                                Phase 7
+```
+
+| 서브 스킬 | Phase | 역할 |
+|----------|-------|------|
+| `gather` | 1-3 | 문제 정의 → 후보 수집 → 선택 |
+| `build` | 4-5 | 구조화 → 압축 |
+| `compose` | 6 | 실행 지시 생성 |
+| `verify` | 7 | 최종 검증 |
 
 ## Skill Modification Guidelines
 
-1. **Variable consistency**: only reference variables defined in Step 0 (e.g., `{OUTPUT_PATH}`) in later phases
-2. **Template sync**: keep `references/` templates and SKILL.md inline artifact structures in sync
-3. **Gate message format**: standardize to `"Phase {N} complete — \`{artifact}\` draft saved. Review and proceed to Phase {N+1}?"`
+1. **Phase 일관성**: gather → build → compose → verify 흐름 유지
+2. **템플릿 동기화**: `references/` 템플릿과 SKILL.md 인라인 구조를 항상 일치
+3. **게이트 형식**: `"Phase N 결과: {요약}\n 미충족 항목: {내용}\n 수정하거나 승인 후 진행해주세요."` 준수
 
 ## Verification
 
-After modifying a skill, run `/context-engineering @<path>` in a real project to confirm Step 0 parameter collection works correctly.
-
-## ke Design Invariants
-
-These rules must hold for the ke skill and sub-skills:
-
-1. **Mode detection**: `/ke` auto-detects Ingest vs. Query from input signals. Never ask the user which mode unless genuinely ambiguous. Ambiguous → 1 question with options 1/2/3.
-2. **KNOWLEDGE_PATH resolution order**: `--kb` arg → `KNOWLEDGE_PATH` env → `./knowledge/index.md` → `~/knowledge/index.md` → ask user.
-3. **Lightweight gates**: Only 2 checkpoints — after Phase 3 (all-duplicate ingest) and after Phase 7 (conflicts for ingest; confidence footer for query). Never gate on anything else.
-4. **Query is read-only**: `/ke:query` and `/ke:ingest`'s Query mode never write files. Only Ingest writes.
-5. **Concept granularity**: One knowledge entry per concept, not per document or session. Large documents are split into multiple entries.
-6. **Index sync**: index.md is updated atomically on every ingest. Re-sort domain tables by date descending on every update.
+스킬 수정 후 실제 프로젝트에서 `/context-engineering @<path>` 실행하여 Phase 1 질의가 올바르게 시작되는지 확인.
