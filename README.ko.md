@@ -57,7 +57,7 @@ Phase 4 --[G4]--> Phase 5 --[G5]--> Phase 6 --[G6]--> [출력]
                                                        Phase 7
 ```
 
-> **인터랙티브 시각화** → [English](https://seokrae.github.io/context-engineering/context-engineering-cycle.html) | [한국어](https://seokrae.github.io/context-engineering/context-engineering-cycle.ko.html)
+> **인터랙티브 시각화** → [context-engineering-cycle.ko.html](https://seokrae.github.io/context-engineering/context-engineering-cycle.ko.html)
 
 | 서브스킬 | Phase | 역할 |
 |---------|-------|------|
