@@ -72,6 +72,44 @@ Role + Task + Constraints + Output Format 구조로 조립:
 - Constraints: 목록 형태, 각 항목은 단독으로 이해 가능
 - Output Format: 형식·분량·구조를 명시
 
+### Tool Context (실행 지시문 전용)
+
+Phase 1 purpose에서 도구 사용이 필요한 작업이면 지시문에 `## Tools` 섹션을 추가한다:
+
+```markdown
+## Tools
+
+| Tool | 용도 | 사용 예시 |
+|------|------|---------|
+| {tool name} | {이 작업에서의 용도} | {호출 예시 또는 패턴} |
+```
+
+MCP Tools (해당 시):
+- context7: 라이브러리 문서 조회 — `resolve-library-id` → `get-library-docs`
+- playwright: 웹 페이지 검증 — `browser_navigate` → `browser_snapshot`
+
+**포함 기준** (Phase 1 purpose 신호 기반):
+- "코드", "구현", "테스트" 신호 → Bash, Read, Write, Agent 포함
+- "문서", "라이브러리" 신호 → context7 MCP 포함
+- "웹", "브라우저", "UI" 신호 → playwright MCP 포함
+- 도구 필요 신호 없으면 → `## Tools` 섹션 생략
+
+### 컨텍스트 유지 지시 (실행 지시문 전용)
+
+실행 지시문(A 형식)이 **3단계 이상** 작업을 지시하는 경우, 지시문 하단에 다음 블록을 추가한다:
+
+    ## Context Checkpoints
+
+    이 작업이 3단계 이상이면:
+    1. 각 주요 단계 완료 후 `_context-session.md`에 기록:
+       - 현재까지 완료한 것
+       - 발견한 핵심 사실
+       - 다음 단계에 필요한 정보
+    2. 다음 단계 시작 전 `_context-session.md`를 다시 읽는다
+    3. 모든 단계 완료 후 `_context-session.md`를 삭제한다
+
+참조: [Context Session Template](../context-engineering/references/context-session-template.md)
+
 ---
 
 ### B. KB 엔트리
