@@ -98,7 +98,7 @@ verify를 실행하여 상세 검증을 진행합니다.
 
 ---
 
-### A. 실행 지시문
+### A. 실행 지시문 (System Prompt)
 
 Role + Task + Constraints + Output Format 구조로 조립:
 
@@ -212,7 +212,7 @@ related: []
 
 프로젝트 개발을 위한 3가지 문서를 생성:
 
-**CLAUDE.md** (AI 행동 정책):
+**CLAUDE.md** (AI 행동 정책 — Persistent System Prompt):
 
 ```markdown
 # {PROJECT_NAME}
