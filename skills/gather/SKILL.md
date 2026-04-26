@@ -120,6 +120,14 @@ Phase 1의 constraints 답변 신호에서 소스를 결정한다:
 
 ### KB 검색 강화
 
+**KB 존재 여부 확인**:
+1. `index.md` 파일 경로를 탐색한다 (KB 설정이 있으면 해당 경로, 없으면 일반적 위치 스캔)
+2. `index.md`가 존재하지 않으면:
+   - 아래 KB 검색 4단계를 **전체 건너뜀**
+   - "KB가 설정되지 않았습니다. KB 없이 진행합니다." 안내 후 Phase 1 신호 테이블의 다른 소스로만 수집 진행
+   - 참조: [Failure Cases — 시나리오 7](../context-engineering/references/failure-cases.md)
+3. `index.md`가 존재하면 → 아래 KB 검색 4단계를 실행:
+
 KB `index.md`에서 후보를 찾을 때 다음 순서로 검색한다:
 
 1. **키워드 매칭**: Phase 1 purpose의 핵심 단어로 index.md 테이블 스캔

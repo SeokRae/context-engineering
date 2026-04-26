@@ -105,6 +105,8 @@ Phase 1 success criteria에 따라 자동 결정:
 | 지식 저장 | KB 엔트리 + index.md 업데이트 |
 | 프로젝트 개발 | CLAUDE.md + spec.md + 구현 계획 |
 
+> Phase 6에서 자동 결정 후 사용자 확인을 거친다. 상세는 compose SKILL.md 참조.
+
 ---
 
 > 파이프라인 실패 시나리오 + 복구 프로토콜 → [Failure Cases & Recovery](references/failure-cases.md)

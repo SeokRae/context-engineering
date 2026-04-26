@@ -52,7 +52,7 @@
 - Phase 3 선택 시: 신뢰도(reliability) 기준을 엄격히 적용 — 출처가 불명확한 항목은 Keep 대신 Skip
 - Phase 7 검증: "Speculation" 체크에서 소스 근거 없는 주장을 감지 → 피드백 루프로 Phase 2 재수집
 
-> **참고**: Phase 4 구조화 단계는 현재 출처 메타데이터 필드를 갖지 않는다. 파이프라인에 출처 추적을 추가하려면 `skills/build/SKILL.md`의 Phase 4 스키마와 G4/G5 게이트를 먼저 확장해야 한다.
+> **참고**: Phase 4 구조화 단계에 `[source: ...]` 인라인 태그가 추가되었다. 각 항목에 출처를 표시하여 Phase 7 추측 검증의 근거로 사용한다. 상세는 `skills/build/SKILL.md`의 Phase 4 구조화 규칙 및 `skills/verify/SKILL.md`의 추측 점검 기준을 참조.
 
 ## 6. 세션 중단 복구
 
@@ -72,6 +72,8 @@
 1. "저장된 지식에서 관련 항목을 찾지 못했습니다. 일반 지식으로 진행합니다." 안내
 2. Phase 3에서 Keep 항목 0건이면 Phase 1 purpose만으로 진행 가능 여부 판단
 3. 진행 불가 시: "소스가 부족합니다. 참고할 수 있는 문서나 URL을 제공해주세요."
+
+> 관련: [gather Phase 2 KB 검색 강화](../../gather/SKILL.md) — KB 미존재 시 검색 단계를 건너뛰는 가드 조건.
 
 ## 8. 파이프라인 중 컴팩션 발생
 

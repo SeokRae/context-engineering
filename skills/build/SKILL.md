@@ -22,9 +22,15 @@ Phase 1 분석 결과 (purpose / constraints / success criteria / Role / scope-d
 Phase 3 선택 결과 (Keep 항목 목록)
 ```
 
-산출물이 없으면:
-> "먼저 `/context-engineering:gather`를 실행해주세요."
-종료.
+확인 순서:
+1. 대화 컨텍스트에 위 산출물이 존재하는가 → 있으면 사용
+2. 없으면 `_phase1-result.md` 파일 존재 여부를 확인 → 있으면 읽어서 Phase 1 결과 복원
+3. Phase 1 결과는 복원됐지만 Phase 3 선택 결과(Keep 항목)가 없으면:
+   > "먼저 `/context-engineering:gather`를 실행해주세요. (Phase 3 선택 결과가 필요합니다)"
+   종료.
+4. 둘 다 없으면:
+   > "먼저 `/context-engineering:gather`를 실행해주세요."
+   종료.
 
 ---
 
@@ -36,17 +42,23 @@ Phase 3 선택 결과 (Keep 항목 목록)
 
 ```markdown
 ## Key Facts
-{Phase 1 purpose와 직접 관련된 핵심 사실들}
+- {핵심 사실} [source: {소스명}]
 
 ## Constraints
-{Phase 1 constraints에서 도출된 제약 조건들}
+- {제약 조건} [source: {소스명}]
 
 ## Decisions
-{관련 결정사항 및 그 근거}
+- {결정사항 및 근거} [source: {소스명}]
 
 ## Notes
-{맥락 이해에 도움이 되는 보조 정보}
+- {보조 정보} [source: {소스명}]
 ```
+
+`[source: ...]` 태그 규칙:
+- 소스명은 Phase 2에서 수집한 소스의 식별자 (파일명, URL, "user", "KB:{entry-title}")
+- 여러 소스에서 도출된 항목: `[source: file.md, user]`
+- 일반 지식에서 도출된 항목: `[source: general]`
+- Phase 7 추측 점검 시 `[source: general]` 항목을 우선 검토 대상으로 삼는다
 
 ### 구조화 규칙
 
@@ -54,6 +66,7 @@ Phase 3 선택 결과 (Keep 항목 목록)
 - 빈 섹션은 완전히 생략
 - 항목 간 중복 없음 — 같은 내용이 두 섹션에 등장하면 더 적합한 섹션으로 통합
 - Key Facts는 Phase 1 purpose와 직접 관련된 것만 포함
+- 모든 항목에 `[source: ...]` 태그를 부착 — Phase 7 추측 검증의 근거가 된다
 
 ### G4 게이트
 
@@ -64,6 +77,7 @@ Phase 3 선택 결과 (Keep 항목 목록)
 | 모호한 항목 없음 | 각 항목이 명확한 하나의 사실/제약/결정을 표현하는가 |
 | 섹션 간 중복 없음 | 동일 내용이 두 섹션에 존재하지 않는가 |
 | Purpose 반영 | Key Facts가 Phase 1 purpose와 연결되는가 |
+| 출처 태그 부착 | 모든 항목에 `[source: ...]` 태그가 있는가 |
 
 **자동 통과**: 기준 명확히 충족 → Phase 5로 진행
 
