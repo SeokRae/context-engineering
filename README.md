@@ -54,7 +54,7 @@ Once you know which sub-skill to enter, decide what context sources take priorit
 | Knowledge base entry | Consolidation check, duplicate detection, stale entry check | Raw source text (already distilled) | B |
 | Execution instruction | Role, task, constraints, output format | Verbose background (compress in Phase 5) | A |
 
-> This table guides Phase 2 source selection and Phase 5 compression priorities. See [context-source-strategy.md](skills/context-engineering/references/context-source-strategy.md) for the underlying RAG / Memory / Tool Result classification.
+> This table guides Phase 2 source selection and Phase 5 compression priorities. See [context-source-strategy.md](skills/context-engineering/references/context-source-strategy.md) for the underlying RAG / Memory / Tool Result / System Prompt classification.
 
 ## Token Budget Allocation
 
@@ -139,9 +139,9 @@ Phase 6 auto-determines the output format from Phase 1 success criteria:
 
 | Format | Trigger signals | Output |
 |--------|----------------|--------|
-| **A — Execution Instruction** | "make a prompt", "how should I write", "give me instructions" | Role + Task + Constraints + Output Format |
-| **B — KB Entry** | "save this", "remember this", "take a note" | Markdown entry with frontmatter + Key Facts / Constraints / Decisions / Notes |
-| **C — Project Artifacts** | "start a project", "analyze codebase", "I want to build" | CLAUDE.md + spec.md + implementation plan |
+| **A — Execution Instruction** (System Prompt) | "make a prompt", "how should I write", "give me instructions" | Role + Task + Constraints + Output Format — assembled as a system prompt for the target AI |
+| **B — KB Entry** (Memory) | "save this", "remember this", "take a note" | Markdown entry with frontmatter + Key Facts / Constraints / Decisions / Notes |
+| **C — Project Artifacts** (Persistent System Prompt) | "start a project", "analyze codebase", "I want to build" | CLAUDE.md (persistent system prompt) + spec.md + implementation plan |
 
 If the signal is ambiguous, Phase 6 asks you to choose A, B, or C once.
 
@@ -188,7 +188,7 @@ Phase artifact templates are in `skills/context-engineering/references/`:
 | [`entry-template.md`](skills/context-engineering/references/entry-template.md) | 6-B | KB entry format (frontmatter + body) |
 | [`index-template.md`](skills/context-engineering/references/index-template.md) | 6-B | KB index format |
 | [`context-session-template.md`](skills/context-engineering/references/context-session-template.md) | 6-A | Multi-step task scratch file (deleted after use) |
-| [`context-source-strategy.md`](skills/context-engineering/references/context-source-strategy.md) | 2 | RAG / Memory / Tool Result strategy classification |
+| [`context-source-strategy.md`](skills/context-engineering/references/context-source-strategy.md) | 2 | RAG / Memory / Tool Result / System Prompt strategy classification |
 | [`failure-cases.md`](skills/context-engineering/references/failure-cases.md) | All | Pipeline failure scenarios + recovery protocols |
 
 ## Project Structure
