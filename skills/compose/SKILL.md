@@ -1,171 +1,171 @@
 ---
 name: compose
 description: >
-  Phase 6: Phase 1 success criteria에 맞는 최종 출력물을 생성한다.
-  build가 압축한 컨텍스트를 받아 지시문 / KB 엔트리 / 프로젝트 산출물 중 하나로 조립한다.
+  Phase 6: Generates the final output matching Phase 1 success criteria.
+  Receives the context compressed by build and assembles it into one of: execution instruction / KB entry / project artifacts.
   Keywords: execution instruction, prompt, role task constraints output format, knowledge entry, CLAUDE.md, spec
 allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 # Compose (Phase 6)
 
-최종 출력물 생성 단계. build의 구조화·압축된 컨텍스트와 Phase 1의 success criteria를 결합하여 목적에 맞는 출력물을 조립한다.
+Final output generation stage. Combines the structured and compressed context from build with Phase 1 success criteria to assemble the appropriate output.
 
 ---
 
-## 전제조건
+## Prerequisites
 
-실행 전 build 산출물 확인:
+Before execution, verify build artifacts:
 
 ```
-Phase 1 분석 결과 (purpose / constraints / success criteria / Role / scope-declaration)
-구조화·압축된 컨텍스트 블록 (Key Facts / Constraints / Decisions / Notes)
+Phase 1 analysis results (purpose / constraints / success criteria / Role / scope-declaration)
+Structured and compressed context blocks (Key Facts / Constraints / Decisions / Notes)
 ```
 
-확인 순서:
-1. 대화 컨텍스트에 위 산출물이 존재하는가 → 있으면 사용
-2. 없으면 `_phase1-result.md` 파일 존재 여부를 확인 → 있으면 읽어서 Phase 1 결과 복원
-3. Phase 1 결과는 복원됐지만 build 산출물(구조화·압축 블록)이 없으면:
-   > "먼저 `/context-engineering:build`를 실행해주세요. (구조화·압축 블록이 필요합니다)"
-   종료.
-4. 둘 다 없으면:
-   > "먼저 `/context-engineering:gather`를 실행해주세요."
-   종료.
+Verification order:
+1. Do the above artifacts exist in the conversation context? → Use them if present
+2. If not, check whether `_phase1-result.md` exists → Read it to restore Phase 1 results if found
+3. If Phase 1 results are restored but build artifacts (structured/compressed blocks) are missing:
+   > "Please run `/context-engineering:build` first. (Structured/compressed blocks are required)"
+   Stop.
+4. If both are missing:
+   > "Please run `/context-engineering:gather` first."
+   Stop.
 
 ---
 
-## 출력 예산 가이드
+## Output Budget Guide
 
-Phase 6 출력물의 목표 크기:
+Target size for Phase 6 output:
 
-| 출력 형식 | 목표 크기 | 초과 시 |
-|---------|---------|-------|
-| A. 실행 지시문 | 200-800단어 | Notes를 한 줄 요약으로 축약 → 그래도 초과 시 아티팩트 분할 |
-| B. KB 엔트리 | 20-80줄 | 엔트리 분할 (entry-template 가이드라인 참조) |
-| C. 프로젝트 산출물 | CLAUDE.md 100-150줄 | 150줄 초과 시 별도 docs/ 파일로 분리 |
+| Output Format | Target Size | If Exceeded |
+|--------------|-------------|-------------|
+| A. Execution Instruction | 200–800 words | Condense Notes to one-line summaries → if still exceeded, split artifacts |
+| B. KB Entry | 20–80 lines | Split the entry (see entry-template guidelines) |
+| C. Project Artifacts | CLAUDE.md 100–150 lines | If over 150 lines, extract to a separate docs/ file |
 
-> **불변 규칙**: Constraints와 Decisions는 출력 예산 압박 하에서도 삭제·축약 금지. build Phase 5에서 이미 보존을 보장한 항목이다.
-
----
-
-## Phase 6. 실행 지시 생성
-
-**목적**: Phase 1 success criteria 신호에 맞는 출력 형식을 자동 결정하고 최종 출력물을 생성한다.
-
-### 출력 형식 자동 결정
-
-Phase 1의 success criteria 답변에서 신호를 읽어 형식을 결정한다:
-
-| success criteria 신호 | 출력 형식 |
-|-----------------------|----------|
-| "지시해줘", "프롬프트 만들어줘", "어떻게 써야 해" | **A. 실행 지시문** |
-| "저장해줘", "기억해줘", "노트해줘" | **B. KB 엔트리** |
-| "프로젝트 시작", "개발하고 싶어", "코드베이스 분석" | **C. 프로젝트 산출물** |
-
-자동 결정 후 반드시 1회 확인:
-> "출력 형식: **{결정된 형식명}** ({A/B/C})로 진행합니다. 변경하려면 A/B/C를 입력해주세요."
-
-- 사용자가 긍정 응답("네", "진행", Enter 등)이면 → 결정대로 진행
-- A/B/C 입력 시 → 해당 형식으로 변경
-
-신호가 테이블 어디에도 매칭되지 않으면 선택지 제시:
-> "출력 형식을 선택해주세요: (A) 실행 지시문  (B) KB 엔트리  (C) 프로젝트 산출물"
+> **Immutable rule**: Constraints and Decisions must not be deleted or condensed even under output budget pressure. These items were already guaranteed to be preserved in build Phase 5.
 
 ---
 
-## G6 게이트
+## Phase 6. Execution Instruction Generation
 
-compose 완료 후 AI가 자동 평가:
+**Purpose**: Automatically determine the output format based on the Phase 1 success criteria signal and generate the final output.
 
-| 기준 | 평가 |
-|------|------|
-| success criteria 일치 | 출력물이 Phase 1에서 정의한 결과물의 형태와 일치하는가 |
-| 누락 없음 | Phase 1 purpose/constraints가 출력에 모두 반영됐는가 |
-| 충돌 없음 | 출력 내 모순이 없는가 |
-| 추측 없음 | 근거 없는 주장이 포함되지 않았는가 |
+### Automatic Output Format Determination
 
-**G6 통과**: 완료 — 출력물 제시. `_phase1-result.md`가 존재하면 삭제.
+Read the signal from the Phase 1 success criteria answer and determine the format:
 
-**G6 실패**: Phase 7 자동 호출
+| success criteria signal | Output Format |
+|------------------------|---------------|
+| "지시해줘" (give me instructions), "프롬프트 만들어줘" (make me a prompt), "어떻게 써야 해" (how should I write it) | **A. Execution Instruction** |
+| "저장해줘" (save it), "기억해줘" (remember it), "노트해줘" (note it) | **B. KB Entry** |
+| "프로젝트 시작" (start a project), "개발하고 싶어" (I want to develop), "코드베이스 분석" (analyze codebase) | **C. Project Artifacts** |
+
+After automatic determination, confirm exactly once:
+> "Output format: **{decided format name}** ({A/B/C}). Enter A/B/C to change."
+
+- If the user responds affirmatively ("yes", "proceed", Enter, etc.) → proceed with the determined format
+- If A/B/C is entered → switch to that format
+
+If the signal does not match any row in the table, present choices:
+> "Please select output format: (A) Execution Instruction  (B) KB Entry  (C) Project Artifacts"
+
+---
+
+## G6 Gate
+
+After compose completes, the AI automatically evaluates:
+
+| Criteria | Evaluation |
+|----------|------------|
+| success criteria match | Does the output match the result form defined in Phase 1? |
+| No omissions | Are all Phase 1 purpose/constraints reflected in the output? |
+| No conflicts | Are there no contradictions within the output? |
+| No speculation | Does the output contain no unsupported claims? |
+
+**G6 Pass**: Complete — present the output. Delete `_phase1-result.md` if it exists.
+
+**G6 Fail**: Automatically invoke Phase 7
 ```
-G6 미충족: {기준} — {이유}
-verify를 실행하여 상세 검증을 진행합니다.
+G6 unmet: {criteria} — {reason}
+Running verify for detailed validation.
 ```
 
 ---
 
-> 각 형식의 상세 구조는 아래를 참조한다.
+> Refer to the sections below for the detailed structure of each format.
 
 ---
 
-### A. 실행 지시문 (System Prompt)
+### A. Execution Instruction (System Prompt)
 
-Role + Task + Constraints + Output Format 구조로 조립:
+Assemble using Role + Task + Constraints + Output Format structure:
 
 ```markdown
 ## Role
-{Phase 1 답변과 컨텍스트에서 추론한 AI의 역할}
+{AI role inferred from Phase 1 answers and context}
 
 ## Task
-{Phase 1 purpose — 해결하려는 문제를 구체적으로 서술}
+{Phase 1 purpose — describe the problem to be solved concretely}
 
 ## Constraints
-{Phase 5의 Constraints 항목 전체}
-{Phase 1 constraints에서 도출된 추가 제약}
+{All Constraints items from Phase 5}
+{Additional constraints derived from Phase 1 constraints}
 
 ## Output Format
-{Phase 1 success criteria에서 정의한 결과물의 형태}
+{Form of the result defined in Phase 1 success criteria}
 ```
 
-작성 원칙:
-- Role: 한 문장, 구체적인 전문 역할로 기술
-- Task: 모호함 없이 행동 가능한 수준으로 기술
-- Constraints: 목록 형태, 각 항목은 단독으로 이해 가능
-- Output Format: 형식·분량·구조를 명시
+Writing principles:
+- Role: One sentence, described as a specific expert role
+- Task: Described at an actionable level without ambiguity
+- Constraints: List form; each item understandable on its own
+- Output Format: Specify format, length, and structure
 
-### Tool Context (실행 지시문 전용)
+### Tool Context (Execution Instruction only)
 
-Phase 1 purpose에서 도구 사용이 필요한 작업이면 지시문에 `## Tools` 섹션을 추가한다:
+If the Phase 1 purpose requires tool usage, add a `## Tools` section to the instruction:
 
 ```markdown
 ## Tools
 
-| Tool | 용도 | 사용 예시 |
-|------|------|---------|
-| {tool name} | {이 작업에서의 용도} | {호출 예시 또는 패턴} |
+| Tool | Purpose | Usage Example |
+|------|---------|---------------|
+| {tool name} | {purpose for this task} | {call example or pattern} |
 ```
 
-MCP Tools (해당 시):
-- context7: 라이브러리 문서 조회 — `resolve-library-id` → `get-library-docs`
-- playwright: 웹 페이지 검증 — `browser_navigate` → `browser_snapshot`
+MCP Tools (if applicable):
+- context7: Library documentation lookup — `resolve-library-id` → `get-library-docs`
+- playwright: Web page verification — `browser_navigate` → `browser_snapshot`
 
-**포함 기준** (Phase 1 purpose 신호 기반):
-- "코드", "구현", "테스트" 신호 → Bash, Read, Write, Agent 포함
-- "문서", "라이브러리" 신호 → context7 MCP 포함
-- "웹", "브라우저", "UI" 신호 → playwright MCP 포함
-- 도구 필요 신호 없으면 → `## Tools` 섹션 생략
+**Inclusion criteria** (based on Phase 1 purpose signals):
+- "code", "implement", "test" signals → include Bash, Read, Write, Agent
+- "documentation", "library" signals → include context7 MCP
+- "web", "browser", "UI" signals → include playwright MCP
+- No tool-usage signal → omit `## Tools` section
 
-### 컨텍스트 유지 지시 (실행 지시문 전용)
+### Context Retention Instruction (Execution Instruction only)
 
-실행 지시문(A 형식)이 **3단계 이상** 작업을 지시하는 경우, 지시문 하단에 다음 블록을 추가한다:
+If the execution instruction (Format A) directs a task with **3 or more steps**, add the following block at the bottom of the instruction:
 
     ## Context Checkpoints
 
-    이 작업이 3단계 이상이면:
-    1. 각 주요 단계 완료 후 `_context-session.md`에 기록:
-       - 현재까지 완료한 것
-       - 발견한 핵심 사실
-       - 다음 단계에 필요한 정보
-    2. 다음 단계 시작 전 `_context-session.md`를 다시 읽는다
-    3. 모든 단계 완료 후 `_context-session.md`를 삭제한다
+    If this task has 3 or more steps:
+    1. After each major step completes, record in `_context-session.md`:
+       - What has been completed so far
+       - Key facts discovered
+       - Information needed for the next step
+    2. Before starting the next step, re-read `_context-session.md`
+    3. After all steps are complete, delete `_context-session.md`
 
-참조: [Context Session Template](../context-engineering/references/context-session-template.md)
+Reference: [Context Session Template](../context-engineering/references/context-session-template.md)
 
 ---
 
-### B. KB 엔트리
+### B. KB Entry
 
-표준 지식 엔트리 형식으로 저장:
+Save in standard knowledge entry format:
 
 ```markdown
 ---
@@ -184,63 +184,63 @@ related: []
 > {one-line summary}
 
 ## Key Facts
-{build 산출물의 Key Facts 항목}
+{Key Facts items from build artifacts}
 
 ## Constraints
-{build 산출물의 Constraints 항목}
+{Constraints items from build artifacts}
 
 ## Decisions
-{build 산출물의 Decisions 항목}
+{Decisions items from build artifacts}
 
 ## Notes
-{build 산출물의 Notes 항목}
+{Notes items from build artifacts}
 ```
 
-저장 경로: `{KNOWLEDGE_PATH}/{domain}/{slugified-title}.md`
+Save path: `{KNOWLEDGE_PATH}/{domain}/{slugified-title}.md`
 
-저장 후 `index.md` 업데이트:
-- 해당 domain 테이블에 행 추가
-- domain 섹션 없으면 알파벳 순서로 신규 섹션 생성
-- 헤더 카운트 재계산 (Total entries, Domains)
-- 날짜 내림차순 정렬 유지
+After saving, update `index.md`:
+- Add a row to the relevant domain table
+- If the domain section does not exist, create a new section in alphabetical order
+- Recalculate header counts (Total entries, Domains)
+- Maintain descending date sort order
 
-참조: [Entry Template](../context-engineering/references/entry-template.md) | [Index Template](../context-engineering/references/index-template.md)
+Reference: [Entry Template](../context-engineering/references/entry-template.md) | [Index Template](../context-engineering/references/index-template.md)
 
 ---
 
-### C. 프로젝트 산출물
+### C. Project Artifacts
 
-프로젝트 개발을 위한 3가지 문서를 생성:
+Generate three documents for project development:
 
-**CLAUDE.md** (AI 행동 정책 — Persistent System Prompt):
+**CLAUDE.md** (AI behavior policy — Persistent System Prompt):
 
 ```markdown
 # {PROJECT_NAME}
 
 This file provides guidance to Claude Code when working with code in this repository.
 
-> {한줄 프로젝트 설명}
+> {one-line project description}
 
 ## Architecture
-{Phase 4 Key Facts + Decisions 기반 아키텍처 설명}
-{레이어 구조 테이블}
+{Architecture description based on Phase 4 Key Facts + Decisions}
+{Layer structure table}
 
 ## Build & Test
-{빌드·테스트 명령어}
+{Build and test commands}
 
 ## Core Constraints
-{Phase 4 Constraints 항목 — 최대 5개, TC/BL 우선}
+{Phase 4 Constraints items — up to 5, TC/BL prioritized}
 
 ## Non-obvious Gotchas
-{Phase 4 Notes 중 놓치기 쉬운 함정}
+{Easy-to-miss pitfalls from Phase 4 Notes}
 
 ## References
 - [Knowledge Base]({OUTPUT_PATH}/knowledge-base.md)
 ```
 
-참조: [CLAUDE.md Template](../context-engineering/references/claude-md-policy-template.md) | [Knowledge Base Template](../context-engineering/references/knowledge-base-template.md)
+Reference: [CLAUDE.md Template](../context-engineering/references/claude-md-policy-template.md) | [Knowledge Base Template](../context-engineering/references/knowledge-base-template.md)
 
-**spec.md** (기술 명세):
+**spec.md** (Technical Specification):
 
 ```markdown
 # {PROJECT_NAME} Spec
@@ -249,7 +249,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 | Decision | Alternatives | Choice | Rationale |
 
 ## Package Structure
-{레이어별 패키지 구조}
+{Package structure by layer}
 
 ## Implementation Plan
 | # | Item | REQ | Depends | Done Criteria |
@@ -258,6 +258,6 @@ This file provides guidance to Claude Code when working with code in this reposi
 | REQ-ID | Feature | Implementation | Status |
 ```
 
-참조: [Spec Template](../context-engineering/references/spec-template.md)
+Reference: [Spec Template](../context-engineering/references/spec-template.md)
 
-**구현 계획**: 첫 번째 구현 항목을 즉시 시작할 수 있는 수준으로 기술.
+**Implementation Plan**: Describe the first implementation item at a level where work can begin immediately.

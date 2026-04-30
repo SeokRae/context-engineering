@@ -1,197 +1,197 @@
 ---
 name: verify
 description: >
-  Phase 7: 최종 holistic 검증. G6 실패 시 자동 호출되거나 수동으로 실행한다.
-  누락·충돌·추측·일관성을 점검하고 신뢰도를 표시한다. 산출물 수정 불가 — 검증 로그만 기록한다.
+  Phase 7: Final holistic verification. Automatically invoked on G6 failure, or run manually.
+  Checks for omissions, conflicts, speculation, and consistency, then reports confidence. Artifacts are not modified — only the verification log is recorded.
   Keywords: verification, holistic check, confidence, feedback loop, omission, conflict, speculation
 allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 # Verify (Phase 7)
 
-최종 검증 단계. compose 출력물이 Phase 1의 기준을 실제로 충족하는지 점검한다. 출력물은 수정하지 않고 검증 결과만 보고한다. 검증 로그(`_verify-log.md`)는 기록한다.
+Final Verification phase. Checks whether the compose output actually satisfies the Phase 1 criteria. Does not modify the output — only reports verification results. Records the verification log (`_verify-log.md`).
 
 ---
 
-## 전제조건
+## Prerequisites
 
-검증 대상 확인:
+Confirm what to verify:
 
 ```
-compose 출력물 (지시문 / KB 엔트리 / 프로젝트 산출물)
-Phase 1 분석 결과 (purpose / constraints / success criteria)
+compose output (execution instruction / KB entry / project artifacts)
+Phase 1 analysis results (purpose / constraints / success criteria)
 ```
 
-출력물이 없으면:
-> "먼저 `/context-engineering:compose`를 실행해주세요."
-종료.
+If no output exists:
+> "Please run `/context-engineering:compose` first."
+Stop.
 
 ---
 
-## 트리거
+## Trigger
 
-- **자동**: G6 미충족 시 compose가 자동 호출
-- **수동**: `/context-engineering:verify` 직접 실행 (기존 산출물 재검증)
-
----
-
-## Phase 7. 최종 검증
-
-**목적**: 4가지 기준으로 출력물을 점검하고 신뢰도를 표시한다.
-
-### 4가지 점검
-
-| 점검 항목 | 기준 |
-|---------|------|
-| **누락** | Phase 1 purpose/constraints가 출력물에 모두 반영됐는가? |
-| **충돌** | 출력물 내 모순이 없는가? |
-| **추측** | 수집된 소스에 근거하지 않은 주장이 없는가? `[source: general]` 태그 항목을 우선 검토한다. |
-| **일관성** | 출력 형식이 Phase 1 success criteria와 일치하는가? |
-
-### 점검 출력 형식
-
-```
-[Phase 7 검증 결과]
-
-누락: {반영된 항목 N개 / 미반영: {항목명} — {설명}}
-충돌: {없음 / {항목A} ↔ {항목B} — {설명}}
-추측: {없음 / {항목명} — 근거 소스 없음}
-일관성: {일치 / {불일치 내용} — Phase 1 success criteria: {원문}}
-
-[신뢰도: H/M/L]
-{신뢰도 설명}
-```
-
-### 신뢰도 기준
-
-| 등급 | 조건 | 의미 |
-|------|------|------|
-| **H** (High) | 3개 이상 소스, 충돌 없음, 추측 없음 | 출력물이 충분한 근거에 기반함 |
-| **M** (Medium) | 1-2개 소스 또는 경미한 갭 존재 | 합리적이나 추가 정보로 개선 가능 |
-| **L** (Low) | 소스 부족 또는 충돌 존재 | 일반 지식에 의존 — 검토 필요 |
-
-M 등급: "더 많은 정보를 gather하면 정확도를 높일 수 있습니다."
-L 등급: "⚠ 소스가 부족합니다. gather를 다시 실행하거나 추가 정보를 제공해주세요."
+- **Automatic**: compose auto-invokes when G6 is not met
+- **Manual**: run `/context-engineering:verify` directly (re-verify existing artifacts)
 
 ---
 
-## 피드백 루프
+## Phase 7. Final Verification
 
-문제 유형에 따라 해당 Phase로 복귀를 안내한다:
+**Purpose**: Check the output against 4 criteria and report confidence.
 
-| 문제 유형 | 복귀 Phase | 명령 |
-|---------|-----------|------|
-| 누락 — purpose/constraints 미반영 | Phase 1-2 | `/context-engineering:gather` |
-| 충돌 — Phase 3 선택 항목 간 모순 | Phase 3 | `/context-engineering:gather` (재선택) |
-| 충돌 — Phase 4 구조화 중 모순 | Phase 4 | `/context-engineering:build` 재실행 |
-| 추측 — 근거 소스 부족 | Phase 2 | `/context-engineering:gather` (소스 추가) |
-| 일관성 — 출력 형식 불일치 | Phase 6 | `/context-engineering:compose` 재실행 |
+### 4 Checks
 
-### 자동 복구 지원
+| Check | Criteria |
+|-------|----------|
+| **Omission** | Are all Phase 1 purpose/constraints reflected in the output? |
+| **Conflict** | Are there no contradictions within the output? |
+| **Speculation** | Are there no claims unsupported by collected sources? Review `[source: general]` tagged items first. |
+| **Consistency** | Does the output format match the Phase 1 success criteria? |
 
-피드백 루프에서 복귀 Phase가 결정되면 사용자에게 자동 실행을 제안한다:
+### Check Output Format
 
 ```
-[Phase 7 피드백]
-문제: {문제 유형} — {상세 설명}
-복귀 대상: Phase {N}
-권장 조치: {구체적 수정 내용}
+[Phase 7 Verification Result]
 
-자동으로 `{명령}`을 실행할까요? (Y/n)
+Omission: {N items reflected / Unreflected: {item name} — {description}}
+Conflict: {none / {itemA} ↔ {itemB} — {description}}
+Speculation: {none / {item name} — no source evidence}
+Consistency: {match / {mismatch detail} — Phase 1 success criteria: {original text}}
+
+[Confidence: H/M/L]
+{confidence description}
 ```
 
-- 사용자가 "Y", "네", "진행" 또는 무응답이면 → 해당 명령을 자동 실행
-- 사용자가 "n", "아니오"이면 → 명령만 안내하고 종료
-- 자동 실행 시 **문제 컨텍스트를 함께 전달**:
-  - 실패한 점검 항목
-  - 구체적 미충족 내용
-  - 이전 시도에서 부족했던 점
+### Confidence Criteria
 
-> 컨텍스트 없이 복귀하면 해당 Phase가 동일한 실수를 반복할 수 있다.
+| Level | Condition | Meaning |
+|-------|-----------|---------|
+| **H** (High) | 3+ sources, no conflicts, no speculation | Output is grounded in sufficient evidence |
+| **M** (Medium) | 1-2 sources or minor gaps present | Reasonable but can be improved with additional information |
+| **L** (Low) | Insufficient sources or conflicts present | Relies on general knowledge — review required |
 
-모든 기준 충족 시:
-```
-검증 완료. [신뢰도: H] 출력물을 사용할 준비가 됐습니다.
-```
+M level: "Gathering more information can improve accuracy."
+L level: "⚠ Sources are insufficient. Re-run gather or provide additional information."
 
 ---
 
-## G7 게이트
+## Feedback Loop
 
-다음 기준을 AI가 자동 평가:
+Guide the return to the appropriate Phase based on the issue type:
 
-| 기준 | 평가 |
-|------|------|
-| 신뢰도 결정 | H/M/L 중 하나가 명확히 산출됐는가 |
-| 피드백 루프 완료 | 문제 유형별 복귀 안내가 제시됐거나 "모든 기준 충족"으로 결론됐는가 |
-| 자가 채점 완료 | 루브릭 점수(0-100)가 산출됐는가 |
-| 로그 기록 | `_verify-log.md`에 결과가 기록됐는가 |
+| Issue Type | Return Phase | Command |
+|------------|--------------|---------|
+| Omission — purpose/constraints not reflected | Phase 1-2 | `/context-engineering:gather` |
+| Conflict — contradiction between Phase 3 selected items | Phase 3 | `/context-engineering:gather` (re-select) |
+| Conflict — contradiction during Phase 4 structuring | Phase 4 | `/context-engineering:build` re-run |
+| Speculation — insufficient source evidence | Phase 2 | `/context-engineering:gather` (add sources) |
+| Consistency — output format mismatch | Phase 6 | `/context-engineering:compose` re-run |
 
-**G7 통과**: 검증 완료 — 출력물 사용 가능. `_phase1-result.md`가 존재하면 삭제.
+### Automatic Recovery Support
 
-**G7 실패**: 피드백 루프에 따라 해당 Phase 복귀
+Once the return Phase is determined in the feedback loop, propose automatic execution to the user:
+
 ```
-Phase 7 결과: {검증 요약}
-미충족 항목: {점검 항목} — {이유}
-권장 조치: {구체적 수정 방향}
-자동으로 `{명령}`을 실행할까요? (Y/n)
+[Phase 7 Feedback]
+Issue: {issue type} — {detailed description}
+Return target: Phase {N}
+Recommended action: {specific correction}
+
+Run `{command}` automatically? (Y/n)
+```
+
+- If the user responds "Y", "네" (yes), "진행" (proceed), or no response → automatically run the command
+- If the user responds "n", "아니오" → provide the command only and stop
+- When running automatically, **pass the issue context along**:
+  - Failed check items
+  - Specific unmet content
+  - What was lacking in the previous attempt
+
+> Returning without context risks the target Phase repeating the same mistake.
+
+When all criteria are met:
+```
+Verification complete. [Confidence: H] The output is ready to use.
 ```
 
 ---
 
-## 검증 결과 저장
+## G7 Gate
 
-검증 실행 시 결과를 `_verify-log.md`에 append한다:
+AI auto-evaluates the following criteria:
 
-    ### {YYYY-MM-DD HH:mm} — {출력 형식: A/B/C}
+| Criteria | Evaluation |
+|----------|------------|
+| Confidence determined | Is one of H/M/L clearly assigned? |
+| Feedback Loop complete | Was return guidance given per issue type, or was "all criteria met" concluded? |
+| Self-scoring rubric complete | Was a rubric score (0-100) produced? |
+| Log recorded | Was the result recorded in `_verify-log.md`? |
 
-    | 점검 | 결과 | 상세 |
-    |------|------|------|
-    | 누락 | Pass/Fail | {내용} |
-    | 충돌 | Pass/Fail | {내용} |
-    | 추측 | Pass/Fail | {내용} |
-    | 일관성 | Pass/Fail | {내용} |
+**G7 Pass**: Verification complete — output is ready to use. Delete `_phase1-result.md` if it exists.
 
-    신뢰도: {H/M/L}
-    조치: {없음 / 피드백 루프 → Phase N}
-
-### 이전 결과 비교
-
-`_verify-log.md`가 이미 존재하면:
-1. 이전 검증 결과를 읽는다
-2. 동일 점검 항목의 Pass/Fail 변화를 비교한다
-3. 반복 실패 패턴이 있으면 명시:
-
-    [반복 실패 패턴]
-    {점검 항목}이 최근 {N}회 연속 Fail — 추정 원인: {원인}
-    권장 조치: {구체적 Phase 복귀 안내}
-
-> 관련: [서킷 브레이커 프로토콜](../context-engineering/references/failure-cases.md) — 동일 gate ~3회 연속 실패 시 사용자 선택지 제시.
+**G7 Failure**: Return to the appropriate Phase per feedback loop
+```
+Phase 7 result: {verification summary}
+Unmet items: {check item} — {reason}
+Recommended action: {specific correction direction}
+Run `{command}` automatically? (Y/n)
+```
 
 ---
 
-## 자가 채점 루브릭
+## Saving Verification Results
 
-검증 완료 후 아래 루브릭으로 전체 점수를 산출한다:
+On each verification run, append the result to `_verify-log.md`:
 
-| 기준 | 배점 | 채점 |
-|------|------|------|
-| Phase 1 purpose 반영도 | 30 | {0-30} |
-| 소스 근거 충분성 | 25 | {0-25} |
-| 내부 일관성 | 25 | {0-25} |
-| 출력 형식 적합성 | 20 | {0-20} |
-| **합계** | **100** | **{총점}** |
+    ### {YYYY-MM-DD HH:mm} — {output format: A/B/C}
 
-점수 해석: 80+ = H, 50-79 = M, 49- = L
+    | Check | Result | Detail |
+    |-------|--------|--------|
+    | Omission | Pass/Fail | {content} |
+    | Conflict | Pass/Fail | {content} |
+    | Speculation | Pass/Fail | {content} |
+    | Consistency | Pass/Fail | {content} |
+
+    Confidence: {H/M/L}
+    Action: {none / feedback loop → Phase N}
+
+### Comparing Previous Results
+
+If `_verify-log.md` already exists:
+1. Read the previous verification results
+2. Compare Pass/Fail changes for the same check items
+3. If a repeated failure pattern is found, state it explicitly:
+
+    [Repeated Failure Pattern]
+    {check item} has failed {N} consecutive times — estimated cause: {cause}
+    Recommended action: {specific Phase return guidance}
+
+> Related: [Circuit Breaker Protocol](../context-engineering/references/failure-cases.md) — present user options when the same gate fails ~3 times consecutively.
 
 ---
 
-## 메모리 정리 (수동 실행)
+## Self-scoring Rubric
 
-`/context-engineering:verify --consolidate`로 수동 실행하면 KB를 점검한다:
+After verification, calculate the overall score using the rubric below:
 
-1. **중복 탐지**: 같은 domain 내 `tags`가 70% 이상 겹치는 엔트리 → Merge 제안
-2. **진부화 탐지**: `date`가 90일 이상 지난 엔트리 → 재검증 또는 archive 제안
-3. **고아 탐지**: 다른 엔트리의 `related`에서 참조되지 않는 엔트리 → 연결 제안
+| Criteria | Points | Score |
+|----------|--------|-------|
+| Phase 1 purpose coverage | 30 | {0-30} |
+| Source evidence sufficiency | 25 | {0-25} |
+| Internal consistency | 25 | {0-25} |
+| Output format appropriateness | 20 | {0-20} |
+| **Total** | **100** | **{total}** |
 
-결과를 사용자에게 보고만 한다. 실제 삭제/수정은 사용자 승인 후 진행.
+Score interpretation: 80+ = H, 50-79 = M, 49- = L
+
+---
+
+## Memory Consolidation (Manual Run)
+
+Running `/context-engineering:verify --consolidate` manually inspects the KB:
+
+1. **Duplicate detection**: Entries within the same domain with 70%+ overlapping `tags` → Suggest merge
+2. **Staleness detection**: Entries with `date` older than 90 days → Suggest re-verification or archive
+3. **Orphan detection**: Entries not referenced in any other entry's `related` → Suggest linking
+
+Report results to the user only. Actual deletion/modification proceeds after user approval.

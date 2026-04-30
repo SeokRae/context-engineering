@@ -20,7 +20,6 @@ Dependency direction: `entry -> application -> domain <- infrastructure` (revers
 {layer}: {folder path}  ← {responsibility}
 ```
 
-> Principles, layer definitions, language-specific folder names → [references/architecture-principles.md](references/architecture-principles.md)
 
 ---
 

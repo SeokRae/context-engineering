@@ -24,8 +24,8 @@ This is a template for generating knowledge base entries. **Everything below the
 - `reliability`: Confidence level — choose one: `high` (verified), `medium` (assumed), `low` (experimental)
 - `tags`: Searchable keywords (array)
 - `related`: Links to other entries in the KB (array of relative paths, e.g., `["domain/entry-name", "domain/another-entry"]`)
-  - gather Phase 2에서 이 필드를 따라가며 관련 엔트리를 자동 수집한다.
-  - 가능하면 2개 이상 연결할 것.
+  - gather Phase 2 follows this field to automatically collect related entries.
+  - Link at least 2 entries when possible.
 
 **When to split entries:**
 - If an entry grows beyond 80 lines, split it into multiple focused entries
