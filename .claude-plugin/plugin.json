@@ -1,7 +1,7 @@
 {
   "name": "context-engineering",
   "version": "3.1.0",
-  "description": "7-Phase Context Engineering plugin: 단일 파이프라인으로 AI 컨텍스트를 수집·선택·구조화·압축·생성·검증한다.",
+  "description": "7-Phase Context Engineering plugin: a single pipeline to collect, select, structure, compress, generate, and verify AI context.",
   "author": {
     "name": "SeokRae",
     "email": "kslbsh@gmail.com"

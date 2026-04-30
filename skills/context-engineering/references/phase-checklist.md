@@ -1,102 +1,102 @@
-# Context Engineering 7-Phase 체크리스트
+# Context Engineering 7-Phase Checklist
 
-프로젝트 시작 시 복사하여 사용한다.
+Copy and use at the start of a project.
 
 ---
 
-## 프로젝트 정보
+## Project Info
 
-- **프로젝트**: 
-- **실행 날짜**: 
-- **목적**: 
+- **Project**: 
+- **Date**: 
+- **Purpose**: 
 
 ---
 
 ## gather (Phase 1-3)
 
-### Phase 1. 문제 정의
+### Phase 1. Problem Definition
 
-- [ ] 질문 1 완료: purpose (해결하려는 문제)
-- [ ] 질문 2 완료: constraints (필요한 배경 정보)
-- [ ] 질문 3 완료: success criteria (결과물 형태)
-- [ ] Scope Reduction 완료: 세션 범위 선언 블록 생성 (최소 문제 / Must-have / Nice-to-have / 제외)
-- [ ] Role 자동 추론 완료
-- [ ] G1 통과: purpose / constraints / success criteria / scope 모두 명확
+- [ ] Question 1 complete: purpose (problem to solve)
+- [ ] Question 2 complete: constraints (required background information)
+- [ ] Question 3 complete: success criteria (form of the output)
+- [ ] Scope Reduction complete: Session Scope Declaration block created (minimum problem / Must-have / Nice-to-have / Excluded)
+- [ ] Role auto-inferred
+- [ ] G1 passed: purpose / constraints / success criteria / scope all clear
 
-### Phase 2. 컨텍스트 후보 수집
+### Phase 2. Context Candidate Collection
 
-- [ ] Phase 1 신호 기반 소스 결정
-- [ ] KB 존재 여부 확인 (미존재 시 KB 검색 건너뜀)
-- [ ] 결정된 소스에서 후보 수집 완료
-- [ ] G2 통과: 필요한 소스 모두 수집, 명백한 누락 없음
+- [ ] Sources determined based on Phase 1 signals
+- [ ] KB existence checked (skip KB search if not present)
+- [ ] Candidate collection from determined sources complete
+- [ ] G2 passed: all required sources collected, no obvious Omissions
 
-### Phase 3. 컨텍스트 선택
+### Phase 3. Context Selection
 
-- [ ] 관련성 / 최신성 / 신뢰성 기준 적용
-- [ ] Keep / Skip / Merge 분류 완료
-- [ ] G3 통과: 기준 일관 적용, Skip 이유 명확
+- [ ] Relevance / Recency / Reliability criteria applied
+- [ ] Keep / Skip / Merge classification complete
+- [ ] G3 passed: criteria applied consistently, Skip reasons clear
 
 ---
 
 ## build (Phase 4-5)
 
-### Phase 4. 컨텍스트 구조화
+### Phase 4. Context Structuring
 
-- [ ] `_phase1-result.md` 존재 확인 (대화 컨텍스트에 없을 시 파일에서 복원)
-- [ ] Key Facts 섹션 작성
-- [ ] Constraints 섹션 작성
-- [ ] Decisions 섹션 작성
-- [ ] Notes 섹션 작성 (해당 시)
-- [ ] 모든 항목에 `[source: ...]` 태그 부착
-- [ ] 빈 섹션 제거
-- [ ] G4 통과: 모호한 항목 없음, 섹션 간 중복 없음, 출처 태그 부착
+- [ ] `_phase1-result.md` existence confirmed (restore from file if not in conversation context)
+- [ ] Key Facts section written
+- [ ] Constraints section written
+- [ ] Decisions section written
+- [ ] Notes section written (if applicable)
+- [ ] `[source: ...]` tag attached to all items
+- [ ] Empty sections removed
+- [ ] G4 passed: no ambiguous items, no cross-section duplicates, source tags attached
 
-### Phase 5. 컨텍스트 압축
+### Phase 5. Context Compression
 
-- [ ] 중복 항목 제거
-- [ ] 접선 정보 한 줄 요약으로 대체
-- [ ] Constraints / Decisions 원문 유지 확인
-- [ ] G5 통과: Constraints / Decisions 보존 + 예산 준수 + 과압축 방지
+- [ ] Duplicate items removed
+- [ ] Tangential information replaced with one-line summaries
+- [ ] Constraints / Decisions original text preserved
+- [ ] G5 passed: Constraints / Decisions preserved + budget met + over-compression avoided
 
 ---
 
 ## compose (Phase 6)
 
-### Phase 6. 실행 지시 생성
+### Phase 6. Execution Instruction Generation
 
-- [ ] `_phase1-result.md` 존재 확인 (대화 컨텍스트에 없을 시 파일에서 복원)
-- [ ] Phase 1 success criteria 신호 재확인
-- [ ] 출력 형식 결정 (지시문 / KB 엔트리 / 프로젝트 산출물)
-- [ ] 출력 형식 자동 결정 후 사용자 확인 완료
-- [ ] 출력물 생성 완료
-- [ ] G6 통과: success criteria 일치, 누락·충돌·추측 없음
+- [ ] `_phase1-result.md` existence confirmed (restore from file if not in conversation context)
+- [ ] Phase 1 success criteria signal re-confirmed
+- [ ] Output format determined (instruction / KB entry / project Artifacts)
+- [ ] Output format auto-determined and user confirmation complete
+- [ ] Output generated
+- [ ] G6 passed: success criteria matched, no Omissions / Conflicts / Speculation
 
-**출력 형식**: ☐ 지시문  ☐ KB 엔트리  ☐ 프로젝트 산출물
-
----
-
-## verify (Phase 7) — G6 실패 시 또는 수동 실행
-
-### Phase 7. 최종 검증
-
-- [ ] 누락 점검: Phase 1 purpose/constraints 반영 여부
-- [ ] 충돌 점검: 출력물 내 모순 없음
-- [ ] 추측 점검: 근거 없는 주장 없음
-- [ ] 일관성 점검: 출력 형식과 success criteria 일치
-- [ ] 신뢰도 표시: H / M / L
-- [ ] 피드백 루프 필요 시 해당 Phase 복귀
-- [ ] 복귀 필요 시 자동 실행 제안 완료 (문제 컨텍스트 포함)
+**Output format**: ☐ Instruction  ☐ KB entry  ☐ Project Artifacts
 
 ---
 
-## 자가 점검 기준
+## verify (Phase 7) — on G6 failure or manual run
 
-| Phase | 핵심 기준 |
-|-------|---------|
-| G1 | purpose / constraints / success criteria 3개 모두 명확 + 세션 범위 선언 블록 생성 |
-| G2 | 필요한 소스 모두 수집, 명백한 누락 없음 |
-| G3 | 관련성·최신성·신뢰성 일관 적용, Skip 이유 명확 |
-| G4 | 모호한 항목 없음, 섹션 간 중복 없음, 출처 태그 부착 |
-| G5 | Constraints / Decisions 보존, 예산 준수, 과압축 방지 |
-| G6 | success criteria 일치, 누락·충돌·추측 없음 |
-| G7 | 신뢰도 H/M/L 표시, 피드백 루프 완료 |
+### Phase 7. Final Verification
+
+- [ ] Omission check: Phase 1 purpose/constraints reflected
+- [ ] Conflict check: no contradictions in output
+- [ ] Speculation check: no unsupported claims
+- [ ] Consistency check: output format matches success criteria
+- [ ] Confidence rating: H / M / L
+- [ ] Return to relevant Phase if feedback loop needed
+- [ ] Auto-run suggestion complete when return needed (with problem context)
+
+---
+
+## Self-Check Criteria
+
+| Phase | Key Criteria |
+|-------|-------------|
+| G1 | All three of purpose / constraints / success criteria clear + Session Scope Declaration block created |
+| G2 | All required sources collected, no obvious Omissions |
+| G3 | Relevance / Recency / Reliability applied consistently, Skip reasons clear |
+| G4 | No ambiguous items, no cross-section duplicates, source tags attached |
+| G5 | Constraints / Decisions preserved, budget met, over-compression avoided |
+| G6 | success criteria matched, no Omissions / Conflicts / Speculation |
+| G7 | Confidence H/M/L rated, feedback loop complete |

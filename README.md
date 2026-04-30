@@ -184,7 +184,6 @@ Phase artifact templates are in `skills/context-engineering/references/`:
 | [`knowledge-base-template.md`](skills/context-engineering/references/knowledge-base-template.md) | 6-C | KB artifact template (Format C output) |
 | [`claude-md-policy-template.md`](skills/context-engineering/references/claude-md-policy-template.md) | 6-C | CLAUDE.md template (Format C output) |
 | [`spec-template.md`](skills/context-engineering/references/spec-template.md) | 6-C | Architecture decisions + package structure (Format C output) |
-| [`architecture-principles.md`](skills/context-engineering/references/architecture-principles.md) | — | Hexagonal + DDD principles (optional, for complex services) |
 | [`entry-template.md`](skills/context-engineering/references/entry-template.md) | 6-B | KB entry format (frontmatter + body) |
 | [`index-template.md`](skills/context-engineering/references/index-template.md) | 6-B | KB index format |
 | [`context-session-template.md`](skills/context-engineering/references/context-session-template.md) | 6-A | Multi-step task scratch file (deleted after use) |

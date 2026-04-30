@@ -1,163 +1,163 @@
 ---
 name: build
 description: >
-  Phase 4-5: 선택된 컨텍스트를 구조화하고 압축한다.
-  gather 산출물을 받아 모델이 읽기 좋은 형태로 정리하고, 핵심만 남긴다.
+  Phase 4-5: Structures and compresses the selected context.
+  Receives gather Artifacts and organizes them into a model-readable form, retaining only the essentials.
   Keywords: context structuring, compression, key facts, constraints, decisions
 allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 # Build (Phase 4-5)
 
-컨텍스트를 구조화하고 압축하는 단계. gather가 선택한 컨텍스트를 받아 모델이 읽기 좋은 형태로 정리한 후 핵심만 남긴다.
+The stage for Context Structuring and Context Compression. Receives the context selected by gather, organizes it into a model-readable form, and retains only the essentials.
 
 ---
 
-## 전제조건
+## Prerequisites
 
-실행 전 gather 산출물 확인:
+Before running, verify gather Artifacts:
 
 ```
-Phase 1 분석 결과 (purpose / constraints / success criteria / Role / scope-declaration)
-Phase 3 선택 결과 (Keep 항목 목록)
+Phase 1 analysis result (purpose / constraints / success criteria / Role / scope-declaration)
+Phase 3 selection result (list of Keep items)
 ```
 
-확인 순서:
-1. 대화 컨텍스트에 위 산출물이 존재하는가 → 있으면 사용
-2. 없으면 `_phase1-result.md` 파일 존재 여부를 확인 → 있으면 읽어서 Phase 1 결과 복원
-3. Phase 1 결과는 복원됐지만 Phase 3 선택 결과(Keep 항목)가 없으면:
-   > "먼저 `/context-engineering:gather`를 실행해주세요. (Phase 3 선택 결과가 필요합니다)"
-   종료.
-4. 둘 다 없으면:
-   > "먼저 `/context-engineering:gather`를 실행해주세요."
-   종료.
+Verification order:
+1. Do the above Artifacts exist in the conversation context? → Use them if present
+2. If not, check whether the `_phase1-result.md` file exists → If present, read it to restore the Phase 1 result
+3. If the Phase 1 result has been restored but the Phase 3 selection result (Keep items) is missing:
+   > "Please run `/context-engineering:gather` first. (Phase 3 selection result is required)"
+   Stop.
+4. If both are missing:
+   > "Please run `/context-engineering:gather` first."
+   Stop.
 
 ---
 
-## Phase 4. 컨텍스트 구조화
+## Phase 4. Context Structuring
 
-**목적**: 선택된 컨텍스트를 모델이 읽기 좋은 섹션 구조로 정리한다.
+**Purpose**: Organize the selected context into a section structure that is easy for the model to read.
 
-### 구조
+### Structure
 
 ```markdown
 ## Key Facts
-- {핵심 사실} [source: {소스명}]
+- {key fact} [source: {source name}]
 
 ## Constraints
-- {제약 조건} [source: {소스명}]
+- {constraint} [source: {source name}]
 
 ## Decisions
-- {결정사항 및 근거} [source: {소스명}]
+- {decision and rationale} [source: {source name}]
 
 ## Notes
-- {보조 정보} [source: {소스명}]
+- {supplementary information} [source: {source name}]
 ```
 
-`[source: ...]` 태그 규칙:
-- 소스명은 Phase 2에서 수집한 소스의 식별자 (파일명, URL, "user", "KB:{entry-title}")
-- 여러 소스에서 도출된 항목: `[source: file.md, user]`
-- 일반 지식에서 도출된 항목: `[source: general]`
-- Phase 7 추측 점검 시 `[source: general]` 항목을 우선 검토 대상으로 삼는다
+`[source: ...]` tag rules:
+- The source name is the identifier of the source collected in Phase 2 (filename, URL, "user", "KB:{entry-title}")
+- Items derived from multiple sources: `[source: file.md, user]`
+- Items derived from general knowledge: `[source: general]`
+- During Phase 7 speculation checks, `[source: general]` items are treated as primary review targets
 
-### 구조화 규칙
+### Structuring Rules
 
-- 각 항목은 하나의 사실/제약/결정을 표현
-- 빈 섹션은 완전히 생략
-- 항목 간 중복 없음 — 같은 내용이 두 섹션에 등장하면 더 적합한 섹션으로 통합
-- Key Facts는 Phase 1 purpose와 직접 관련된 것만 포함
-- 모든 항목에 `[source: ...]` 태그를 부착 — Phase 7 추측 검증의 근거가 된다
+- Each item expresses a single fact / constraint / decision
+- Empty sections are omitted entirely
+- No Omission between items — if the same content appears in two sections, consolidate it into the more appropriate section
+- Key Facts includes only items directly related to the Phase 1 purpose
+- Attach `[source: ...]` tags to all items — they serve as the basis for Phase 7 speculation verification
 
-### G4 게이트
+### G4 Gate
 
-다음 기준을 AI가 자동 평가:
+The AI automatically evaluates the following criteria:
 
-| 기준 | 평가 |
-|------|------|
-| 모호한 항목 없음 | 각 항목이 명확한 하나의 사실/제약/결정을 표현하는가 |
-| 섹션 간 중복 없음 | 동일 내용이 두 섹션에 존재하지 않는가 |
-| Purpose 반영 | Key Facts가 Phase 1 purpose와 연결되는가 |
-| 출처 태그 부착 | 모든 항목에 `[source: ...]` 태그가 있는가 |
+| Criterion | Evaluation |
+|-----------|------------|
+| No ambiguous items | Does each item express a single clear fact / constraint / decision? |
+| No Conflict between sections | Does the same content not exist in two sections? |
+| Purpose reflected | Do Key Facts connect to the Phase 1 purpose? |
+| Source tags attached | Do all items have a `[source: ...]` tag? |
 
-**자동 통과**: 기준 명확히 충족 → Phase 5로 진행
+**Auto-pass**: Criteria clearly met → proceed to Phase 5
 
-**사용자 확인** (모호하거나 미충족 시):
+**User confirmation** (when ambiguous or unmet):
 ```
-Phase 4 결과:
-  미충족 항목: {항목명} — {이유}
-  수정하거나 승인 후 진행해주세요.
-```
-
----
-
-## Phase 5. 컨텍스트 압축
-
-**목적**: 핵심 사실·제약·결정사항만 남기고 불필요한 부분을 제거한다.
-
-### 토큰 예산 추정
-
-압축 전 컨텍스트 크기를 측정한다:
-
-1. **측정**: Keep 항목들의 총 단어 수를 `wc -w`로 추정
-2. **예산 결정**:
-
-   | 작업 규모 | 단어 수 기준 | 목표 압축률 |
-   |---------|-----------|----------|
-   | 소형 (단일 파일/질문) | < 500 단어 | 압축 불필요 |
-   | 중형 (모듈/기능 단위) | 500-2,000 단어 | 50% 이하로 |
-   | 대형 (프로젝트 전체) | 2,000+ 단어 | 30% 이하로 |
-
-3. **초과 시 전략**: Notes 섹션부터 요약 → Key Facts 축약 → 최후에 Constraints 축약
-
-### 예산 예시 시나리오
-
-| 시나리오 | 입력 | 목표 | 압축 후 | 주요 방법 |
-|---------|------|------|--------|---------|
-| 단일 API 질문 | 300단어 | — | 300단어 | 압축 불필요 |
-| 모듈 리팩토링 | 1,200단어 | ≤50% | ~550단어 | Notes 요약 + 중복 제거 |
-| 프로젝트 전체 분석 | 4,000단어 | ≤30% | ~1,100단어 | Notes 제거 + Key Facts 축약 |
-
-### 점진적 로딩
-
-소스가 대형(2,000+ 단어)인 경우:
-- 전문을 한 번에 읽지 않는다
-- 먼저 파일 목록 / 목차 / 헤더만 스캔
-- Phase 1 purpose와 관련된 섹션만 선택적으로 읽기
-- 읽은 섹션의 경로와 라인 범위를 기록
-
-### 압축 규칙
-
-- **중복 제거**: 같은 의미의 항목이 여러 번 등장하면 하나로 합침
-- **접선 정보 요약**: Phase 1 purpose와 간접적으로 관련된 내용 → 한 줄 요약으로 대체
-- **핵심 유지**: Constraints / Decisions 항목은 원문 유지 — 이 항목들은 압축 대상이 아님
-- **Key Facts 우선**: purpose와 직접 관련된 사실은 원문 유지
-
-### G5 게이트
-
-다음 기준을 AI가 자동 평가:
-
-| 기준 | 평가 |
-|------|------|
-| Constraints 보존 | 압축 후에도 제약 조건이 모두 살아있는가 |
-| Decisions 보존 | 결정사항과 근거가 손실 없이 유지되는가 |
-| 과압축 방지 | Phase 1 purpose 달성에 필요한 정보가 제거되지 않았는가 |
-| 예산 준수 | 압축 후 단어 수가 목표 예산 이내인가 |
-
-**자동 통과**: 기준 명확히 충족 → compose로 전달
-
-**사용자 확인** (모호하거나 미충족 시):
-```
-Phase 5 결과:
-  미충족 항목: {항목명} — {이유}
-  수정하거나 승인 후 진행해주세요.
+Phase 4 result: {summary}
+  Unmet items: {item name} — {reason}
+  Please revise or approve to continue.
 ```
 
 ---
 
-## 완료 후
+## Phase 5. Context Compression
 
-build 산출물 (구조화·압축된 컨텍스트 블록)을 가지고 다음 단계로:
+**Purpose**: Remove unnecessary parts, retaining only essential facts, Constraints, and Decisions.
+
+### Token Budget Estimation
+
+Measure the context size before compression:
+
+1. **Measure**: Estimate the total word count of Keep items using `wc -w`
+2. **Budget decision**:
+
+   | Task scale | Word count basis | Target compression ratio |
+   |------------|-----------------|--------------------------|
+   | Small (single file / question) | < 500 words | No compression needed |
+   | Medium (module / feature unit) | 500–2,000 words | Compress to 50% or less |
+   | Large (entire project) | 2,000+ words | Compress to 30% or less |
+
+3. **Strategy when over budget**: Summarize Notes section first → condense Key Facts → condense Constraints last
+
+### Budget Example Scenarios
+
+| Scenario | Input | Target | After compression | Main method |
+|----------|-------|--------|-------------------|-------------|
+| Single API question | 300 words | — | 300 words | No compression needed |
+| Module refactoring | 1,200 words | ≤50% | ~550 words | Summarize Notes + remove duplicates |
+| Full project analysis | 4,000 words | ≤30% | ~1,100 words | Remove Notes + condense Key Facts |
+
+### Incremental Loading
+
+When a source is large (2,000+ words):
+- Do not read the full text at once
+- First scan only the file list / table of contents / headers
+- Selectively read only the sections relevant to the Phase 1 purpose
+- Record the path and line range of each section read
+
+### Compression Rules
+
+- **Remove duplicates**: If items with the same meaning appear multiple times, merge them into one
+- **Summarize Tangential information**: Content indirectly related to the Phase 1 purpose → replace with a one-line summary
+- **Preserve essentials**: Constraints / Decisions items retain original text — these are not subject to compression
+- **Key Facts priority**: Facts directly related to the purpose retain original text
+
+### G5 Gate
+
+The AI automatically evaluates the following criteria:
+
+| Criterion | Evaluation |
+|-----------|------------|
+| Constraints preserved | Are all Constraints still present after compression? |
+| Decisions preserved | Are Decisions and their rationale retained without loss? |
+| Over-compression prevention | Has information needed to achieve the Phase 1 purpose not been removed? |
+| Budget met | Is the post-compression word count within the target budget? |
+
+**Auto-pass**: Criteria clearly met → pass to compose
+
+**User confirmation** (when ambiguous or unmet):
+```
+Phase 5 result: {summary}
+  Unmet items: {item name} — {reason}
+  Please revise or approve to continue.
+```
+
+---
+
+## After Completion
+
+Take the build Artifacts (structured and compressed context block) and proceed to the next stage:
 
 ```
-/context-engineering:compose   — Phase 6 실행 지시 생성
+/context-engineering:compose   — Run Phase 6 execution instruction generation
 ```

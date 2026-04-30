@@ -1,97 +1,97 @@
 # Failure Cases & Recovery
 
-> 파이프라인 수준의 실패 시나리오와 대응 프로토콜. 아래 임계값은 강제 규칙이 아닌 권장 가이드라인이다.
+> Pipeline-level failure scenarios and response protocols. The thresholds below are recommended guidelines, not hard rules.
 
-## 1. 컨텍스트 윈도우 오버플로우
+## 1. Context Window Overflow
 
-**증상**: Phase 5 압축 후에도 목표 예산 초과
-**원인**: Phase 2에서 소스 과다 수집 또는 Phase 3 Keep 항목 과다
-**대응**:
-1. Phase 3으로 복귀 — Keep 기준을 "관련됨"에서 "필수"로 상향
-2. Phase 5 초과 전략 강화: Notes 섹션 전체 제거 → Key Facts를 한 줄 요약으로 대체
-3. 그래도 초과 시: 신뢰도(reliability)가 가장 낮은 Keep 항목부터 Skip으로 전환
+**Symptom**: Target budget exceeded even after Phase 5 compression
+**Cause**: Too many sources collected in Phase 2, or too many Keep items in Phase 3
+**Response**:
+1. Return to Phase 3 — raise Keep criteria from "relevant" to "essential"
+2. Strengthen Phase 5 overflow strategy: remove the entire Notes section → replace Key Facts with one-line summaries
+3. If still over budget: convert Keep items with the lowest Reliability to Skip, starting from the lowest
 
-## 2. Keep 항목 간 충돌
+## 2. Conflict Between Keep Items
 
-**증상**: Phase 4 구조화 중 Keep 항목 A와 B가 서로 모순
-**원인**: 서로 다른 시점/소스의 정보가 모두 Keep됨
-**대응**:
-1. 두 항목의 source와 date를 비교
-2. 최신(date 기준) + 높은 신뢰도(reliability) 항목을 우선
-3. 동등하면 사용자에게 1회 질문: "{항목A} vs {항목B} — 어느 것이 현재 유효한가요?"
-4. 해결 결과를 Decisions 섹션에 기록: "충돌 해결: {A} 선택, {B} 폐기, 근거: {이유}"
+**Symptom**: Keep items A and B contradict each other during Phase 4 structuring
+**Cause**: Information from different points in time or different sources both retained as Keep
+**Response**:
+1. Compare the source and date of both items
+2. Prioritize the item with the most recent date and highest Reliability
+3. If equal, ask the user once: "{itemA} vs {itemB} — which one is currently valid?"
+4. Record the resolution in the Decisions section: "Conflict resolved: {A} selected, {B} discarded, reason: {reason}"
 
-## 3. 파이프라인 포기 권장 기준
+## 3. Pipeline Abandonment Criteria
 
-다음 신호가 누적되면 중단을 고려한다:
+Consider stopping when the following signals accumulate:
 
-| 신호 | 권장 임계값 | 대응 |
-|------|-----------|------|
-| Phase 1 purpose 반복 수정 | ~3회 | "문제를 더 작게 분해하는 것을 권장합니다. 핵심 하나만 골라주세요." |
-| Phase 7 연속 L 등급 | ~2회 | "소스를 추가하거나 문제 범위를 축소한 후 재시도를 권장합니다." |
-| Gate 실패 누적 | ~5회 | "직접 작업이 더 효율적일 수 있습니다. 파이프라인을 중단하시겠습니까?" |
+| Signal | Recommended Threshold | Response |
+|--------|-----------------------|----------|
+| Phase 1 purpose revised repeatedly | ~3 times | "It is recommended to break the problem into smaller parts. Please pick just one core focus." |
+| Phase 7 consecutive L grades | ~2 times | "It is recommended to add more sources or narrow the problem scope before retrying." |
+| Accumulated Gate failures | ~5 times | "Working directly may be more efficient. Would you like to abort the pipeline?" |
 
-## 4. 연쇄 Gate 실패 (서킷 브레이커)
+## 4. Cascading Gate Failures (Circuit Breaker)
 
-**증상**: 동일 gate가 반복 실패 → 피드백 루프 → 재실패
-**대응**:
-- 동일 gate ~2회 연속 실패 시: 실패 이유를 비교하여 패턴 보고
-- 동일 gate ~3회 연속 실패 시:
+**Symptom**: The same gate fails repeatedly → Feedback Loop → fails again
+**Response**:
+- ~2 consecutive failures at the same gate: compare failure reasons and report the pattern
+- ~3 consecutive failures at the same gate:
   ```
-  Phase {N} gate가 {N}회 연속 실패했습니다.
-  추정 원인: {패턴}
-  선택지: (1) 이 gate를 수동 승인하고 진행  (2) 이전 Phase로 복귀  (3) 파이프라인 중단
+  Phase {N} gate has failed {N} times consecutively.
+  Estimated cause: {pattern}
+  Options: (1) Manually approve this gate and continue  (2) Return to previous Phase  (3) Abort pipeline
   ```
 
-> 관련: verify Phase 7 [반복 실패 패턴 탐지](../../verify/SKILL.md) — `_verify-log.md`에서 연속 Fail 패턴을 감지하여 보고한다.
+> Related: verify Phase 7 [Repeated Failure Pattern Detection](../../verify/SKILL.md) — detects and reports consecutive Fail patterns in `_verify-log.md`.
 
-## 5. 추측 침투 방지
+## 5. Speculation Infiltration Prevention
 
-**문제**: G6 / Phase 7에서만 잡히는 근거 없는 주장
-**현재 파이프라인에서 가능한 대응 (Phase 3 + Phase 7)**:
-- Phase 3 선택 시: 신뢰도(reliability) 기준을 엄격히 적용 — 출처가 불명확한 항목은 Keep 대신 Skip
-- Phase 7 검증: "Speculation" 체크에서 소스 근거 없는 주장을 감지 → 피드백 루프로 Phase 2 재수집
+**Problem**: Unfounded claims caught only at G6 / Phase 7
+**Possible responses within the current pipeline (Phase 3 + Phase 7)**:
+- During Phase 3 selection: apply Reliability criteria strictly — items with unclear sources should be Skip rather than Keep
+- Phase 7 verification: detect claims without source evidence in the "Speculation" check → Feedback Loop to re-collect in Phase 2
 
-> **참고**: Phase 4 구조화 단계에 `[source: ...]` 인라인 태그가 추가되었다. 각 항목에 출처를 표시하여 Phase 7 추측 검증의 근거로 사용한다. 상세는 `skills/build/SKILL.md`의 Phase 4 구조화 규칙 및 `skills/verify/SKILL.md`의 추측 점검 기준을 참조.
+> **Note**: `[source: ...]` inline tags have been added to the Phase 4 structuring step. Each item is tagged with its source to serve as evidence for Phase 7 Speculation verification. See the Phase 4 structuring rules in `skills/build/SKILL.md` and the Speculation check criteria in `skills/verify/SKILL.md` for details.
 
-## 6. 세션 중단 복구
+## 6. Mid-Session Interruption Recovery
 
-**증상**: 파이프라인 실행 중 세션이 종료됨
-**원인**: 사용자 중단, 연결 끊김, 타임아웃
-**대응**:
-1. `_phase1-result.md` 존재 여부 확인
-2. `_context-session.md` 존재 여부 확인
-3. 마지막 완료된 Phase의 산출물을 기준으로 해당 서브 스킬부터 재개
-4. 산출물이 전혀 없으면 `/context-engineering:gather`부터 다시 시작
+**Symptom**: Session ends while pipeline is running
+**Cause**: User interruption, connection drop, timeout
+**Response**:
+1. Check whether `_phase1-result.md` exists
+2. Check whether `_context-session.md` exists
+3. Resume from the sub-skill corresponding to the last completed Phase's artifacts
+4. If no artifacts exist at all, restart from `/context-engineering:gather`
 
-## 7. 소스 완전 부재
+## 7. Complete Absence of Sources
 
-**증상**: Phase 2에서 수집할 소스가 전혀 없음
-**원인**: 신규 프로젝트, 문서 미비, 일반 질문
-**대응**:
-1. "저장된 지식에서 관련 항목을 찾지 못했습니다. 일반 지식으로 진행합니다." 안내
-2. Phase 3에서 Keep 항목 0건이면 Phase 1 purpose만으로 진행 가능 여부 판단
-3. 진행 불가 시: "소스가 부족합니다. 참고할 수 있는 문서나 URL을 제공해주세요."
+**Symptom**: No sources available to collect in Phase 2
+**Cause**: New project, insufficient documentation, general question
+**Response**:
+1. Inform the user: "No relevant items were found in stored knowledge. Proceeding with general knowledge."
+2. In Phase 3, if Keep items total 0, determine whether it is possible to proceed using only the Phase 1 purpose
+3. If proceeding is not possible: "Sources are insufficient. Please provide documents or URLs that can be referenced."
 
-> 관련: [gather Phase 2 KB 검색 강화](../../gather/SKILL.md) — KB 미존재 시 검색 단계를 건너뛰는 가드 조건.
+> Related: [gather Phase 2 KB search enhancement](../../gather/SKILL.md) — guard condition that skips the search step when no KB exists.
 
-## 8. 파이프라인 중 컴팩션 발생
+## 8. Compaction During Pipeline Execution
 
-**증상**: Phase 진행 중 모델의 컨텍스트 윈도우가 압축됨
-**원인**: 대화가 길어져 자동 컴팩션 트리거
-**대응**:
-1. `_phase1-result.md`에서 Phase 1 결과 복원
-2. 현재 Phase의 산출물이 대화에 남아있는지 확인
-3. 산출물 유실 시 해당 Phase의 게이트부터 재평가
-4. 각 SKILL.md 핵심 계약은 첫 5,000토큰 내에 위치하므로 행동 규칙은 유지됨
+**Symptom**: The model's Context window is compressed while a Phase is in progress
+**Cause**: Conversation grows long enough to trigger automatic compaction
+**Response**:
+1. Restore Phase 1 results from `_phase1-result.md`
+2. Verify whether the current Phase's artifacts remain in the conversation
+3. If artifacts are lost, re-evaluate starting from that Phase's Gate
+4. Core behavioral contracts in each SKILL.md are placed within the first 5,000 tokens, so behavioral rules are preserved
 
 ---
 
-## 정상 vs 실패 빠른 판단
+## Normal vs Failure Quick Reference
 
-| 지표 | 정상 범위 | 실패 신호 |
-|------|---------|---------|
-| Phase 3 Skip 비율 | 30-70% | 90%+ (소스 품질 문제) 또는 0% (필터링 부재) |
-| Phase 5 압축률 | 목표 범위 내 | 목표 대비 2배 이상 초과 |
-| Phase 7 신뢰도 | H 또는 M | L (소스 부족 또는 충돌) |
-| Gate 실패 누적 | 0-2회 | ~5회+ (파이프라인 부적합) |
+| Metric | Normal Range | Failure Signal |
+|--------|-------------|----------------|
+| Phase 3 Skip ratio | 30–70% | 90%+ (source quality issue) or 0% (no filtering) |
+| Phase 5 compression ratio | Within target range | More than 2× over target |
+| Phase 7 Reliability | H or M | L (insufficient sources or Conflict) |
+| Accumulated Gate failures | 0–2 | ~5+ (pipeline not suitable) |
