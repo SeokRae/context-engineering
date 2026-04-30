@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "context-engineering",
+  "name": "seokrae-plugins-official",
   "description": "7-Phase Context Engineering pipeline plugin — problem definition, collection, selection, structuring, compression, output generation, and verification",
   "owner": {
     "name": "SeokRae",
